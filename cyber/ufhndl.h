@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "exceptions.h"
 
 class FileHandle
 {
@@ -24,9 +25,12 @@ public:
 	static unsigned int countLines(const std::string& filepath);
 	static std::string current_path();
 	static std::string parent_path(const std::string& szFilePath);
+	static std::string absolute_path(const std::string& szFilePath);
 	static void rename(const std::string& szSource, const std::string& szRename);
 	static uintmax_t file_size(const std::string& szFilePath);
 	static bool exists(const std::string& szFilePath);
+	static PanicException BuildException(const std::string& msg);
+
 };
 
 

@@ -102,7 +102,7 @@ class PanicException :
 	public ProgramException {
 public:
 	PanicException(std::any val, const location& loc)
-		:ProgramException("PanicException", "", loc, Severity().LOW()), m_value{ val }{}
+		:ProgramException("PanicException:", "of type " + std::string(val.type().name()), loc, Severity().LOW()), m_value{val}{}
 	~PanicException() {}
 
 	virtual std::any value() { return m_value; }
@@ -118,4 +118,13 @@ public:
 	IOException(const std::string& msg, const location& loc)
 		:ProgramException("IOException", msg, loc, Severity().LOW()){}
 	~IOException() {}
+};
+
+
+class ImportException :
+	public ProgramException {
+public:
+	ImportException(const std::string& msg, const location& loc)
+		:ProgramException("ImportException", msg, loc, Severity().LOW()) {}
+	~ImportException() {}
 };

@@ -59,10 +59,15 @@ public:
 
 	std::any assert_or_convert_type(const param& p, std::any obj, const location& loc);
 
-
 	std::shared_ptr<execution_context> get_context();
+
 private:
 
+	void CompleteImport(const std::string& szFile, const location& loc);
+	bool AddModule(const std::string& szFile);
+	void FlushImports();
+	void FlushImport(const std::string& szFile);
+	bool isImported(const std::string& szFile);
 	void Validate();
 	std::shared_ptr<activation_record> acceptBlock_KeepEnvironment(std::shared_ptr<block> blk);
 	
@@ -71,5 +76,7 @@ private:
 	std::shared_ptr<tokenizer> m_tokenizer{ nullptr };
 	std::shared_ptr<parser> m_parser{ nullptr };
 	unsigned int m_arIndex{ 0 };
+
+	std::map<std::string, bool> m_imports;
 };
 

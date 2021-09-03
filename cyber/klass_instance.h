@@ -38,6 +38,32 @@ public:
 		return out;
 	}
 
+	template <class Ty>
+	Ty Get(std::string szName, const location& loc) {
+		std::any out;
+		if (!m_ar->environment->get(szName, out)) {
+			throw ProgramException("unable to get value from key " + szName, loc);
+		}
+		if (out.type() != typeid(Ty)) {
+			throw ProgramException("type mismatch in assertion type " + std::string(out.type().name()) + " != " + std::string(typeid(Ty).name()), loc);
+		}
+		return std::any_cast<Ty>(out);
+	}
+
+	template <typename Ty>
+	Ty tryGet(const std::string& szKey, Ty defaultValue)
+	{
+		std::any out = nullptr;
+		if (!m_ar->environment->get(szKey, out)) {
+			return defaultValue;
+		}
+
+		if (out.type() != typeid(Ty)) {
+			return defaultValue;
+		}
+		return std::any_cast<Ty>(out);
+	}
+
 	std::string getSignature()
 	{
 		return m_szSignature;
@@ -115,6 +141,32 @@ public:
 			throw ProgramException("unable to get value from key " + szName, loc);
 		}
 		return out;
+	}
+
+	template <class Ty>
+	Ty Get(std::string szName, const location& loc) {
+		std::any out;
+		if (!m_ar->environment->get(szName, out)) {
+			throw ProgramException("unable to get value from key " + szName, loc);
+		}
+		if (out.type() != typeid(Ty)) {
+			throw ProgramException("type mismatch in assertion type " + std::string(out.type().name()) + " != " + std::string(typeid(Ty).name()), loc);
+		}
+		return std::any_cast<Ty>(out);
+	}
+
+	template <typename Ty>
+	Ty tryGet(const std::string& szKey, Ty defaultValue)
+	{
+		std::any out = nullptr;
+		if (!m_ar->environment->get(szKey, out)) {
+			return defaultValue;
+		}
+
+		if (out.type() != typeid(Ty)) {
+			return defaultValue;
+		}
+		return std::any_cast<Ty>(out);
 	}
 
 	std::string toString()

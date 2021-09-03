@@ -27,6 +27,7 @@ std::any print_environment(std::shared_ptr<interpreter> i, _args args);
 
 
 // FileSystem
+std::any fs_relative_path(std::shared_ptr<interpreter> i, _args args);
 std::any fs_copy_file(std::shared_ptr<interpreter> i, _args args);
 std::any fs_remove_all(std::shared_ptr<interpreter> i, _args args);
 std::any fs_read_file(std::shared_ptr<interpreter> i, _args args);
@@ -37,6 +38,7 @@ std::any fs_write_line_to_file(std::shared_ptr<interpreter> i, _args args);
 std::any fs_count_lines(std::shared_ptr<interpreter> i, _args args);
 std::any fs_current_path(std::shared_ptr<interpreter> i, _args args);
 std::any fs_parent_path(std::shared_ptr<interpreter> i, _args args);
+std::any fs_absolute_path(std::shared_ptr<interpreter> i, _args args);
 std::any fs_rename_file(std::shared_ptr<interpreter> i, _args args);
 std::any fs_file_size(std::shared_ptr<interpreter> i, _args args);
 std::any fs_exists(std::shared_ptr<interpreter> i, _args args);

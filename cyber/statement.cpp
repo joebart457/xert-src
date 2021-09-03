@@ -23,7 +23,7 @@ void variable_declaration::accept(std::shared_ptr<interpreter> i)
 
 void inject_statement::accept(std::shared_ptr<interpreter> i)
 {
-	i->acceptImportStatement(std::static_pointer_cast<inject_statement>(shared_from_this()));
+	i->acceptInjectStatement(std::static_pointer_cast<inject_statement>(shared_from_this()));
 }
 
 void return_statement::accept(std::shared_ptr<interpreter> i)

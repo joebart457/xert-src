@@ -1,4 +1,4 @@
-
+print("Executing in " + FileSystem.WorkingDirectory);
 
 class Op{
 

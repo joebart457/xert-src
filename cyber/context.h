@@ -15,8 +15,7 @@
 #include "callable.h"
 #include "OperatorHandler.h"
 #include "Utilities.h"
-#include "tokenizer.hpp"
-#include "parser.h"
+
 
 
 struct activation_record {
@@ -120,7 +119,7 @@ public:
 			std::shared_ptr<activation_record> ar = crawler.next();
 			std::any out;
 			if (ar->environment->get(szKey, out)) {
-				return retrieve_callable(out);
+				return Utilities().getCallable(out);
 			}
 		}
 		throw ProgramException("unable to retrieve callable with key '" + szKey + "'", loc);
@@ -167,28 +166,6 @@ public:
 	}
 
 
-	std::shared_ptr<callable> retrieve_callable(std::any callee) {
-		if (callee.type() == typeid(std::shared_ptr<callable>)) {
-			return std::any_cast<std::shared_ptr<callable>>(callee);
-		}
-		else if (callee.type() == typeid(std::shared_ptr<native_fn>)) {
-			return std::any_cast<std::shared_ptr<native_fn>>(callee);
-		}
-		else if (callee.type() == typeid(std::shared_ptr<binary_fn>)) {
-			return std::any_cast<std::shared_ptr<binary_fn>>(callee);
-		}
-		else if (callee.type() == typeid(std::shared_ptr<unary_fn>)) {
-			return std::any_cast<std::shared_ptr<unary_fn>>(callee);
-		}
-		else if (callee.type() == typeid(std::shared_ptr<custom_fn>)) {
-			return std::any_cast<std::shared_ptr<custom_fn>>(callee);
-		}
-		else {
-			throw ProgramException("unable to convert type " + std::string(callee.type().name()) + " to callable type", location());
-		}
-	}
-
-
 	std::shared_ptr<activation_record> current_ar()
 	{
 		if (m_records.size() == 0) throw ProgramException("no activation record to execute", location(), Severity().CRITICAL());
@@ -204,6 +181,25 @@ public:
 	std::shared_ptr<callable> getOperator(const std::string& szName, std::vector<std::any> args)
 	{
 		return m_opHandler->getOperator(Utilities().createOperatorSignature(szName, args));
+	}
+
+
+	template <typename Ty>
+	Ty tryGet(const std::string& szKey, Ty defaultValue)
+	{
+		std::any out = nullptr;
+		rlist_crawler<std::shared_ptr<activation_record>> crawler(m_records);
+		while (!crawler.end()) {
+			std::shared_ptr<activation_record> ar = crawler.next();
+			if (ar->environment->get(szKey, out)) {
+				break;
+			}
+		}
+
+		if (out.type() != typeid(Ty)) {
+			return defaultValue;
+		}
+		return std::any_cast<Ty>(out);
 	}
 
 private:
@@ -223,8 +219,6 @@ private:
 	unsigned int m_index{ 0 };
 	std::vector<std::shared_ptr<activation_record>> m_records;
 	std::shared_ptr<OperatorHandler> m_opHandler{ nullptr };
-	std::shared_ptr<tokenizer> m_tokenizer{ nullptr };
-	std::shared_ptr<parser> m_parser{ nullptr };
 };
 
 #endif

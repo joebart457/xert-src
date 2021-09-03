@@ -135,11 +135,6 @@ protected:
 };
 
 
-bool isMLCommentEnclosing(tokenizer_rule rule) {
-	return rule.getType() == TOKEN_TYPE_ML_COMMENT_ENCLOSING;
-}
-
-
 class tokenizer
 {
 public:
@@ -245,8 +240,8 @@ private:
 				continue;
 			}
 
-			if (next(2) == "&*") {
-				advance(2);
+			if (m_cCurrent == '~') {
+				advance();
 				return tokenliteral();
 			}
 
@@ -457,7 +452,7 @@ private:
 	token tokenliteral()
 	{
 		std::string result{ "" };
-		while (!m_bAtEnd && m_cCurrent != '&') {
+		while (!m_bAtEnd && m_cCurrent != '~') {
 			result.push_back(m_cCurrent);
 			advance();
 		}
@@ -478,7 +473,9 @@ private:
 
 	void mlcomment()
 	{
-		auto it = std::find_if(m_rules.begin(), m_rules.end(), isMLCommentEnclosing);
+		auto it = std::find_if(m_rules.begin(), m_rules.end(), [](tokenizer_rule rule) {
+			return rule.getType() == TOKEN_TYPE_ML_COMMENT_ENCLOSING;
+		});
 		std::string enclosing = it != m_rules.end() ? it->getValue() : "\n"; // if enclosing is not found, default to newline
 
 		while (!m_bAtEnd && next(enclosing.size()) != enclosing) {

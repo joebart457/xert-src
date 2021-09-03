@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <filesystem>
-#include "exceptions.h"
 
 FileHandle::FileHandle()
 {
@@ -36,7 +35,7 @@ std::vector<std::string> FileHandle::readFile(const std::string& filepath) {
 		return fileData;
 	}
 	else {
-		throw PanicException(IOException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open", location()), location());
+		throw BuildException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open");
 	}
 }
 
@@ -57,7 +56,7 @@ std::string FileHandle::readLine(const std::string& filepath, unsigned int lineN
 		return fileData;
 	}
 	else {
-		throw PanicException(IOException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open", location()), location());
+		throw BuildException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open");
 	}
 }
 
@@ -73,7 +72,7 @@ unsigned int FileHandle::countLines(const std::string& filepath) {
 		return counter;
 	}
 	else {
-		throw PanicException(IOException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open", location()), location());
+		throw BuildException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open");
 	}
 }
 
@@ -90,7 +89,7 @@ std::string FileHandle::readFileAsString(const std::string& filepath)
 		return fileData;
 	}
 	else {
-		throw PanicException(IOException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open", location()), location());
+		throw BuildException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open");
 	}
 }
 
@@ -105,7 +104,7 @@ void FileHandle::writeToFile(const std::string& filepath, std::vector<std::strin
 		return;
 	}
 	else {
-		throw PanicException(IOException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open", location()), location());
+		throw BuildException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open");
 	}
 }
 
@@ -117,7 +116,7 @@ void FileHandle::writeLine(const std::string& filepath, std::string data, bool o
 		return;
 	}
 	else {
-		throw PanicException(IOException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open", location()), location());
+		throw BuildException("unable to perform io operation on file '" + filepath + "'; file not found or unable to open");
 	}
 }
 
@@ -133,6 +132,12 @@ std::string FileHandle::parent_path(const std::string& szFilePath)
 	return fp.parent_path().string();
 }
 
+std::string FileHandle::absolute_path(const std::string& szFilePath)
+{
+	return std::filesystem::absolute(szFilePath).string();
+}
+
+
 void FileHandle::rename(const std::string& szSource, const std::string& szRename)
 {
 	std::filesystem::rename(szSource, szRename);
@@ -146,4 +151,11 @@ uintmax_t FileHandle::file_size(const std::string& szFilePath)
 bool FileHandle::exists(const std::string& szFilePath)
 {
 	return std::filesystem::exists(szFilePath);
+}
+
+PanicException FileHandle::BuildException(const std::string& msg)
+{
+	PanicException pe(IOException(msg, location()), location());
+	pe.addStackTrace(msg, location());
+	return pe;
 }

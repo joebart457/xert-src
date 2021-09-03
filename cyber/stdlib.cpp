@@ -4,8 +4,6 @@
 #include "db_framework.h"
 #include "ufhndl.h"
 #include "Utilities.h"
-#include "tokenizer.hpp"
-#include "parser.h"
 
 
 
@@ -111,6 +109,14 @@ std::any print_environment(std::shared_ptr<interpreter> i, _args args)
 
 
 // FileSystem
+std::any fs_relative_path(std::shared_ptr<interpreter> i, _args args)
+{
+	auto context = Utilities().fetch_context(i);
+	auto fs = context->get<std::shared_ptr<klass_definition>>("FileSystem");
+	auto wd = fs->Get<std::string>("WorkingDirectory", location());
+	return wd + "/" + args.get<std::string>(0);
+}
+
 std::any fs_copy_file(std::shared_ptr<interpreter> i, _args args)
 {
 	FileHandle().copyFile(args.get<std::string>(0), args.get<std::string>(1));
@@ -166,6 +172,12 @@ std::any fs_parent_path(std::shared_ptr<interpreter> i, _args args)
 {
 	return FileHandle().parent_path(args.get<std::string>(0));
 }
+
+std::any fs_absolute_path(std::shared_ptr<interpreter> i, _args args)
+{
+	return FileHandle().absolute_path(args.get<std::string>(0));
+}
+
 
 std::any fs_rename_file(std::shared_ptr<interpreter> i, _args args)
 {

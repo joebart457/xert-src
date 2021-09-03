@@ -32,6 +32,45 @@ void interpreter::Validate()
 	}
 }
 
+void interpreter::CompleteImport(const std::string& szFile, const location& loc)
+{
+	if (m_imports.count(szFile) && !m_imports[szFile]) {
+		m_imports[szFile] = true;
+		return;
+	}
+	throw PanicException(ImportException("unable to complete import of module '" + szFile + "'", loc), loc);
+}
+
+bool interpreter::AddModule(const std::string& szFile)
+{
+	if (m_imports.count(szFile)) {
+		return !m_imports[szFile];
+	}
+	m_imports[szFile] = false;
+	return true;
+}
+
+void interpreter::FlushImports()
+{
+	m_imports.clear();
+}
+
+void interpreter::FlushImport(const std::string& szFile)
+{
+	if (m_imports.count(szFile)) {
+		m_imports[szFile] = 0;
+	}
+}
+
+
+bool interpreter::isImported(const std::string& szFile)
+{
+	if (m_imports.count(szFile)) {
+		return m_imports[szFile];
+	}
+	return false;
+}
+
 std::shared_ptr<execution_context> interpreter::get_context()
 {
 	return m_context;
@@ -109,11 +148,42 @@ void interpreter::acceptVariableDeclaration(std::shared_ptr<variable_declaration
 
 void interpreter::acceptInjectStatement(std::shared_ptr<inject_statement> inject_stmt)
 {
-	std::any szInFile = acceptExpression(inject_stmt->m_expr);
-	if (szInFile.type() != typeid(std::string)) {
+
+	std::any inFile = acceptExpression(inject_stmt->m_expr);
+	if (inFile.type() != typeid(std::string)) {
 		throw ProgramException("expect <expr> to resolve to filename in inject_statement", location());
 	}
-	interpret(m_parser->parse(m_tokenizer->tokenize(FileHandle().readFileAsString(std::any_cast<std::string>(szInFile)))));
+	std::string szInFile = FileHandle().absolute_path(std::any_cast<std::string>(inFile));
+	if (!AddModule(szInFile)) {
+		// if module is already imported, we skip re-importing it
+		return;
+	}
+	std::string previous_wd = FileHandle().current_path();
+
+	auto fs = m_context->tryGet<std::shared_ptr<klass_definition>>("FileSystem", nullptr);
+	if (fs != nullptr) {
+		previous_wd = fs->tryGet<std::string>("WorkingDirectory", FileHandle().current_path());
+		fs->Define("WorkingDirectory", FileHandle().absolute_path(FileHandle().parent_path(szInFile)), inject_stmt->m_loc, true);
+	}
+	try {
+		interpret(m_parser->parse(m_tokenizer->tokenize(FileHandle().readFileAsString(szInFile))));
+		CompleteImport(szInFile, inject_stmt->m_loc);
+	}
+	catch (PanicException pe) {
+		if (fs != nullptr) {
+			fs->Define("WorkingDirectory", previous_wd, inject_stmt->m_loc, true);
+		}
+		throw pe;
+	}
+	catch (ProgramException pe) {
+		if (fs != nullptr) {
+			fs->Define("WorkingDirectory", previous_wd, inject_stmt->m_loc, true);
+		}
+		throw pe;
+	}
+	if (fs != nullptr) {
+		fs->Define("WorkingDirectory", previous_wd, inject_stmt->m_loc, true);
+	}
 }
 
 void interpreter::acceptReturnStatement(std::shared_ptr<return_statement> return_stmt)

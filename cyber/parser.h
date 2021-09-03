@@ -54,6 +54,10 @@ public:
 			return parse_variable_declaration();
 		}
 
+		if (m_pi.match(Keywords().INJECT())) {
+			return parse_inject();
+		}
+
 		throw ParsingException("unrecognized token in toplevel: " + m_pi.current().toStr() + "; expect declaration only in toplevel",  m_pi.current().loc());
 	}
 
@@ -112,6 +116,10 @@ public:
 
 	std::shared_ptr<statement> parse_statement()
 	{
+		if (m_pi.match(Keywords().INJECT())) {
+			return parse_inject();
+		}
+		// Remove^
 		if (m_pi.match(Keywords().IF())) {
 			return parse_if();
 		}

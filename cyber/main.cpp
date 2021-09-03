@@ -1,46 +1,40 @@
 
-
 #include <iostream>
-#include <conio.h>
+#include <vector>
+#include <string>
+#include <filesystem>
 
+#include "language_main.h"
 
-#include "parser.h"
-
-#include "ContextBuilder.h"
-#include "ufhndl.h"
+void displayUsage();
 
 int main(int argc, char** argv)
 {
-	std::shared_ptr<interpreter> i = ContextBuilder().BuildInterpreter();
-	std::shared_ptr<tokenizer> t = ContextBuilder().BuildTokenizer();
-	parser p;
-	std::string input{ "" };
-	bool showTokens{ false };
-	std::cout << ">>> ";
-	while (std::getline(std::cin, input)) {
-		if (input == "exit") {
-			break;
-		}
-		else if (input == "show-tokens") {
-			showTokens = !showTokens;
-			std::cout << ">>>";
-			continue;
-		}
-		try {
-			i->interpret(p.parse(t->tokenize(input, showTokens)));
-		}
-		catch (ParsingException p) {
-			std::cout << p.fullTrace() << std::endl;
-		}
-		catch (ProgramException pe) {
-			std::cout << pe.fullTrace() << std::endl;
-		}
-		catch (std::exception e) {
-			std::cout << e.what() << std::endl;
-		}
-		std::cout << ">>> ";
-	}
+	language_main lang;
 
-	std::cout << "Press any key to exit...";
-	_getch();
+	if (argc > 1) {
+		if (_stricmp(argv[1], "-h")) {
+			displayUsage();
+		}
+		else {
+			std::string szRunFile = argv[1];
+			std::vector<std::string> clArgs;
+			for (int i{ 0 }; i < argc; i++) {
+				clArgs.push_back(argv[i]);
+			}
+			return lang.run_file(std::filesystem::absolute(szRunFile).string(), clArgs);
+		}
+	}
+	else {
+		lang.repl();
+	}
+	return 0;
+}
+
+
+void displayUsage() {
+	std::cout << "usage:  xert *(options)" << std::endl;
+	std::cout << "\toption		|  desc" << std::endl;
+	std::cout << "\t-h			| display this message" << std::endl;
+	std::cout << "\t<filename>	| execute file <filename> with remaining arguments passed to program entry point" << std::endl;
 }

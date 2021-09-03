@@ -7,6 +7,7 @@
 #include <any>
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 
 #include "db_helper.h"
 #include "interpreter.h"
@@ -64,7 +65,7 @@ public:
         sys_env_ar->environment = std::make_shared<scope<std::any>>();
 
         e->define("System",
-            std::make_shared<klass_definition>("list", sys_env_ar),
+            std::make_shared<klass_definition>("System", sys_env_ar),
             true);
 
         // List
@@ -90,6 +91,10 @@ public:
         std::shared_ptr<activation_record> fs_env_ar = std::make_shared<activation_record>();
         fs_env_ar->szAlias = "FileSystem";
         fs_env_ar->environment = std::make_shared<scope<std::any>>();
+        fs_env_ar->environment->define("relative_path",
+            std::make_shared<native_fn>("relative_path", fs_relative_path, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>())
+        );
         fs_env_ar->environment->define("copy",
             std::make_shared<native_fn>("copy", fs_copy_file, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>())
@@ -134,6 +139,10 @@ public:
             std::make_shared<native_fn>("parent_path", fs_parent_path, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>())
         );
+        fs_env_ar->environment->define("absolute_path",
+            std::make_shared<native_fn>("absolute_path", fs_absolute_path, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>())
+        );
         fs_env_ar->environment->define("rename",
             std::make_shared<native_fn>("rename", fs_rename_file, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>())
@@ -146,6 +155,10 @@ public:
         fs_env_ar->environment->define("exists",
             std::make_shared<native_fn>("exists", fs_exists, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>())
+        );
+        fs_env_ar->environment->define("WorkingDirectory",
+            std::filesystem::current_path().string(),
+            true
         );
 
         e->define("FileSystem",
