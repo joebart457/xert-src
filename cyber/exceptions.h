@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "location.h"
+#include "Utilities.h"
 
 class Severity {
 public:
@@ -106,6 +107,23 @@ public:
 	~PanicException() {}
 
 	virtual std::any value() { return m_value; }
+
+	std::string what()
+	{
+		std::ostringstream oss;
+		oss << "{" << m_szSeverity << "}[" << m_szType << "] " << "(value:" << Utilities().stringify(m_value) << ")" << m_szMsg;
+		return oss.str();
+	}
+
+	virtual std::string fullTrace()
+	{
+		std::ostringstream oss;
+		oss << "[" << m_loc.y() << "][" << m_loc.x() << "] " << m_szType << ": " << "(value:" << Utilities().stringify(m_value) << ")" << m_szMsg << "\n";
+		for (auto trace : m_trace) {
+			oss << "\tat [" << trace.loc.y() << "][" << trace.loc.x() << "] " << trace.szMsg << "\n";
+		}
+		return oss.str();
+	}
 
 protected:
 	std::any m_value;

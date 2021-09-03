@@ -237,3 +237,103 @@ std::shared_ptr<binary_fn> binary_fn::registerParameter(const param& p)
 	m_params.push_back(p);
 	return std::static_pointer_cast<binary_fn>(shared_from_this());
 }
+
+
+
+#ifdef BUILD_WINDOWS
+
+// Loaded native
+
+
+std::any loaded_native_fn::call(std::shared_ptr<interpreter> c, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(c);
+
+	std::any ret = nullptr;
+	context->push_ar(m_enclosing);
+
+	try {
+		std::vector<std::any> cleanedArgs;
+		if (!m_variadic) {
+			if (args.size() != m_params.size()) {
+				throw ProgramException("parity_mismatch", "expected " + std::to_string(m_params.size())
+					+ " arguments but got " + std::to_string(args.size()), location());
+			}
+
+			for (unsigned int i{ 0 }; i < m_params.size(); i++) {
+				std::any arg = c->assert_or_convert_type(m_params.at(i), args.at(i), location());
+				cleanedArgs.push_back(arg);
+			}
+		}
+		else {
+
+			if (args.size() < m_variadic_after) {
+				throw ProgramException("parity_mismatch", "expected at least " + std::to_string(m_params.size())
+					+ " arguments but got " + std::to_string(args.size()), location());
+			}
+
+			unsigned int i{ 0 };
+			for (i; i < m_variadic_after; i++) {
+				std::any arg = c->assert_or_convert_type(m_params.at(i), args.at(i), location());
+				cleanedArgs.push_back(arg);
+			}
+
+			for (unsigned int j{ i }; j < args.size(); j++) {
+				cleanedArgs.push_back(args.at(j));
+			}
+
+		}
+
+		ret = m_hFn(c, _args(cleanedArgs));
+	}
+	catch (ReturnException ret) {
+		// Reset environment
+		context->pop_ar();
+
+		throw ret;
+	}
+	catch (PanicException pe) {
+		// Reset environment
+		context->pop_ar();
+
+		throw pe;
+	}
+	catch (ProgramException pe) {
+		// Reset environment
+		context->pop_ar();
+
+		// throw error
+		throw pe;
+	}
+
+	context->pop_ar();
+	return ret;
+
+}
+
+void loaded_native_fn::setEnclosing(std::shared_ptr<activation_record> ar)
+{
+	m_enclosing = ar;
+}
+
+std::shared_ptr<loaded_native_fn> loaded_native_fn::setVariadic()
+{
+	m_variadic = true;
+	return std::static_pointer_cast<loaded_native_fn>(shared_from_this());
+}
+
+std::shared_ptr<loaded_native_fn> loaded_native_fn::setVariadicAfter(unsigned int index)
+{
+	if (!m_variadic) throw ProgramException("cannot set variadic index of non-variadic function", location(), Severity().FATAL());
+	if (index > m_params.size()) throw ProgramException("variadic index must be less than parameter size", location(), Severity().FATAL());
+	m_variadic_after = index;
+	return std::static_pointer_cast<loaded_native_fn>(shared_from_this());
+}
+
+std::shared_ptr<loaded_native_fn> loaded_native_fn::registerParameter(const param& p)
+{
+	m_params.push_back(p);
+	return std::static_pointer_cast<loaded_native_fn>(shared_from_this());
+}
+
+#endif

@@ -66,6 +66,9 @@ public:
 			try {
 				i->interpret(p->parse(t->tokenize(szText, bShowTokens)));
 			}
+			catch (PanicException pe) {
+				std::cout << pe.fullTrace();
+			}
 			catch (ProgramException pe) {
 				std::cout << pe.fullTrace();
 			}

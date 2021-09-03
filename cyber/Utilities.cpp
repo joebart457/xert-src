@@ -6,6 +6,7 @@
 #include "klass_instance.h"
 #include "interpreter.h"
 
+#include "BuildDefinitions.h"
 
 void Utilities::check_context(std::shared_ptr<interpreter> i)
 {
@@ -54,6 +55,11 @@ std::string Utilities::stringify(const std::any& obj)
 	else if (obj.type() == typeid(std::shared_ptr<native_fn>)) {
 		oss << (std::any_cast<std::shared_ptr<native_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<native_fn>>(obj)->getSignature());
 	}
+#ifdef BUILD_WINDOWS
+	else if (obj.type() == typeid(std::shared_ptr<loaded_native_fn>)) {
+		oss << (std::any_cast<std::shared_ptr<loaded_native_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<loaded_native_fn>>(obj)->getSignature());
+	}
+#endif
 	else if (obj.type() == typeid(std::shared_ptr<binary_fn>)) {
 		oss << (std::any_cast<std::shared_ptr<binary_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<binary_fn>>(obj)->getSignature());
 	}
@@ -138,6 +144,11 @@ std::shared_ptr<callable> Utilities::getCallable(std::any callee) {
 	else if (callee.type() == typeid(std::shared_ptr<native_fn>)) {
 		return std::any_cast<std::shared_ptr<native_fn>>(callee);
 	}
+#ifdef BUILD_WINDOWS
+	else if (callee.type() == typeid(std::shared_ptr<loaded_native_fn>)) {
+		return std::any_cast<std::shared_ptr<loaded_native_fn>>(callee);
+	}
+#endif
 	else if (callee.type() == typeid(std::shared_ptr<binary_fn>)) {
 		return std::any_cast<std::shared_ptr<binary_fn>>(callee);
 	}

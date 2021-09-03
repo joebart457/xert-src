@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BuildDefinitions.h" />
     <ClInclude Include="callable.h" />
     <ClInclude Include="context.h" />
     <ClInclude Include="ContextBuilder.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="tokenizer.hpp" />
     <ClInclude Include="ufhndl.h" />
     <ClInclude Include="Utilities.h" />
+    <ClInclude Include="win_std_lib.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="callable.cpp" />
@@ -186,6 +188,7 @@
     <ClCompile Include="string_utilities.cpp" />
     <ClCompile Include="ufhndl.cpp" />
     <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="win_std_lib.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

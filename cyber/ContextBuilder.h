@@ -23,7 +23,11 @@
 #include "db_framework.h"
 #include "parser.h"
 
+#include "BuildDefinitions.h"
 
+#ifdef BUILD_WINDOWS
+#include "win_std_lib.h"
+#endif
 
 
 
@@ -64,9 +68,50 @@ public:
         sys_env_ar->szAlias = "System";
         sys_env_ar->environment = std::make_shared<scope<std::any>>();
 
+#ifdef BUILD_WINDOWS
+        /* Windows */
+
+        std::shared_ptr<activation_record> winlib_env_ar = std::make_shared<activation_record>();
+        winlib_env_ar->szAlias = "lib";
+        winlib_env_ar->environment = std::make_shared<scope<std::any>>();
+        winlib_env_ar->environment->define("valid",
+            std::make_shared<native_fn>("valid", win_lib_valid, winlib_env_ar),
+            true
+        );
+
+        // hMod will be defined, but in its ctor not here
+        //winlib_env_ar->environment->define("hMod",
+        //    0,
+        //    true
+        //);
+
+        winlib_env_ar->environment->define("constructor",
+            std::make_shared<native_fn>("constructor", win_lib_constructor, winlib_env_ar)
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
+        winlib_env_ar->environment->define("get_function",
+            std::make_shared<native_fn>("get_function", win_lib_get_function, winlib_env_ar)
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
+        sys_env_ar->environment->define("lib",
+            std::make_shared<klass_definition>("lib", winlib_env_ar),
+            true
+        );
+
+
+
+        /* End Windows */
+#endif
+
         e->define("System",
             std::make_shared<klass_definition>("System", sys_env_ar),
             true);
+
+        // End System
 
         // List
 

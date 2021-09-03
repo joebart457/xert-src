@@ -57,6 +57,9 @@
     <ClCompile Include="ufhndl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="win_std_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="callable.h">
@@ -138,6 +141,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="language_main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win_std_lib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildDefinitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

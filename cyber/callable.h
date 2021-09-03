@@ -14,6 +14,8 @@
 #include "exceptions.h"
 #include "location.h"
 
+#include "BuildDefinitions.h"
+
 class interpreter;
 struct activation_record;
 
@@ -78,7 +80,7 @@ protected:
 };
 
 
-typedef std::any(*func)(std::shared_ptr<interpreter>, _args);
+typedef std::any( *func)(std::shared_ptr<interpreter>, _args);
 
 class native_fn :
 	public callable {
@@ -167,6 +169,33 @@ private:
 	binary_func m_hFn;
 };
 
+#ifdef BUILD_WINDOWS
 
+typedef std::any(__stdcall *hFunc)(std::shared_ptr<interpreter>, _args);
+
+class loaded_native_fn :
+	public callable {
+public:
+	loaded_native_fn(std::string szName, hFunc fn, std::shared_ptr<activation_record> enclosing = nullptr)
+		:callable(szName), m_hFn{ fn }, m_enclosing{ enclosing } {}
+	loaded_native_fn(loaded_native_fn& fn)
+		:callable(fn.m_szName, fn.m_params), m_hFn{ fn.m_hFn }, m_enclosing{ fn.m_enclosing }, m_variadic{ fn.m_variadic }, m_variadic_after{ fn.m_variadic_after } {}
+	~loaded_native_fn() {}
+
+	std::any call(std::shared_ptr<interpreter> c, _args args);
+
+	void setEnclosing(std::shared_ptr<activation_record> ar);
+	std::shared_ptr<loaded_native_fn> setVariadic();
+	std::shared_ptr<loaded_native_fn> setVariadicAfter(unsigned int index);
+
+	std::shared_ptr<loaded_native_fn> registerParameter(const param& p);
+
+private:
+	hFunc m_hFn;
+	std::shared_ptr<activation_record> m_enclosing{ nullptr };
+	bool m_variadic{ false };
+	unsigned int m_variadic_after{ 0 };
+};
+#endif
 
 #endif

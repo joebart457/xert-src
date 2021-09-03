@@ -113,6 +113,14 @@ public:
 				fn->setEnclosing(ar);
 				ar->environment->define(it->first, fn, true);
 			}
+#ifdef BUILD_WINDOWS
+			else if (it->second.type() == typeid(std::shared_ptr<loaded_native_fn>)) {
+				std::shared_ptr<loaded_native_fn> fn = std::any_cast<std::shared_ptr<loaded_native_fn>>(it->second);
+				fn = std::make_shared<loaded_native_fn>(*fn.get());
+				fn->setEnclosing(ar);
+				ar->environment->define(it->first, fn, true);
+			}
+#endif
 		}
 		klass_instance instance = klass_instance(m_szName, alias, ar);
 		ar->environment->define("this", instance, true);
