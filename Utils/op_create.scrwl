@@ -1,0 +1,713 @@
+
+
+class Op{
+
+	string operation = "";
+	string operator = "";
+	string actualTypeOverride = "";
+	
+	function isArithmeticOperator(){
+		return in(this.operation, new list("add", "subtract", "multiply", "divide"));
+	}
+	
+	function constructor(string operation, string operator)
+	{
+		this.operation = operation;
+		this.operator = operator;
+	}
+	
+	function createOperatorDefintion(DataType ty1, DataType ty2){
+		string opNativeSignature = this.operation + "_" +ty1.typeName + "_" + ty2.typeName;
+		string result = "opHandler->registerOperator(
+			std::make_shared<binary_fn>(" + getOperator() + ", " + opNativeSignature +")
+			->registerParameter(BuildParameter<" + ty1.nativeTypeOverride +">())
+			->registerParameter(BuildParameter<" +ty2.nativeTypeOverride +">())
+		);";
+		return result;
+	}
+	
+	
+	function createUnaryOperatorDefinition(DataType ty1){
+		string opNativeSignature = this.operation + "_" +ty1.typeName;
+		string result = "opHandler->registerOperator(
+				std::make_shared<unary_fn>("+getOperator()+", " + opNativeSignature + ")
+				->registerParameter(BuildParameter<" + ty1.nativeTypeOverride + ">())
+			);";
+		return result;
+	}
+	
+	function createNativeUnaryOperatorDeclaraion(DataType ty1){
+		string opNativeSignature = this.operation + "_" +ty1.typeName;
+		string result = "std::any " + opNativeSignature + "(std::shared_ptr<interpreter> i, std::any& rhs);";
+		return result;
+	}
+	
+	function createNativeUnaryOperatorDefinition(DataType ty1){
+		string opNativeSignature = this.operation + "_" +ty1.typeName;
+		string result = "std::any " + opNativeSignature + "(std::shared_ptr<interpreter> i, std::any& rhs)";
+		result = result +"\n{\n";
+		if (ty1.isUnaryOperationSupported(this.operation)){
+			if (this.operation == "negate"){
+				result = result + "\treturn "+ty1.getCast()+"(rhs);\n";
+			} 
+			else if (this.operation == "not"){
+				result = result + "\treturn !Utilities().isTruthy(rhs);\n";
+			} else { 
+				// panic("err");
+			}
+		} 
+		else {
+			result = result + "\tthrow ProgramException(\"Unsupported Operation\", location());\n";
+		}
+		result = result + "}\n";
+		return result;
+	}
+	
+	function createNativeOperatorDeclaraion(DataType ty1, DataType ty2){
+		string opNativeSignature = this.operation + "_" +ty1.typeName + "_" + ty2.typeName;
+		string result = "std::any " + opNativeSignature + "(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);";
+		return result;
+	}
+	
+	function createNativeOperatorDefinition(DataType ty1, DataType ty2){
+		string opNativeSignature = this.operation + "_" +ty1.typeName + "_" + ty2.typeName;
+		string result = "std::any " + opNativeSignature + "(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)";
+		result = result +"\n{\n";
+		if ((ty1.typeName == "null" || ty2.typeName == "null") && (this.operation == "equalequal" || this.operation == "notequal")){
+			if (this.operation == "notequal"){
+				if (ty1.typeName == ty2.typeName){ // if they are both null
+					result = result + "\treturn false;\n";
+				} else {
+					result = result + "\treturn true;\n";
+				}
+			} else {
+				// operation is equalequal
+				if (ty1.typeName == ty2.typeName){ // if they are both null
+					result = result + "\treturn true;\n";
+				} else {
+					result = result + "\treturn false;\n";
+				}
+			}
+		}
+		else if (ty1.isOperationSupported(this.operation, ty2.typeName)){
+			if (this.operation == "divide" && ty1.isNumericType() && ty2.isNumericType()){
+				string rhsModifier = "";
+				string rhsModifierEnclosing = "";
+				string lhsModifier = "";
+				string lhsModifierEnclosing = "";
+				if (ty2.typeName == "bool"){
+					rhsModifier = "static_cast<int>(";
+					rhsModifierEnclosing = ")";
+				}
+				if (ty1.typeName == "bool"){
+					lhsModifier = "static_cast<int>(";
+					lhsModifierEnclosing = ")";
+				}
+			
+				result = result + "auto rhsVal = " + rhsModifier + ty2.getCast() + "(rhs)" + rhsModifierEnclosing + ";\n"
+									+ "\tif (rhsVal == 0) {\n"
+									+	"\t\tthrow ProgramException(\"unable to divide by 0\", location());\n"
+									+"\t}\n"
+									+"\treturn " + lhsModifier + ty1.getCast() + "(lhs)" + lhsModifierEnclosing + "/ rhsVal;\n";
+			} else {
+				string rhsModifier = "";
+				string rhsModifierEnclosing = "";
+				string lhsModifier = "";
+				string lhsModifierEnclosing = "";
+				if (this.operation == "add" && ty1.typeName == "string" && ty2.isNumericType()){
+					rhsModifier = "std::to_string(";
+					rhsModifierEnclosing = ")";
+				} else if (ty1.isNumericType() && ty2.typeName == "bool") {
+					rhsModifier = "static_cast<int>(";
+					rhsModifierEnclosing = ")";
+				}
+				if (ty2.isNumericType() && ty1.typeName == "bool") {
+					lhsModifier = "static_cast<int>(";
+					lhsModifierEnclosing = ")";
+				}
+				
+				result = result + "\treturn " + lhsModifier + ty1.getCast() + "(lhs)" + lhsModifierEnclosing + " " + this.operator + " " + rhsModifier + ty2.getCast() + "(rhs)" + rhsModifierEnclosing + ";\n";
+			}			
+		} 
+		else {
+			result = result + "\tthrow ProgramException(\"Unsupported Operation\", location());\n";
+		}
+		result = result + "}\n";
+		return result;
+	}
+	
+	function getOperator(){
+		return "\"" + this.operator +"\"";
+	}
+}
+
+function in(_ty item, list ls)
+{
+	int counter = 0;
+	while (counter < ls.size){
+		
+		if (ls[counter] == item){
+			return true;
+		}
+		
+		counter = counter + 1;
+	}
+	return false;
+}
+
+
+class DataType{
+	string nativeTypeOverride = "";
+	string typeName = "";
+	list supportedOperations = new list();
+	
+	
+	function constructor(string typeName, string nativeTypeOverride, list supportedOperations)
+	{
+		this.typeName = typeName;
+		this.nativeTypeOverride = nativeTypeOverride;
+		this.supportedOperations = supportedOperations;
+	}
+	
+	function isOperationSupported(string operation, string type)
+	{
+		int counter = 0;
+		while (counter < this.supportedOperations.size){
+			if (this.supportedOperations[counter][0] == operation 
+				&& this.supportedOperations[counter][1] == type)
+			{
+				return true;
+			}
+			counter = counter + 1;
+		}
+		return false;
+	}
+	
+	function isUnaryOperationSupported(string operation)
+	{
+		int counter = 0;
+		while (counter < this.supportedOperations.size){
+			if (this.supportedOperations[counter][0] == operation)
+			{
+				return true;
+			}
+			counter = counter + 1;
+		}
+		return false;
+	}
+	
+	function getCast(){
+		string result = "std::any_cast<" + this.nativeTypeOverride + ">";
+		return result;
+	}
+	
+	function isNumericType(){
+		return in(this.typeName, new list("int", "unsignedlong", "float", "double", "bool"));
+	}
+}
+
+
+list binaryOperations = new list(
+	new Op("add", "+"),
+	new Op("subtract", "-"),
+	new Op("multiply", "*"),
+	new Op("divide", "/"),
+	new Op("lessthan", "<"),
+	new Op("lessthanequal", "<="),
+	new Op("greaterthan", ">"),
+	new Op("greaterthanequal", ">="),
+	new Op("equalequal", "=="),
+	new Op("notequal", "!=")
+);
+
+
+list unaryOperations = new list(
+	new Op("not", "!"),
+	new Op("negate", "-")
+);
+
+
+list types = new list(
+	new DataType("int","int", 
+		new list(
+			new list("negate", ""),
+			new list("not", ""),
+			
+			new list("add", "int"),
+			new list("add", "unsignedlong"),
+			new list("add", "float"),
+			new list("add", "double"),
+			new list("add", "bool"),
+			new list("subtract", "int"),
+			new list("subtract", "unsignedlong"),
+			new list("subtract", "float"),
+			new list("subtract", "double"),
+			new list("subtract", "bool"),
+			new list("multiply", "int"),
+			new list("multiply", "unsignedlong"),
+			new list("multiply", "float"),
+			new list("multiply", "double"),
+			new list("multiply", "bool"),
+			new list("divide", "int"),
+			new list("divide", "unsignedlong"),
+			new list("divide", "float"),
+			new list("divide", "double"),
+			new list("divide", "bool"),
+			new list("lessthan", "int"),
+			new list("lessthan", "unsignedlong"),
+			new list("lessthan", "float"),
+			new list("lessthan", "double"),
+			new list("lessthan", "bool"),
+			new list("lessthanequal", "int"),
+			new list("lessthanequal", "unsignedlong"),
+			new list("lessthanequal", "float"),
+			new list("lessthanequal", "double"),
+			new list("lessthanequal", "bool"),
+			new list("greaterthan", "int"),
+			new list("greaterthan", "unsignedlong"),
+			new list("greaterthan", "float"),
+			new list("greaterthan", "double"),
+			new list("greaterthan", "bool"),
+			new list("greaterthanequal", "int"),
+			new list("greaterthanequal", "unsignedlong"),
+			new list("greaterthanequal", "float"),
+			new list("greaterthanequal", "double"),
+			new list("greaterthanequal", "bool"),
+			new list("equalequal", "int"),
+			new list("equalequal", "unsignedlong"),
+			new list("equalequal", "float"),
+			new list("equalequal", "double"),
+			new list("equalequal", "bool"),
+			new list("equalequal", "null"),
+			new list("notequal", "int"),
+			new list("notequal", "unsignedlong"),
+			new list("notequal", "float"),
+			new list("notequal", "double"),
+			new list("notequal", "bool"),
+			new list("notequal", "null")
+		)
+	),
+	
+	new DataType("unsignedlong", "unsigned long",
+		new list(
+			new list("not", ""),
+			
+			new list("add", "int"),
+			new list("add", "unsignedlong"),
+			new list("add", "float"),
+			new list("add", "double"),
+			new list("add", "bool"),
+			new list("subtract", "int"),
+			new list("subtract", "unsignedlong"),
+			new list("subtract", "float"),
+			new list("subtract", "double"),
+			new list("subtract", "bool"),
+			new list("multiply", "int"),
+			new list("multiply", "unsignedlong"),
+			new list("multiply", "float"),
+			new list("multiply", "double"),
+			new list("multiply", "bool"),
+			new list("divide", "int"),
+			new list("divide", "unsignedlong"),
+			new list("divide", "float"),
+			new list("divide", "double"),
+			new list("divide", "bool"),
+			new list("lessthan", "int"),
+			new list("lessthan", "unsignedlong"),
+			new list("lessthan", "float"),
+			new list("lessthan", "double"),
+			new list("lessthan", "bool"),
+			new list("lessthanequal", "int"),
+			new list("lessthanequal", "unsignedlong"),
+			new list("lessthanequal", "float"),
+			new list("lessthanequal", "double"),
+			new list("lessthanequal", "bool"),
+			new list("greaterthan", "int"),
+			new list("greaterthan", "unsignedlong"),
+			new list("greaterthan", "float"),
+			new list("greaterthan", "double"),
+			new list("greaterthan", "bool"),
+			new list("greaterthanequal", "int"),
+			new list("greaterthanequal", "unsignedlong"),
+			new list("greaterthanequal", "float"),
+			new list("greaterthanequal", "double"),
+			new list("greaterthanequal", "bool"),
+			new list("equalequal", "int"),
+			new list("equalequal", "unsignedlong"),
+			new list("equalequal", "float"),
+			new list("equalequal", "double"),
+			new list("equalequal", "bool"),
+			new list("equalequal", "null"),
+			new list("notequal", "int"),
+			new list("notequal", "unsignedlong"),
+			new list("notequal", "float"),
+			new list("notequal", "double"),
+			new list("notequal", "bool"),
+			new list("notequal", "null")
+		)
+	),
+	new DataType("float","float",
+		new list(
+			new list("negate", ""),
+			new list("not", ""),
+		
+			new list("add", "int"),
+			new list("add", "unsignedlong"),
+			new list("add", "float"),
+			new list("add", "double"),
+			new list("add", "bool"),
+			new list("subtract", "int"),
+			new list("subtract", "unsignedlong"),
+			new list("subtract", "float"),
+			new list("subtract", "double"),
+			new list("subtract", "bool"),
+			new list("multiply", "int"),
+			new list("multiply", "unsignedlong"),
+			new list("multiply", "float"),
+			new list("multiply", "double"),
+			new list("multiply", "bool"),
+			new list("divide", "int"),
+			new list("divide", "unsignedlong"),
+			new list("divide", "float"),
+			new list("divide", "double"),
+			new list("divide", "bool"),
+			new list("lessthan", "int"),
+			new list("lessthan", "unsignedlong"),
+			new list("lessthan", "float"),
+			new list("lessthan", "double"),
+			new list("lessthan", "bool"),
+			new list("lessthanequal", "int"),
+			new list("lessthanequal", "unsignedlong"),
+			new list("lessthanequal", "float"),
+			new list("lessthanequal", "double"),
+			new list("lessthanequal", "bool"),
+			new list("greaterthan", "int"),
+			new list("greaterthan", "unsignedlong"),
+			new list("greaterthan", "float"),
+			new list("greaterthan", "double"),
+			new list("greaterthan", "bool"),
+			new list("greaterthanequal", "int"),
+			new list("greaterthanequal", "unsignedlong"),
+			new list("greaterthanequal", "float"),
+			new list("greaterthanequal", "double"),
+			new list("greaterthanequal", "bool"),
+			new list("equalequal", "int"),
+			new list("equalequal", "unsignedlong"),
+			new list("equalequal", "float"),
+			new list("equalequal", "double"),
+			new list("equalequal", "bool"),
+			new list("equalequal", "null"),
+			new list("notequal", "int"),
+			new list("notequal", "unsignedlong"),
+			new list("notequal", "float"),
+			new list("notequal", "double"),
+			new list("notequal", "bool"),
+			new list("notequal", "null")
+		)
+	),
+	new DataType("double","double",
+		new list(
+			new list("negate", ""),
+			new list("not", ""),
+			
+			new list("add", "int"),
+			new list("add", "unsignedlong"),
+			new list("add", "float"),
+			new list("add", "double"),
+			new list("add", "bool"),
+			new list("subtract", "int"),
+			new list("subtract", "unsignedlong"),
+			new list("subtract", "float"),
+			new list("subtract", "double"),
+			new list("subtract", "bool"),
+			new list("multiply", "int"),
+			new list("multiply", "unsignedlong"),
+			new list("multiply", "float"),
+			new list("multiply", "double"),
+			new list("multiply", "bool"),
+			new list("divide", "int"),
+			new list("divide", "unsignedlong"),
+			new list("divide", "float"),
+			new list("divide", "double"),
+			new list("divide", "bool"),
+			new list("lessthan", "int"),
+			new list("lessthan", "unsignedlong"),
+			new list("lessthan", "float"),
+			new list("lessthan", "double"),
+			new list("lessthan", "bool"),
+			new list("lessthanequal", "int"),
+			new list("lessthanequal", "unsignedlong"),
+			new list("lessthanequal", "float"),
+			new list("lessthanequal", "double"),
+			new list("lessthanequal", "bool"),
+			new list("greaterthan", "int"),
+			new list("greaterthan", "unsignedlong"),
+			new list("greaterthan", "float"),
+			new list("greaterthan", "double"),
+			new list("greaterthan", "bool"),
+			new list("greaterthanequal", "int"),
+			new list("greaterthanequal", "unsignedlong"),
+			new list("greaterthanequal", "float"),
+			new list("greaterthanequal", "double"),
+			new list("greaterthanequal", "bool"),
+			new list("equalequal", "int"),
+			new list("equalequal", "unsignedlong"),
+			new list("equalequal", "float"),
+			new list("equalequal", "double"),
+			new list("equalequal", "bool"),
+			new list("equalequal", "null"),
+			new list("notequal", "int"),
+			new list("notequal", "unsignedlong"),
+			new list("notequal", "float"),
+			new list("notequal", "double"),
+			new list("notequal", "bool"),
+			new list("notequal", "null")
+		)
+	),
+	new DataType("bool","bool",
+		new list(
+			new list("negate", ""),
+			new list("not", ""),
+		
+			new list("add", "int"),
+			new list("add", "unsignedlong"),
+			new list("add", "float"),
+			new list("add", "double"),
+			new list("add", "bool"),
+			new list("subtract", "int"),
+			new list("subtract", "unsignedlong"),
+			new list("subtract", "float"),
+			new list("subtract", "double"),
+			new list("subtract", "bool"),
+			new list("multiply", "int"),
+			new list("multiply", "unsignedlong"),
+			new list("multiply", "float"),
+			new list("multiply", "double"),
+			new list("multiply", "bool"),
+			new list("divide", "int"),
+			new list("divide", "unsignedlong"),
+			new list("divide", "float"),
+			new list("divide", "double"),
+			new list("divide", "bool"),
+			new list("lessthan", "int"),
+			new list("lessthan", "unsignedlong"),
+			new list("lessthan", "float"),
+			new list("lessthan", "double"),
+			new list("lessthan", "bool"),
+			new list("lessthanequal", "int"),
+			new list("lessthanequal", "unsignedlong"),
+			new list("lessthanequal", "float"),
+			new list("lessthanequal", "double"),
+			new list("lessthanequal", "bool"),
+			new list("greaterthan", "int"),
+			new list("greaterthan", "unsignedlong"),
+			new list("greaterthan", "float"),
+			new list("greaterthan", "double"),
+			new list("greaterthan", "bool"),
+			new list("greaterthanequal", "int"),
+			new list("greaterthanequal", "unsignedlong"),
+			new list("greaterthanequal", "float"),
+			new list("greaterthanequal", "double"),
+			new list("greaterthanequal", "bool"),
+			new list("equalequal", "int"),
+			new list("equalequal", "unsignedlong"),
+			new list("equalequal", "float"),
+			new list("equalequal", "double"),
+			new list("equalequal", "bool"),
+			new list("equalequal", "null"),
+			new list("notequal", "int"),
+			new list("notequal", "unsignedlong"),
+			new list("notequal", "float"),
+			new list("notequal", "double"),
+			new list("notequal", "bool"),
+			new list("notequal", "null")
+		)
+	),
+	new DataType("string", "std::string",
+		new list(
+			new list("not", ""),
+			
+			new list("add", "int"),
+			new list("add", "unsignedlong"),
+			new list("add", "float"),
+			new list("add", "double"),
+			new list("add", "bool"),
+			new list("add", "string"),		
+			new list("equalequal", "string"),
+			new list("equalequal", "null"),
+			new list("notequal", "string"),
+			new list("notequal", "null")
+		)
+	),
+	new DataType("null", "std::nullptr_t",
+		new list(
+			new list("negate", ""),
+			new list("not", ""),
+			
+			new list("equalequal", "null"),
+			new list("notequal", "null")
+		)
+	)
+);
+
+
+function createBinaryContextDefinitions(){
+	int counter = 0;
+	while (counter < binaryOperations.size){
+		Op op = binaryOperations[counter];
+		int counter2 = 0;
+		while (counter2 < types.size){
+			DataType ty1 = types[counter2];
+			int counter3 = 0;
+			while (counter3 < types.size){
+				DataType ty2 = types[counter3];
+				print(op.createOperatorDefintion(ty1, ty2));
+				print("\n");
+				counter3 = counter3 + 1;
+			}
+			counter2 = counter2 + 1;
+		}
+		counter = counter + 1;
+	}
+}
+
+
+function createUnaryContextDefinitions(){
+	int counter = 0;
+	while (counter < unaryOperations.size){
+		Op op = unaryOperations[counter];
+		int counter2 = 0;
+		while (counter2 < types.size){
+			DataType ty1 = types[counter2];
+			print(op.createUnaryOperatorDefinition(ty1));
+			print("\n");
+			counter2 = counter2 + 1;
+		}
+		counter = counter + 1;
+	}
+}
+
+
+
+function createUnaryOperatorDeclarations(){
+	int counter = 0;
+	while (counter < unaryOperations.size){
+		Op op = unaryOperations[counter];
+		int counter2 = 0;
+		print("\n/*\n-\n- start " + op.operation + "\n-\n*/\n\n");
+		while (counter2 < types.size){
+			DataType ty1 = types[counter2];
+			print(op.createNativeUnaryOperatorDeclaraion(ty1));
+			print("\n");
+			counter2 = counter2 + 1;
+		}
+		print("\n/*\n-\n- end " + op.operation + "\n-\n*/\n\n");
+		counter = counter + 1;
+	}
+}
+
+function createBinaryOperatorDeclarations(){
+	int counter = 0;
+	while (counter < binaryOperations.size){
+		Op op = binaryOperations[counter];
+		int counter2 = 0;
+		print("\n/*\n-\n- start " + op.operation + "\n-\n*/\n\n");
+		while (counter2 < types.size){
+			DataType ty1 = types[counter2];
+			int counter3 = 0;
+			while (counter3 < types.size){
+				DataType ty2 = types[counter3];
+				print(op.createNativeOperatorDeclaraion(ty1, ty2));
+				print("\n");
+				counter3 = counter3 + 1;
+			}
+			counter2 = counter2 + 1;
+			print("\n");
+		}
+		print("\n/*\n-\n- end " + op.operation + "\n-\n*/\n\n");
+		counter = counter + 1;
+	}
+
+}
+
+
+function createUnaryOperatorDefinitions(){
+	int counter = 0;
+	while (counter < unaryOperations.size){
+		Op op = unaryOperations[counter];
+		int counter2 = 0;
+		print("\n/*\n-\n- start " + op.operation + "\n-\n*/\n\n");
+		while (counter2 < types.size){
+			DataType ty1 = types[counter2];
+			print(op.createNativeUnaryOperatorDefinition(ty1));
+			print("\n");
+			counter2 = counter2 + 1;
+		}
+		print("\n/*\n-\n- end " + op.operation + "\n-\n*/\n\n");
+		counter = counter + 1;
+	}
+}
+
+
+function createBinaryOperatorDefintions(){
+	int counter = 0;
+	while (counter < binaryOperations.size){
+		Op op = binaryOperations[counter];
+		int counter2 = 0;
+		print("\n/*\n-\n- start " + op.operation + "\n-\n*/\n\n");
+		while (counter2 < types.size){
+			DataType ty1 = types[counter2];
+			int counter3 = 0;
+			while (counter3 < types.size){
+				DataType ty2 = types[counter3];
+				print(op.createNativeOperatorDefinition(ty1, ty2));
+				print("\n");
+				counter3 = counter3 + 1;
+			}
+			counter2 = counter2 + 1;
+			print("\n");
+		}
+		print("\n/*\n-\n- end " + op.operation + "\n-\n*/\n\n");
+		counter = counter + 1;
+	}
+}
+
+function createContextDefinitions(){
+	print("/* Auto Generated using op_create.scrwl */\n\n");
+	createUnaryContextDefinitions();
+	createBinaryContextDefinitions();
+	print("/* End Auto Generation */");
+}
+
+
+function createDeclarations(){
+	print("/* Auto Generated using op_create.scrwl */\n\n");
+	createUnaryOperatorDeclarations();
+	createBinaryOperatorDeclarations();
+	print("/* End Auto Generation */");
+}
+
+function createDefinitions(){
+	print("/* Auto Generated using op_create.scrwl */\n\n");
+	createUnaryOperatorDefinitions();
+	createBinaryOperatorDefintions();
+	print("/* End Auto Generation */");
+}
+
+
+function main()
+{
+	//createBinaryContextDefinitions();
+	//createUnaryContextDefinitions();
+	//createUnaryOperatorDeclarations();
+	//createUnaryOperatorDefinitions();
+	//createBinaryOperatorDeclarations();
+	//createBinaryOperatorDefintions();
+	
+	
+	createContextDefinitions();
+	createDeclarations();
+	createDefinitions();
+}
+
+main();
