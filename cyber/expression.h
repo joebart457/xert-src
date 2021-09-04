@@ -245,19 +245,19 @@ class cast :
 	friend class interpreter;
 public:
 	cast(
-		std::shared_ptr<expression> lhs,						// left hand side
+		std::shared_ptr<expression> rhs,							// right hand side
 		std::string op,												// operation to execute
 		std::string szTypeName,										// type to cast to
 		const location& loc											// location of expr
 	)
-		:expression("cast", loc), lhs{ lhs }, op{ op }, szTypeName{ szTypeName }{}
+		:expression("cast", loc), rhs{ rhs }, op{ op }, szTypeName{ szTypeName }{}
 	~cast() {}
 
 	virtual std::any visit(std::shared_ptr<interpreter> i);
 
 
 protected:
-	std::shared_ptr<expression> lhs;
+	std::shared_ptr<expression> rhs;
 	std::string op;
 	std::string szTypeName;
 };

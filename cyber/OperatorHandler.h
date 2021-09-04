@@ -13,7 +13,7 @@ public:
 	OperatorHandler(){}
 	~OperatorHandler(){}
 
-	void registerOperator(std::shared_ptr<callable> op);
+	void registerOperator(std::shared_ptr<callable> op, const std::string& signatureOverride = "");
 	std::shared_ptr<callable> getOperator(std::string szName);
 
 private:

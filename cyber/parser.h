@@ -475,7 +475,13 @@ public:
 			}
 			else if (m_pi.match(Keywords().CAST())) {
 				std::string op = m_pi.previous().lexeme();
-				token type = m_pi.consume(TOKEN_TYPE_WORD, "expected syntax: <expr>::<typename> for cast");
+				token type;
+				if (match_builtin()) {
+					type = m_pi.previous();
+				}
+				else {
+					type = m_pi.consume(TOKEN_TYPE_WORD, "expected syntax: <expr>::<typename> for cast");
+				}
 				expr = std::make_shared<cast>(expr, op, type.lexeme(), type.loc());
 			}
 			else if (m_pi.match(Keywords().LBRACKET())) {

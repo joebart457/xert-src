@@ -42,3 +42,5 @@ std::any fs_absolute_path(std::shared_ptr<interpreter> i, _args args);
 std::any fs_rename_file(std::shared_ptr<interpreter> i, _args args);
 std::any fs_file_size(std::shared_ptr<interpreter> i, _args args);
 std::any fs_exists(std::shared_ptr<interpreter> i, _args args);
+std::any fs_replace_line(std::shared_ptr<interpreter> i, _args args);
+std::any fs_get_unique_name(std::shared_ptr<interpreter> i, _args args);

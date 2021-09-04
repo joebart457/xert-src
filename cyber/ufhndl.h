@@ -30,6 +30,8 @@ public:
 	static uintmax_t file_size(const std::string& szFilePath);
 	static bool exists(const std::string& szFilePath);
 	static PanicException BuildException(const std::string& msg);
+	static std::string getUniqueName(const std::string& base, unsigned int tries = 100);
+	static bool replaceLine(const std::string& szFile, const std::string& newLine, unsigned long lineNumber);
 
 };
 

@@ -17,13 +17,25 @@ class Op{
 	}
 	
 	function createOperatorDefintion(DataType ty1, DataType ty2){
-		string opNativeSignature = this.operation + "_" +ty1.typeName + "_" + ty2.typeName;
-		string result = "opHandler->registerOperator(
-			std::make_shared<binary_fn>(" + getOperator() + ", " + opNativeSignature +")
-			->registerParameter(BuildParameter<" + ty1.nativeTypeOverride +">())
-			->registerParameter(BuildParameter<" +ty2.nativeTypeOverride +">())
-		);";
-		return result;
+	
+		if (this.operation == "cast"){
+			string opNativeSignature = this.operation + "_" +ty1.typeName + "_" + ty2.typeName;
+			string result = "opHandler->registerOperator(
+				std::make_shared<unary_fn>(" + getOperator() + ", " + opNativeSignature +")
+				->registerParameter(BuildParameter<" + ty1.nativeTypeOverride +">()),
+				\"" + this.operator + "(\" + std::string(typeid(" + ty1.nativeTypeOverride + ").name()) + \",\" + std::string(typeid(" + ty2.nativeTypeOverride+").name()) + \")\"
+			);";
+			return result;
+		
+		} else {
+			string opNativeSignature = this.operation + "_" +ty1.typeName + "_" + ty2.typeName;
+			string result = "opHandler->registerOperator(
+				std::make_shared<binary_fn>(" + getOperator() + ", " + opNativeSignature +")
+				->registerParameter(BuildParameter<" + ty1.nativeTypeOverride +">())
+				->registerParameter(BuildParameter<" +ty2.nativeTypeOverride +">())
+			);";
+			return result;
+		}
 	}
 	
 	
@@ -64,9 +76,16 @@ class Op{
 	}
 	
 	function createNativeOperatorDeclaraion(DataType ty1, DataType ty2){
-		string opNativeSignature = this.operation + "_" +ty1.typeName + "_" + ty2.typeName;
-		string result = "std::any " + opNativeSignature + "(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);";
-		return result;
+		if (this.operation == "cast"){
+			string opNativeSignature = this.operation + "_" +ty1.typeName + "_" + ty2.typeName;
+			string result = "std::any " + opNativeSignature + "(std::shared_ptr<interpreter> i, std::any& rhs);";
+			return result;
+		}
+		else {
+			string opNativeSignature = this.operation + "_" +ty1.typeName + "_" + ty2.typeName;
+			string result = "std::any " + opNativeSignature + "(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);";
+			return result;
+		}
 	}
 	
 	function createNativeOperatorDefinition(DataType ty1, DataType ty2){
@@ -90,6 +109,38 @@ class Op{
 			}
 		}
 		else if (ty1.isOperationSupported(this.operation, ty2.typeName)){
+			if (this.operation == "cast"){
+				result = "std::any " + opNativeSignature + "(std::shared_ptr<interpreter> i, std::any& rhs)";
+				result = result +"\n{\n";
+				if (ty1.typeName == ty2.typeName){
+					result = result + "\treturn " + ty1.getCast() + "(rhs);\n";
+				}
+				else if (ty2.typeName == "string"){
+					result = result + "\treturn Utilities().stringify(rhs);\n";
+				}
+				else if (ty2.isNumericType() && ty1.typeName == "string"){
+					// We'll just have to handle these manaully NBD
+					result = result + "\treturn std::foobar(" + ty1.getCast() + "(rhs));\n";
+				}
+				else if (ty2.typeName == "bool"){
+					result = result + "\treturn Utilities().isTruthy(rhs);\n";
+				}
+				else if (ty1.isNumericType() && ty2.isNumericType()){
+					result = result + "\treturn static_cast<" + ty2.nativeTypeOverride + ">(" + ty1.getCast() + "(rhs));\n";
+				}
+				else if (ty1.typeName == "null"){
+					if (ty2.isNumericType()){
+						result = result + "\treturn static_cast<"+ ty2.nativeTypeOverride+">(0);";
+					}
+					// Cannot get here since if its a string its already taken care of and if its null, its the same
+				} 
+				else if (ty2.typeName == "null"){
+					result = result + "\treturn nullptr;\n";
+				}
+				result = result + "}\n";
+				return result;
+				
+			}
 			if (this.operation == "divide" && ty1.isNumericType() && ty2.isNumericType()){
 				string rhsModifier = "";
 				string rhsModifierEnclosing = "";
@@ -217,7 +268,8 @@ list binaryOperations = new list(
 	new Op("greaterthan", ">"),
 	new Op("greaterthanequal", ">="),
 	new Op("equalequal", "=="),
-	new Op("notequal", "!=")
+	new Op("notequal", "!="),
+	new Op("cast", "::")
 );
 
 
@@ -284,7 +336,14 @@ list types = new list(
 			new list("notequal", "float"),
 			new list("notequal", "double"),
 			new list("notequal", "bool"),
-			new list("notequal", "null")
+			new list("notequal", "null"),
+			new list("cast", "int"),
+			new list("cast", "unsignedlong"),
+			new list("cast", "float"),
+			new list("cast", "double"),
+			new list("cast", "bool"),
+			new list("cast", "string"),
+			new list("cast", "null")
 		)
 	),
 	
@@ -343,7 +402,14 @@ list types = new list(
 			new list("notequal", "float"),
 			new list("notequal", "double"),
 			new list("notequal", "bool"),
-			new list("notequal", "null")
+			new list("notequal", "null"),
+			new list("cast", "int"),
+			new list("cast", "unsignedlong"),
+			new list("cast", "float"),
+			new list("cast", "double"),
+			new list("cast", "bool"),
+			new list("cast", "string"),
+			new list("cast", "null")
 		)
 	),
 	new DataType("float","float",
@@ -402,7 +468,14 @@ list types = new list(
 			new list("notequal", "float"),
 			new list("notequal", "double"),
 			new list("notequal", "bool"),
-			new list("notequal", "null")
+			new list("notequal", "null"),
+			new list("cast", "int"),
+			new list("cast", "unsignedlong"),
+			new list("cast", "float"),
+			new list("cast", "double"),
+			new list("cast", "bool"),
+			new list("cast", "string"),
+			new list("cast", "null")
 		)
 	),
 	new DataType("double","double",
@@ -461,7 +534,14 @@ list types = new list(
 			new list("notequal", "float"),
 			new list("notequal", "double"),
 			new list("notequal", "bool"),
-			new list("notequal", "null")
+			new list("notequal", "null"),
+			new list("cast", "int"),
+			new list("cast", "unsignedlong"),
+			new list("cast", "float"),
+			new list("cast", "double"),
+			new list("cast", "bool"),
+			new list("cast", "string"),
+			new list("cast", "null")
 		)
 	),
 	new DataType("bool","bool",
@@ -520,7 +600,14 @@ list types = new list(
 			new list("notequal", "float"),
 			new list("notequal", "double"),
 			new list("notequal", "bool"),
-			new list("notequal", "null")
+			new list("notequal", "null"),
+			new list("cast", "int"),
+			new list("cast", "unsignedlong"),
+			new list("cast", "float"),
+			new list("cast", "double"),
+			new list("cast", "bool"),
+			new list("cast", "string"),
+			new list("cast", "null")
 		)
 	),
 	new DataType("string", "std::string",
@@ -536,7 +623,14 @@ list types = new list(
 			new list("equalequal", "string"),
 			new list("equalequal", "null"),
 			new list("notequal", "string"),
-			new list("notequal", "null")
+			new list("notequal", "null"),
+			new list("cast", "int"),
+			new list("cast", "unsignedlong"),
+			new list("cast", "float"),
+			new list("cast", "double"),
+			new list("cast", "bool"),
+			new list("cast", "string"),
+			new list("cast", "null")
 		)
 	),
 	new DataType("null", "std::nullptr_t",
@@ -545,7 +639,14 @@ list types = new list(
 			new list("not", ""),
 			
 			new list("equalequal", "null"),
-			new list("notequal", "null")
+			new list("notequal", "null"),
+			new list("cast", "int"),
+			new list("cast", "unsignedlong"),
+			new list("cast", "float"),
+			new list("cast", "double"),
+			new list("cast", "bool"),
+			new list("cast", "string"),
+			new list("cast", "null")
 		)
 	)
 );
@@ -706,8 +807,8 @@ function main()
 	
 	
 	createContextDefinitions();
-	createDeclarations();
-	createDefinitions();
+	//createDeclarations();
+	//createDefinitions();
 }
 
 main();

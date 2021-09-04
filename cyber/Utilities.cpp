@@ -37,7 +37,7 @@ std::string Utilities::stringify(const std::any& obj)
 		oss << std::any_cast<int>(obj);
 	}
 	else if (obj.type() == typeid(bool)) {
-		oss << std::any_cast<bool>(obj);
+		oss << std::boolalpha << std::any_cast<bool>(obj);
 	}
 	else if (obj.type() == typeid(float)) {
 		oss << std::any_cast<float>(obj);
@@ -119,20 +119,21 @@ std::string Utilities::createOperatorSignature(const std::string& szName, std::v
 	std::ostringstream oss;
 	oss << szName << "(";
 	if (args.size() > 0) {
-		std::string type_name = args.at(0).type().name();
-		if (args.at(0).type() == typeid(klass_instance)) {
-			type_name = std::any_cast<klass_instance>(args.at(0)).getType();
-		}
+		std::string type_name = getTypeString(args.at(0));
 		oss << type_name;
 	}
 	for (unsigned int i{ 1 }; i < args.size(); i++) {
-		std::string type_name = args.at(i).type().name();
-		if (args.at(i).type() == typeid(klass_instance)) {
-			type_name = std::any_cast<klass_instance>(args.at(i)).getType();
-		}
+		std::string type_name = getTypeString(args.at(i));
 		oss << "," << type_name;
 	}
 	oss << ")";
+	return oss.str();
+}
+
+std::string Utilities::createOperatorSignature(const std::string& szName, std::any arg, const std::string& szTypeName)
+{
+	std::ostringstream oss;
+	oss << szName << "(" << getTypeString(arg)<<"," <<szTypeName << ")";
 	return oss.str();
 }
 

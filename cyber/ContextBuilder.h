@@ -201,6 +201,18 @@ public:
             std::make_shared<native_fn>("exists", fs_exists, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>())
         );
+        fs_env_ar->environment->define("replace_line",
+            std::make_shared<native_fn>("replace_line", fs_replace_line, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter<unsigned long>()),
+            true
+        );
+        fs_env_ar->environment->define("make_unique",
+            std::make_shared<native_fn>("make_unique", fs_get_unique_name, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
         fs_env_ar->environment->define("WorkingDirectory",
             std::filesystem::current_path().string(),
             true
@@ -357,7 +369,8 @@ public:
         );
 
 		// End Custom Operators
-        /* Auto Generated using op_create.scrwl */
+
+       /* Auto Generated using op_create.scrwl */
 
         opHandler->registerOperator(
             std::make_shared<unary_fn>("!", not_int)
@@ -2865,7 +2878,252 @@ public:
             ->registerParameter(BuildParameter<std::nullptr_t>())
             ->registerParameter(BuildParameter<std::nullptr_t>())
         );
-        /* End Auto Generation */ 
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int_int)
+            ->registerParameter(BuildParameter<int>()),
+            "::(" + std::string(typeid(int).name()) + "," + std::string(typeid(int).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int_unsignedlong)
+            ->registerParameter(BuildParameter<int>()),
+            "::(" + std::string(typeid(int).name()) + "," + std::string(typeid(unsigned long).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int_float)
+            ->registerParameter(BuildParameter<int>()),
+            "::(" + std::string(typeid(int).name()) + "," + std::string(typeid(float).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int_double)
+            ->registerParameter(BuildParameter<int>()),
+            "::(" + std::string(typeid(int).name()) + "," + std::string(typeid(double).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int_bool)
+            ->registerParameter(BuildParameter<int>()),
+            "::(" + std::string(typeid(int).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int_string)
+            ->registerParameter(BuildParameter<int>()),
+            "::(" + std::string(typeid(int).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int_null)
+            ->registerParameter(BuildParameter<int>()),
+            "::(" + std::string(typeid(int).name()) + "," + std::string(typeid(std::nullptr_t).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_unsignedlong_int)
+            ->registerParameter(BuildParameter<unsigned long>()),
+            "::(" + std::string(typeid(unsigned long).name()) + "," + std::string(typeid(int).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_unsignedlong_unsignedlong)
+            ->registerParameter(BuildParameter<unsigned long>()),
+            "::(" + std::string(typeid(unsigned long).name()) + "," + std::string(typeid(unsigned long).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_unsignedlong_float)
+            ->registerParameter(BuildParameter<unsigned long>()),
+            "::(" + std::string(typeid(unsigned long).name()) + "," + std::string(typeid(float).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_unsignedlong_double)
+            ->registerParameter(BuildParameter<unsigned long>()),
+            "::(" + std::string(typeid(unsigned long).name()) + "," + std::string(typeid(double).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_unsignedlong_bool)
+            ->registerParameter(BuildParameter<unsigned long>()),
+            "::(" + std::string(typeid(unsigned long).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_unsignedlong_string)
+            ->registerParameter(BuildParameter<unsigned long>()),
+            "::(" + std::string(typeid(unsigned long).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_unsignedlong_null)
+            ->registerParameter(BuildParameter<unsigned long>()),
+            "::(" + std::string(typeid(unsigned long).name()) + "," + std::string(typeid(std::nullptr_t).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_float_int)
+            ->registerParameter(BuildParameter<float>()),
+            "::(" + std::string(typeid(float).name()) + "," + std::string(typeid(int).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_float_unsignedlong)
+            ->registerParameter(BuildParameter<float>()),
+            "::(" + std::string(typeid(float).name()) + "," + std::string(typeid(unsigned long).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_float_float)
+            ->registerParameter(BuildParameter<float>()),
+            "::(" + std::string(typeid(float).name()) + "," + std::string(typeid(float).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_float_double)
+            ->registerParameter(BuildParameter<float>()),
+            "::(" + std::string(typeid(float).name()) + "," + std::string(typeid(double).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_float_bool)
+            ->registerParameter(BuildParameter<float>()),
+            "::(" + std::string(typeid(float).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_float_string)
+            ->registerParameter(BuildParameter<float>()),
+            "::(" + std::string(typeid(float).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_float_null)
+            ->registerParameter(BuildParameter<float>()),
+            "::(" + std::string(typeid(float).name()) + "," + std::string(typeid(std::nullptr_t).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_double_int)
+            ->registerParameter(BuildParameter<double>()),
+            "::(" + std::string(typeid(double).name()) + "," + std::string(typeid(int).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_double_unsignedlong)
+            ->registerParameter(BuildParameter<double>()),
+            "::(" + std::string(typeid(double).name()) + "," + std::string(typeid(unsigned long).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_double_float)
+            ->registerParameter(BuildParameter<double>()),
+            "::(" + std::string(typeid(double).name()) + "," + std::string(typeid(float).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_double_double)
+            ->registerParameter(BuildParameter<double>()),
+            "::(" + std::string(typeid(double).name()) + "," + std::string(typeid(double).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_double_bool)
+            ->registerParameter(BuildParameter<double>()),
+            "::(" + std::string(typeid(double).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_double_string)
+            ->registerParameter(BuildParameter<double>()),
+            "::(" + std::string(typeid(double).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_double_null)
+            ->registerParameter(BuildParameter<double>()),
+            "::(" + std::string(typeid(double).name()) + "," + std::string(typeid(std::nullptr_t).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_int)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(int).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_unsignedlong)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(unsigned long).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_float)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(float).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_double)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(double).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_bool)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_string)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_null)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(std::nullptr_t).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_string_int)
+            ->registerParameter(BuildParameter<std::string>()),
+            "::(" + std::string(typeid(std::string).name()) + "," + std::string(typeid(int).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_string_unsignedlong)
+            ->registerParameter(BuildParameter<std::string>()),
+            "::(" + std::string(typeid(std::string).name()) + "," + std::string(typeid(unsigned long).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_string_float)
+            ->registerParameter(BuildParameter<std::string>()),
+            "::(" + std::string(typeid(std::string).name()) + "," + std::string(typeid(float).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_string_double)
+            ->registerParameter(BuildParameter<std::string>()),
+            "::(" + std::string(typeid(std::string).name()) + "," + std::string(typeid(double).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_string_bool)
+            ->registerParameter(BuildParameter<std::string>()),
+            "::(" + std::string(typeid(std::string).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_string_string)
+            ->registerParameter(BuildParameter<std::string>()),
+            "::(" + std::string(typeid(std::string).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_string_null)
+            ->registerParameter(BuildParameter<std::string>()),
+            "::(" + std::string(typeid(std::string).name()) + "," + std::string(typeid(std::nullptr_t).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_null_int)
+            ->registerParameter(BuildParameter<std::nullptr_t>()),
+            "::(" + std::string(typeid(std::nullptr_t).name()) + "," + std::string(typeid(int).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_null_unsignedlong)
+            ->registerParameter(BuildParameter<std::nullptr_t>()),
+            "::(" + std::string(typeid(std::nullptr_t).name()) + "," + std::string(typeid(unsigned long).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_null_float)
+            ->registerParameter(BuildParameter<std::nullptr_t>()),
+            "::(" + std::string(typeid(std::nullptr_t).name()) + "," + std::string(typeid(float).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_null_double)
+            ->registerParameter(BuildParameter<std::nullptr_t>()),
+            "::(" + std::string(typeid(std::nullptr_t).name()) + "," + std::string(typeid(double).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_null_bool)
+            ->registerParameter(BuildParameter<std::nullptr_t>()),
+            "::(" + std::string(typeid(std::nullptr_t).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_null_string)
+            ->registerParameter(BuildParameter<std::nullptr_t>()),
+            "::(" + std::string(typeid(std::nullptr_t).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_null_null)
+            ->registerParameter(BuildParameter<std::nullptr_t>()),
+            "::(" + std::string(typeid(std::nullptr_t).name()) + "," + std::string(typeid(std::nullptr_t).name()) + ")"
+        );
+        /* End Auto Generation */
 		
 		return opHandler;
 	}
@@ -2876,7 +3134,7 @@ public:
 			tokenizer_rule(Keywords().AND(), "&&"),
 			tokenizer_rule(Keywords().OR(), "||"),
 			tokenizer_rule(Keywords().TYPEOF(), "|"),
-			tokenizer_rule(Keywords().CAST(), "->"),
+			tokenizer_rule(Keywords().CAST(), "::"),
 			tokenizer_rule(Keywords().LPAREN(), "("),
 			tokenizer_rule(Keywords().RPAREN(), ")"),
 			tokenizer_rule(Keywords().LCURLY(), "{"),

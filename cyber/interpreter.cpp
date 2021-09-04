@@ -472,7 +472,12 @@ std::any interpreter::acceptPrimary(std::shared_ptr<primary> expr_primary)
 }
 std::any interpreter::acceptCast(std::shared_ptr<cast> expr_cast)
 {
-	throw ProgramException("NotSupportedException", location());
+	std::any rhs = acceptExpression(expr_cast->rhs);
+	std::vector<std::any> arguments = { rhs };
+
+
+	return m_context->getOperator(Utilities().createOperatorSignature(expr_cast->op, rhs, expr_cast->szTypeName))
+		->call(std::static_pointer_cast<interpreter>(shared_from_this()), _args(arguments));
 }
 
 

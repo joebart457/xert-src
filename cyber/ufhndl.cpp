@@ -159,3 +159,48 @@ PanicException FileHandle::BuildException(const std::string& msg)
 	pe.addStackTrace(msg, location());
 	return pe;
 }
+
+
+bool FileHandle::replaceLine(const std::string& szFile, const std::string& newLine, unsigned long lineNumber)
+{
+	if (countLines(szFile) < lineNumber) {
+		return false;
+	}
+	std::string szOutFile = getUniqueName(szFile);
+	std::ifstream inFile(szFile, std::ifstream::in);
+	std::ofstream outFile(szOutFile, std::ofstream::out);
+	if (inFile.is_open() && outFile.is_open()) {
+		std::string line;
+		unsigned int counter = 0;
+		while (std::getline(inFile, line)) {
+			if (counter == lineNumber) {
+				outFile << newLine << "\n";
+			}
+			else {
+				outFile << line << "\n";
+			}
+			counter++;
+		}
+		inFile.close();
+		outFile.close();
+
+		removeAll(szFile);
+		rename(szOutFile, szFile);
+		return true;
+	}
+	else {
+		throw BuildException("unable to perform io operation on file '" + szFile + "'; file not found or unable to open");
+	}
+
+}
+
+std::string FileHandle::getUniqueName(const std::string& base, unsigned int tries)
+{
+	std::filesystem::path p(base);
+	std::string fName = p.filename().string();
+	for (unsigned int i{ 0 }; i < tries; i++) {
+		auto uniqueFile = p.replace_filename("tmp" + std::to_string(i) + "__" + fName);
+		if (!std::filesystem::exists(uniqueFile)) return uniqueFile.string();
+	}
+	throw BuildException("unable to create unique file '" + p.string() + "'");
+}

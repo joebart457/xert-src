@@ -3,10 +3,16 @@
 
 #include "exceptions.h"
 
-void OperatorHandler::registerOperator(std::shared_ptr<callable> op)
+void OperatorHandler::registerOperator(std::shared_ptr<callable> op, const std::string& signatureOverride)
 {
 	if (op == nullptr) return;
-	m_operators[op->getSignature()] = op;
+	if (signatureOverride.empty()) {
+		m_operators[op->getSignature()] = op;
+	}
+	else {
+		m_operators[signatureOverride] = op;
+
+	}
 }
 
 std::shared_ptr<callable> OperatorHandler::getOperator(std::string szName)

@@ -195,3 +195,13 @@ std::any fs_exists(std::shared_ptr<interpreter> i, _args args)
 {
 	return FileHandle().exists(args.get<std::string>(0));
 }
+
+std::any fs_replace_line(std::shared_ptr<interpreter> i, _args args)
+{
+	return FileHandle().replaceLine(args.get<std::string>(0), args.get<std::string>(1), args.get<unsigned long>(2));
+}
+
+std::any fs_get_unique_name(std::shared_ptr<interpreter> i, _args args)
+{
+	return FileHandle().getUniqueName(args.get<std::string>(0));
+}

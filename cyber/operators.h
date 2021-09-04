@@ -26,8 +26,10 @@ std::any index_string_int(std::shared_ptr<interpreter> i, std::any& lhs, std::an
 std::any index_string_unsignedlong(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
 
 
+// End Custom operators
 
 /* Auto Generated using op_create.scrwl */
+
 
 /*
 -
@@ -767,6 +769,76 @@ std::any notequal_null_null(std::shared_ptr<interpreter> i, std::any& lhs, std::
 /*
 -
 - end notequal
+-
+*/
+
+
+/*
+-
+- start cast
+-
+*/
+
+std::any cast_int_int(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_int_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_int_float(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_int_double(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_int_bool(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_int_string(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_int_null(std::shared_ptr<interpreter> i, std::any& rhs);
+
+std::any cast_unsignedlong_int(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_unsignedlong_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_unsignedlong_float(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_unsignedlong_double(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_unsignedlong_bool(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_unsignedlong_string(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_unsignedlong_null(std::shared_ptr<interpreter> i, std::any& rhs);
+
+std::any cast_float_int(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_float_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_float_float(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_float_double(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_float_bool(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_float_string(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_float_null(std::shared_ptr<interpreter> i, std::any& rhs);
+
+std::any cast_double_int(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_double_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_double_float(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_double_double(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_double_bool(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_double_string(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_double_null(std::shared_ptr<interpreter> i, std::any& rhs);
+
+std::any cast_bool_int(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_bool_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_bool_float(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_bool_double(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_bool_bool(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_bool_string(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_bool_null(std::shared_ptr<interpreter> i, std::any& rhs);
+
+std::any cast_string_int(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_string_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_string_float(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_string_double(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_string_bool(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_string_string(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_string_null(std::shared_ptr<interpreter> i, std::any& rhs);
+
+std::any cast_null_int(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_null_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_null_float(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_null_double(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_null_bool(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_null_string(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any cast_null_null(std::shared_ptr<interpreter> i, std::any& rhs);
+
+
+/*
+-
+- end cast
 -
 */
 

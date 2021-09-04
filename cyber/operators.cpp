@@ -4,6 +4,8 @@
 #include "exceptions.h"
 #include "Utilities.h"
 
+#include <stdexcept>
+
 /*
 * 
 * Necessary for operator Auto Generation capabilites
@@ -82,9 +84,77 @@ std::any index_string_unsignedlong(std::shared_ptr<interpreter> i, std::any& lhs
     throw ProgramException("string index out of range", location());
 }
 
+/* Custom casts */
+
+
+std::any cast_string_int(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    try {
+        return std::stoi(std::any_cast<std::string>(rhs));
+    }
+    catch (std::invalid_argument) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type int", location());
+    }
+    catch (std::out_of_range) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type int", location());
+    }
+}
+
+std::any cast_string_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    try {
+        return std::stoul(std::any_cast<std::string>(rhs));
+    }
+    catch (std::invalid_argument) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type unsigned long", location());
+    }
+    catch (std::out_of_range) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type unsigned long", location());
+    }
+}
+
+std::any cast_string_float(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    try {
+        return std::stof(std::any_cast<std::string>(rhs));
+    }
+    catch (std::invalid_argument) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type float", location());
+    }
+    catch (std::out_of_range) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type float", location());
+    }
+}
+
+std::any cast_string_double(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    try {
+        return std::stod(std::any_cast<std::string>(rhs));
+    }
+    catch (std::invalid_argument) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type double", location());
+    }
+    catch (std::out_of_range) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type double", location());
+    }
+}
+
+std::any cast_string_bool(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    try {
+        return (bool)std::stoi(std::any_cast<std::string>(rhs));
+    }
+    catch (std::invalid_argument) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type bool", location());
+    }
+    catch (std::out_of_range) {
+        throw ProgramException("unable to cast " + Utilities().stringify(rhs) + " to type bool", location());
+    }
+}
+
+
 
 /* End Custom Defined Binary Operators */
-
 
 /* Auto Generated using op_create.scrwl */
 
@@ -2943,6 +3013,246 @@ std::any notequal_null_null(std::shared_ptr<interpreter> i, std::any& lhs, std::
 /*
 -
 - end notequal
+-
+*/
+
+
+/*
+-
+- start cast
+-
+*/
+
+std::any cast_int_int(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return std::any_cast<int>(rhs);
+}
+
+std::any cast_int_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<unsigned long>(std::any_cast<int>(rhs));
+}
+
+std::any cast_int_float(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<float>(std::any_cast<int>(rhs));
+}
+
+std::any cast_int_double(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<double>(std::any_cast<int>(rhs));
+}
+
+std::any cast_int_bool(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().isTruthy(rhs);
+}
+
+std::any cast_int_string(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().stringify(rhs);
+}
+
+std::any cast_int_null(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return nullptr;
+}
+
+
+std::any cast_unsignedlong_int(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<int>(std::any_cast<unsigned long>(rhs));
+}
+
+std::any cast_unsignedlong_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return std::any_cast<unsigned long>(rhs);
+}
+
+std::any cast_unsignedlong_float(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<float>(std::any_cast<unsigned long>(rhs));
+}
+
+std::any cast_unsignedlong_double(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<double>(std::any_cast<unsigned long>(rhs));
+}
+
+std::any cast_unsignedlong_bool(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().isTruthy(rhs);
+}
+
+std::any cast_unsignedlong_string(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().stringify(rhs);
+}
+
+std::any cast_unsignedlong_null(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return nullptr;
+}
+
+
+std::any cast_float_int(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<int>(std::any_cast<float>(rhs));
+}
+
+std::any cast_float_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<unsigned long>(std::any_cast<float>(rhs));
+}
+
+std::any cast_float_float(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return std::any_cast<float>(rhs);
+}
+
+std::any cast_float_double(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<double>(std::any_cast<float>(rhs));
+}
+
+std::any cast_float_bool(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().isTruthy(rhs);
+}
+
+std::any cast_float_string(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().stringify(rhs);
+}
+
+std::any cast_float_null(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return nullptr;
+}
+
+
+std::any cast_double_int(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<int>(std::any_cast<double>(rhs));
+}
+
+std::any cast_double_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<unsigned long>(std::any_cast<double>(rhs));
+}
+
+std::any cast_double_float(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<float>(std::any_cast<double>(rhs));
+}
+
+std::any cast_double_double(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return std::any_cast<double>(rhs);
+}
+
+std::any cast_double_bool(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().isTruthy(rhs);
+}
+
+std::any cast_double_string(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().stringify(rhs);
+}
+
+std::any cast_double_null(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return nullptr;
+}
+
+
+std::any cast_bool_int(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<int>(std::any_cast<bool>(rhs));
+}
+
+std::any cast_bool_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<unsigned long>(std::any_cast<bool>(rhs));
+}
+
+std::any cast_bool_float(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<float>(std::any_cast<bool>(rhs));
+}
+
+std::any cast_bool_double(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<double>(std::any_cast<bool>(rhs));
+}
+
+std::any cast_bool_bool(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return std::any_cast<bool>(rhs);
+}
+
+std::any cast_bool_string(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().stringify(rhs);
+}
+
+std::any cast_bool_null(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return nullptr;
+}
+
+std::any cast_string_string(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return std::any_cast<std::string>(rhs);
+}
+
+std::any cast_string_null(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return nullptr;
+}
+
+
+std::any cast_null_int(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<int>(0);
+}
+
+std::any cast_null_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<unsigned long>(0);
+}
+
+std::any cast_null_float(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<float>(0);
+}
+
+std::any cast_null_double(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return static_cast<double>(0);
+}
+
+std::any cast_null_bool(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().isTruthy(rhs);
+}
+
+std::any cast_null_string(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return Utilities().stringify(rhs);
+}
+
+std::any cast_null_null(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return nullptr;
+}
+
+
+
+/*
+-
+- end cast
 -
 */
 
