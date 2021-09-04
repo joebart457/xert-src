@@ -1,3 +1,3 @@
 #pragma once
 
-//#define BUILD_WINDOWS
+#define BUILD_WINDOWS

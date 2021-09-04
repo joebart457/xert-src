@@ -15,8 +15,9 @@ int main(int argc, char** argv)
 	language_main lang;
 
 	if (argc > 1) {
-		if (_stricmp(argv[1], "-h")) {
+		if (_stricmp(argv[1], "-h") == 0) {
 			displayUsage();
+			return 0;
 		}
 		else {
 			std::string szRunFile = argv[1];
@@ -28,6 +29,7 @@ int main(int argc, char** argv)
 		}
 	}
 	else {
+		displayUsage();
 		lang.repl();
 	}
 	return 0;
@@ -37,6 +39,6 @@ int main(int argc, char** argv)
 void displayUsage() {
 	std::cout << "usage:  xert *(options)" << std::endl;
 	std::cout << "\toption		|  desc" << std::endl;
-	std::cout << "\t-h			| display this message" << std::endl;
+	std::cout << "\t-h		| display this message" << std::endl;
 	std::cout << "\t<filename>	| execute file <filename> with remaining arguments passed to program entry point" << std::endl;
 }
