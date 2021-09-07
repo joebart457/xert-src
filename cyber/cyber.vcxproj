@@ -167,7 +167,7 @@
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="statement.h" />
     <ClInclude Include="stdlib.h" />
-    <ClInclude Include="string_utilities.h" />
+    <ClInclude Include="StringUtilities.h" />
     <ClInclude Include="tokenizer.hpp" />
     <ClInclude Include="ufhndl.h" />
     <ClInclude Include="Utilities.h" />
@@ -185,7 +185,7 @@
     <ClCompile Include="sqlite3.c" />
     <ClCompile Include="statement.cpp" />
     <ClCompile Include="stdlib.cpp" />
-    <ClCompile Include="string_utilities.cpp" />
+    <ClCompile Include="StringUtilities.cpp" />
     <ClCompile Include="ufhndl.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="win_std_lib.cpp" />

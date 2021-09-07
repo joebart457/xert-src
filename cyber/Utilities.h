@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef __INCLUDE_UTILITIES_H
+#define __INCLUDE_UTILITIES_H
 
 #include <any>
 #include <memory>
@@ -9,6 +11,7 @@
 class callable;
 class execution_context;
 class interpreter;
+struct activation_record;
 
 class Utilities
 {
@@ -21,5 +24,7 @@ public:
 	static std::string createOperatorSignature(const std::string& szName, std::any arg, const std::string& szTypeName);
 	static std::shared_ptr<callable> getCallable(std::any callee);
 	static std::string getTypeString(std::any& obj);
+	static std::shared_ptr<activation_record> extractScope(std::any& obj);
 };
 
+#endif

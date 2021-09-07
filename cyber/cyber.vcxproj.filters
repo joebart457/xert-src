@@ -36,7 +36,7 @@
     <ClCompile Include="callable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="string_utilities.cpp">
+    <ClCompile Include="StringUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="scope.cpp">
@@ -113,7 +113,7 @@
     <ClInclude Include="scope.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="string_utilities.h">
+    <ClInclude Include="StringUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="db_helper.h">

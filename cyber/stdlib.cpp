@@ -5,7 +5,7 @@
 #include "db_framework.h"
 #include "ufhndl.h"
 #include "Utilities.h"
-
+#include "StringUtilities.h"
 
 // Time
 
@@ -81,7 +81,7 @@ std::any db_run_prepared_query(std::shared_ptr<interpreter> i, _args args)
 
 	std::shared_ptr<klass_definition> ls = context->get<std::shared_ptr<klass_definition>>("list");
 	klass_instance results_container = ls->create();
-	std::any_cast<std::shared_ptr<native_fn>>(results_container.Get("constructor", location()))->call(i, _args(results));
+	results_container.Get<std::shared_ptr<native_fn>>("constructor", location())->call(i, _args(results));
 	return results_container;
 }
 
@@ -144,12 +144,6 @@ std::any map_constructor(std::shared_ptr<interpreter> i, _args args)
 
 // Std
 
-std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs)
-{
-	return Utilities().stringify(rhs);
-}
-
-
 std::any print(std::shared_ptr<interpreter> i, _args args)
 {
 	for (unsigned int j{ 0 }; j < args.size(); j++) {
@@ -157,6 +151,29 @@ std::any print(std::shared_ptr<interpreter> i, _args args)
 	}
 	return nullptr;
 }
+
+
+std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+	return Utilities().stringify(rhs);
+}
+
+std::any string_split(std::shared_ptr<interpreter> i, _args args)
+{
+	auto context = Utilities().fetch_context(i);
+	auto lsProto = context->get_coalesce<std::shared_ptr<klass_definition>>("Containers.list");
+	std::string szSrc = args.get<std::string>(0);
+	std::string szDelim = args.get<std::string>(1);
+	std::vector<std::string> results = StringUtilities().split(szSrc, szDelim);
+	std::vector<std::any> arguments;
+	for (auto str : results) {
+		arguments.push_back(str);
+	}
+	klass_instance lsInstance = lsProto->create();
+	lsInstance.Get<std::shared_ptr<native_fn>>("constructor", location())->call(i, _args(arguments));
+	return lsInstance;
+}
+
 
 
 // Language

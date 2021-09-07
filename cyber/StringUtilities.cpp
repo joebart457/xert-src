@@ -1,0 +1,48 @@
+#include "StringUtilities.h"
+
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <sstream>
+
+bool StringUtilities::contains(const std::string& s, const std::string& match)
+{
+	return s.find(match) != std::string::npos;
+}
+
+std::vector<std::string> StringUtilities::split(const std::string& s, char delimiter)
+{
+	std::vector<std::string> tokens;
+	std::string token;
+	std::istringstream tokenStream(s);
+	while (std::getline(tokenStream, token, delimiter))
+	{
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+
+std::string StringUtilities::lower(const std::string& s)
+{
+	std::string data = s;
+	std::transform(data.begin(), data.end(), data.begin(), ::tolower);
+	return data;
+}
+
+std::vector<std::string> StringUtilities::split(const std::string& src, const std::string& delimiter)
+{
+	size_t pos_start = 0;
+	size_t pos_end = 0;
+	size_t delim_len = delimiter.length();
+	std::string token{ "" };
+	std::vector<std::string> res;
+
+	while ((pos_end = src.find(delimiter, pos_start)) != std::string::npos) {
+		token = src.substr(pos_start, pos_end - pos_start);
+		pos_start = pos_end + delim_len;
+		res.push_back(token);
+	}
+
+	res.push_back(src.substr(pos_start));
+	return res;
+}

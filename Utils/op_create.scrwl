@@ -173,11 +173,21 @@ class Op{
 					rhsModifier = "std::to_string(";
 					rhsModifierEnclosing = ")";
 				} else if (ty1.isNumericType() && ty2.typeName == "bool") {
-					rhsModifier = "static_cast<int>(";
+					if (ty1.typeName == "unsignedlong"){
+						rhsModifier = "static_cast<unsigned int>(";
+					} 
+					else {
+						rhsModifier = "static_cast<int>(";
+					}
 					rhsModifierEnclosing = ")";
 				}
 				if (ty2.isNumericType() && ty1.typeName == "bool") {
-					lhsModifier = "static_cast<int>(";
+					if (ty2.typeName == "unsignedlong"){
+						lhsModifier = "static_cast<unsigned int>(";
+					} 
+					else {
+						lhsModifier = "static_cast<int>(";
+					}
 					lhsModifierEnclosing = ")";
 				}
 				
@@ -318,28 +328,24 @@ list types = new list(
 			new list("divide", "longlong"),
 			new list("divide", "bool"),
 			new list("lessthan", "int"),
-			new list("lessthan", "unsignedlong"),
 			new list("lessthan", "float"),
 			new list("lessthan", "double"),
 			new list("lessthan", "longdouble"),
 			new list("lessthan", "longlong"),
 			new list("lessthan", "bool"),
 			new list("lessthanequal", "int"),
-			new list("lessthanequal", "unsignedlong"),
 			new list("lessthanequal", "float"),
 			new list("lessthanequal", "double"),
 			new list("lessthanequal", "longdouble"),
 			new list("lessthanequal", "longlong"),
 			new list("lessthanequal", "bool"),
 			new list("greaterthan", "int"),
-			new list("greaterthan", "unsignedlong"),
 			new list("greaterthan", "float"),
 			new list("greaterthan", "double"),
 			new list("greaterthan", "longdouble"),
 			new list("greaterthan", "longlong"),
 			new list("greaterthan", "bool"),
 			new list("greaterthanequal", "int"),
-			new list("greaterthanequal", "unsignedlong"),
 			new list("greaterthanequal", "float"),
 			new list("greaterthanequal", "double"),
 			new list("greaterthanequal", "longdouble"),
@@ -405,28 +411,24 @@ list types = new list(
 			new list("divide", "longdouble"),
 			new list("divide", "longlong"),
 			new list("divide", "bool"),
-			new list("lessthan", "int"),
 			new list("lessthan", "unsignedlong"),
 			new list("lessthan", "float"),
 			new list("lessthan", "double"),
 			new list("lessthan", "longdouble"),
 			new list("lessthan", "longlong"),
 			new list("lessthan", "bool"),
-			new list("lessthanequal", "int"),
 			new list("lessthanequal", "unsignedlong"),
 			new list("lessthanequal", "float"),
 			new list("lessthanequal", "double"),
 			new list("lessthanequal", "longdouble"),
 			new list("lessthanequal", "longlong"),
 			new list("lessthanequal", "bool"),
-			new list("greaterthan", "int"),
 			new list("greaterthan", "unsignedlong"),
 			new list("greaterthan", "float"),
 			new list("greaterthan", "double"),
 			new list("greaterthan", "longdouble"),
 			new list("greaterthan", "longlong"),
 			new list("greaterthan", "bool"),
-			new list("greaterthanequal", "int"),
 			new list("greaterthanequal", "unsignedlong"),
 			new list("greaterthanequal", "float"),
 			new list("greaterthanequal", "double"),

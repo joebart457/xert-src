@@ -4,7 +4,6 @@
 #include <memory>
 #include <any>
 
-#include "environment.h"
 #include "context.h"
 #include "exceptions.h"
 

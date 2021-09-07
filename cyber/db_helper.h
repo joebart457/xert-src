@@ -14,7 +14,7 @@
 #include "klass_instance.h"
 #include "exceptions.h"
 #include "sqlite3.h"
-#include "string_utilities.h"
+#include "StringUtilities.h"
 
 
 struct db_helper_context {
@@ -74,7 +74,7 @@ public:
         klass_instance row = context->mapper->create();
         std::string szColumn;
         for (unsigned int i = 0; i < (unsigned int)argc; i++) {
-            szColumn = lower(azColName[i]);
+            szColumn = StringUtilities().lower(azColName[i]);
             std::any val = argv[i] ? std::string(reinterpret_cast<const char *>(argv[i])) : nullptr;
             row.Define(szColumn, val, location(), true);
         }
@@ -137,7 +137,7 @@ public:
                 while (rc == SQLITE_ROW) { // While query has result rows.
                     klass_instance row = mapper->create();
                     for (int colIndex = 0; colIndex < sqlite3_column_count(stmt); colIndex++) {
-                        std::string szColumnName = lower(sqlite3_column_name(stmt, colIndex));
+                        std::string szColumnName = StringUtilities().lower(sqlite3_column_name(stmt, colIndex));
                         int columnType = sqlite3_column_type(stmt, colIndex); // SQLITE_INTEGER, SQLITE_FLOAT, SQLITE_TEXT, SQLITE_BLOB OR SQLITE_NULL
                         if (include_unexpected) {
                             if (columnType == SQLITE_INTEGER) {

@@ -44,20 +44,33 @@ public:
 	static std::shared_ptr<scope<std::any>> BuildDefaultScope()
 	{
 		std::shared_ptr<scope<std::any>> e = std::make_shared<scope<std::any>>("default");
+
+        // Std
+
 		e->define("to_string", 
 			std::make_shared<unary_fn>("to_string", to_string)
 				->registerParameter(BuildParameter("")), 
-			true);
+			true
+        );
 
 		e->define("print", 
 			std::make_shared<native_fn>("print", print)
 				->registerParameter(BuildParameter("")), 
-			true);
+			true
+        );
 
 		e->define("typeof",
 			std::make_shared<unary_fn>("typeof", type_of_any)
 			->registerParameter(BuildParameter("")),
-			true);
+			true
+        );
+
+        e->define("split",
+            std::make_shared<native_fn>("split", string_split)
+            ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
 
         // System 
 

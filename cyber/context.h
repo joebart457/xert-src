@@ -15,7 +15,7 @@
 #include "callable.h"
 #include "OperatorHandler.h"
 #include "Utilities.h"
-
+#include "StringUtilities.h"
 
 
 struct activation_record {
@@ -86,6 +86,38 @@ public:
 			}
 		}
 		return false;
+	}
+
+	template <typename Ty>
+	Ty get_coalesce(const std::string& szKey, const std::string& delim = ".")
+	{
+		std::vector<std::string> matches = StringUtilities().split(szKey, delim);
+		list_crawler<std::string> crwlMatches(matches);
+		std::shared_ptr<activation_record> ar = nullptr;
+		while (!crwlMatches.end()) {
+			std::string key = crwlMatches.next();
+			std::any obj = nullptr;
+			if (ar == nullptr) {
+				obj = get(key, location());
+			}
+			else {
+				if (!ar->environment->get(key, obj)) {
+					throw ProgramException("unable to retrieve value with key '" + szKey + "'", location());
+				}
+			}
+			if (crwlMatches.end()) {
+				if (obj.type() != typeid(Ty)) {
+					throw ProgramException("type mismatch in assertion type " + std::string(obj.type().name()) + " != " + std::string(typeid(Ty).name()), location());
+				}
+				return std::any_cast<Ty>(obj);
+			}
+
+			ar = Utilities().extractScope(obj);
+			if (ar == nullptr) {
+				throw ProgramException("unable to retrieve value with key '" + szKey + "'", location());
+			}
+		}
+		throw ProgramException("unable to retrieve value with key '" + szKey + "'", location());
 	}
 
 

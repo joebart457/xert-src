@@ -30,6 +30,7 @@ std::any map_constructor(std::shared_ptr<interpreter> i, _args args);
 // stdlib
 std::any print(std::shared_ptr<interpreter> i, _args args);
 std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any string_split(std::shared_ptr<interpreter> i, _args args);
 
 // Language
 std::any print_environment(std::shared_ptr<interpreter> i, _args args);

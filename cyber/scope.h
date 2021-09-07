@@ -10,7 +10,7 @@
 #include <sstream>
 #include <any>
 #include <iostream>
-#include "string_utilities.h"
+#include "StringUtilities.h"
 
 template<typename T>
 std::ostream& operator<<(std::ostream& out, const std::shared_ptr<T>& ptr);
@@ -104,7 +104,7 @@ public:
 				oss << "\n\t\t" << it->first << " := " << it->second << ",";
 			}
 			else {
-				if (!contains(it->first, exclude)) {
+				if (!StringUtilities().contains(it->first, exclude)) {
 					oss << "\n\t\t" << it->first << " := " << it->second << ",";
 				}
 			}

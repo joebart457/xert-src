@@ -5,7 +5,7 @@
 #include "callable.h"
 #include "klass_instance.h"
 #include "interpreter.h"
-
+#include "context.h"
 #include "BuildDefinitions.h"
 
 void Utilities::check_context(std::shared_ptr<interpreter> i)
@@ -183,4 +183,16 @@ std::string Utilities::getTypeString(std::any& obj)
 		return std::any_cast<klass_instance>(obj).getType();
 	}
 	return obj.type().name();
+}
+
+
+std::shared_ptr<activation_record> Utilities::extractScope(std::any& obj)
+{
+	if (obj.type() == typeid(klass_instance)) {
+		return std::any_cast<klass_instance>(obj).ar();
+	}
+	if (obj.type() == typeid(std::shared_ptr<klass_definition>)) {
+		return std::any_cast<std::shared_ptr<klass_definition>>(obj)->ar();
+	}
+	return nullptr;
 }
