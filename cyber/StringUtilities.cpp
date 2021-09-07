@@ -46,3 +46,42 @@ std::vector<std::string> StringUtilities::split(const std::string& src, const st
 	res.push_back(src.substr(pos_start));
 	return res;
 }
+
+
+// trim from end of string (right)
+std::string& StringUtilities::rtrim(std::string& s, const char* t)
+{
+	s.erase(s.find_last_not_of(t) + 1);
+	return s;
+}
+
+// trim from beginning of string (left)
+std::string& StringUtilities::ltrim(std::string& s, const char* t)
+{
+	s.erase(0, s.find_first_not_of(t));
+	return s;
+}
+
+// trim from both ends of string (right then left)
+std::string& StringUtilities::trim(std::string& s, const char* t)
+{
+	return ltrim(rtrim(s, t), t);
+}
+
+long long StringUtilities::find(const std::string& src, const std::string& search)
+{
+	std::size_t found = src.find(search);
+	if (found == std::string::npos) {
+		return -1;
+	}
+	return found;
+}
+
+std::string StringUtilities::substr(const std::string& src, unsigned long start, unsigned long end)
+{
+	if (start > src.size() || end > src.size()) {
+		return "";
+	}
+	return src.substr(start, end);
+}
+

@@ -65,10 +65,60 @@ public:
 			true
         );
 
-        e->define("split",
+        // String
+
+        std::shared_ptr<activation_record> string_ar = std::make_shared<activation_record>();
+        string_ar->szAlias = "String";
+        string_ar->environment = std::make_shared<scope<std::any>>();
+
+        string_ar->environment->define("split",
             std::make_shared<native_fn>("split", string_split)
             ->registerParameter(BuildParameter<std::string>())
             ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
+        string_ar->environment->define("rtrim",
+            std::make_shared<native_fn>("rtrim", string_rtrim, string_ar)
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
+        string_ar->environment->define("ltrim",
+            std::make_shared<native_fn>("ltrim", string_ltrim, string_ar)
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
+        string_ar->environment->define("trim",
+            std::make_shared<native_fn>("trim", string_trim, string_ar)
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
+        string_ar->environment->define("create",
+            std::make_shared<unary_fn>("create", to_string)
+            ->registerParameter(BuildParameter("")),
+            true
+        );
+
+        string_ar->environment->define("find",
+            std::make_shared<native_fn>("find", string_find)
+            ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
+        string_ar->environment->define("substr",
+            std::make_shared<native_fn>("substr", string_substr)
+            ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter<unsigned long>())
+            ->registerParameter(BuildParameter<unsigned long>()),
+            true
+        );
+
+        e->define("String",
+            std::make_shared<klass_definition>("String", string_ar),
             true
         );
 
@@ -85,6 +135,7 @@ public:
         std::shared_ptr<activation_record> winlib_env_ar = std::make_shared<activation_record>();
         winlib_env_ar->szAlias = "lib";
         winlib_env_ar->environment = std::make_shared<scope<std::any>>();
+
         winlib_env_ar->environment->define("valid",
             std::make_shared<native_fn>("valid", win_lib_valid, winlib_env_ar),
             true
@@ -375,7 +426,7 @@ public:
         );
 
         language_ar->environment->define("Version",
-            VERSION_NO,
+            INTERPRETER_VERSION + "." + PARSER_VERSION + "." + TOKENIZER_VERSION + "." + STD_LIB_VERSION,
             true
         );
 
@@ -394,7 +445,7 @@ public:
 
         auto systemNamespace = context->get<std::shared_ptr<klass_definition>>("System");
 
-        auto listDefintion = context->get<std::shared_ptr<klass_definition>>("Containers")->Get<std::shared_ptr<klass_definition>>("list", location());
+        auto listDefintion = context->get_coalesce<std::shared_ptr<klass_definition>>("Containers.list");
         auto lsInstance = listDefintion->create();
         std::vector<std::any> arguments;
         Utilities().getCallable(lsInstance.Get("constructor", location()))->call(i, _args(arguments));
@@ -413,7 +464,7 @@ public:
         auto fsNamespace = context->get<std::shared_ptr<klass_definition>>("FileSystem");
 
         fsNamespace->Define("WorkingDirectory", szExecutionDir, location(), true);
-        auto listDefintion = context->get<std::shared_ptr<klass_definition>>("Containers")->Get<std::shared_ptr<klass_definition>>("list", location());
+        auto listDefintion = context->get_coalesce<std::shared_ptr<klass_definition>>("Containers.list");
         auto lsInstance = listDefintion->create();
         
         std::vector<std::any> arguments;

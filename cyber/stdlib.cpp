@@ -60,7 +60,7 @@ std::any db_get(std::shared_ptr<interpreter> i, _args args)
 
 	std::vector<std::any> results = db->get(args.get<std::string>(0));
 
-	std::shared_ptr<klass_definition> ls = context->get<std::shared_ptr<klass_definition>>("list");
+	std::shared_ptr<klass_definition> ls = context->get_coalesce<std::shared_ptr<klass_definition>>("Containers.list");
 	klass_instance results_container = ls->create();
 	std::any_cast<std::shared_ptr<native_fn>>(results_container.Get("constructor", location()))->call(i, _args(results));
 	return results_container;
@@ -79,7 +79,7 @@ std::any db_run_prepared_query(std::shared_ptr<interpreter> i, _args args)
 		args.get<std::shared_ptr<klass_definition>>(1),
 		false);
 
-	std::shared_ptr<klass_definition> ls = context->get<std::shared_ptr<klass_definition>>("list");
+	std::shared_ptr<klass_definition> ls = context->get_coalesce<std::shared_ptr<klass_definition>>("Containers.list");
 	klass_instance results_container = ls->create();
 	results_container.Get<std::shared_ptr<native_fn>>("constructor", location())->call(i, _args(results));
 	return results_container;
@@ -87,6 +87,7 @@ std::any db_run_prepared_query(std::shared_ptr<interpreter> i, _args args)
 
 
 // List methods
+
 std::any list_push(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
@@ -158,6 +159,8 @@ std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs)
 	return Utilities().stringify(rhs);
 }
 
+// String
+
 std::any string_split(std::shared_ptr<interpreter> i, _args args)
 {
 	auto context = Utilities().fetch_context(i);
@@ -175,6 +178,33 @@ std::any string_split(std::shared_ptr<interpreter> i, _args args)
 }
 
 
+std::any string_rtrim(std::shared_ptr<interpreter> i, _args args)
+{
+	std::string szSrc = args.get<std::string>(0);
+	return StringUtilities().rtrim(szSrc);
+}
+
+std::any string_ltrim(std::shared_ptr<interpreter> i, _args args)
+{
+	std::string szSrc = args.get<std::string>(0);
+	return StringUtilities().ltrim(szSrc);
+}
+
+std::any string_trim(std::shared_ptr<interpreter> i, _args args)
+{
+	std::string szSrc = args.get<std::string>(0);
+	return StringUtilities().trim(szSrc);
+}
+
+std::any string_find(std::shared_ptr<interpreter> i, _args args)
+{
+	return StringUtilities().find(args.get<std::string>(0), args.get<std::string>(1));
+}
+
+std::any string_substr(std::shared_ptr<interpreter> i, _args args)
+{
+	return StringUtilities().substr(args.get<std::string>(0), args.get<unsigned long>(1), args.get<unsigned long>(2));
+}
 
 // Language
 

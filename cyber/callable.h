@@ -3,7 +3,6 @@
 #ifndef __INCLUDE_CALLABLE_H
 #define __INCLUDE_CALLABLE_H
 
-
 #include <any>
 #include <memory>
 #include <string>

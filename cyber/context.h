@@ -94,9 +94,12 @@ public:
 		std::vector<std::string> matches = StringUtilities().split(szKey, delim);
 		list_crawler<std::string> crwlMatches(matches);
 		std::shared_ptr<activation_record> ar = nullptr;
-		while (!crwlMatches.end()) {
-			std::string key = crwlMatches.next();
-			std::any obj = nullptr;
+		std::any obj = nullptr;
+		for (unsigned int i{ 0 }; i < matches.size(); i++) {
+			std::string key = matches.at(i);
+			if (i > 0 && ar == nullptr) {
+				throw ProgramException("unable to retrieve value with key '" + szKey + "'", location());
+			}
 			if (ar == nullptr) {
 				obj = get(key, location());
 			}
@@ -105,19 +108,13 @@ public:
 					throw ProgramException("unable to retrieve value with key '" + szKey + "'", location());
 				}
 			}
-			if (crwlMatches.end()) {
-				if (obj.type() != typeid(Ty)) {
-					throw ProgramException("type mismatch in assertion type " + std::string(obj.type().name()) + " != " + std::string(typeid(Ty).name()), location());
-				}
-				return std::any_cast<Ty>(obj);
-			}
-
 			ar = Utilities().extractScope(obj);
-			if (ar == nullptr) {
-				throw ProgramException("unable to retrieve value with key '" + szKey + "'", location());
-			}
 		}
-		throw ProgramException("unable to retrieve value with key '" + szKey + "'", location());
+
+		if (obj.type() != typeid(Ty)) {
+			throw ProgramException("type mismatch in assertion type " + std::string(obj.type().name()) + " != " + std::string(typeid(Ty).name()), location());
+		}
+		return std::any_cast<Ty>(obj);
 	}
 
 

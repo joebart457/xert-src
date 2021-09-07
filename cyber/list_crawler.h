@@ -46,7 +46,7 @@ public:
 
 	bool end()
 	{
-		return m_index == m_list.size();
+		return m_index <= m_list.size();
 	}
 
 
@@ -54,7 +54,7 @@ private:
 
 	void check_index()
 	{
-		if (!(m_index < m_list.size())) {
+		if (m_index >= m_list.size()) {
 			throw std::out_of_range("current index out of range ["
 				+ std::to_string(m_index) + "] when size was [" + std::to_string(m_list.size()) + "] at check_index of list_crawler<_Ty>");
 		}
