@@ -29,8 +29,13 @@ std::any map_constructor(std::shared_ptr<interpreter> i, _args args);
 
 // stdlib
 std::any print(std::shared_ptr<interpreter> i, _args args);
-std::any print_environment(std::shared_ptr<interpreter> i, _args args);
 std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs);
+
+// Language
+std::any print_environment(std::shared_ptr<interpreter> i, _args args);
+std::any flush_imports(std::shared_ptr<interpreter> i, _args args);
+std::any flush_import(std::shared_ptr<interpreter> i, _args args);
+
 
 // FileSystem
 std::any fs_relative_path(std::shared_ptr<interpreter> i, _args args);

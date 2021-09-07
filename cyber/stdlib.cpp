@@ -159,14 +159,28 @@ std::any print(std::shared_ptr<interpreter> i, _args args)
 }
 
 
+// Language
 
-// DEBUG 
 std::any print_environment(std::shared_ptr<interpreter> i, _args args)
 {
 	Utilities().fetch_context(i)->output();
 	return nullptr;
 }
 
+
+std::any flush_imports(std::shared_ptr<interpreter> i, _args args)
+{
+	Utilities().check_context(i);
+	i->FlushImports();
+	return nullptr;
+}
+
+std::any flush_import(std::shared_ptr<interpreter> i, _args args)
+{
+	Utilities().check_context(i);
+	i->FlushImport(args.get<std::string>(0));
+	return nullptr;
+}
 
 
 // FileSystem

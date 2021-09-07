@@ -53,9 +53,6 @@ public:
 			std::make_shared<native_fn>("print", print)
 				->registerParameter(BuildParameter("")), 
 			true);
-		e->define("e",
-			std::make_shared<native_fn>("e", print_environment),
-			true);
 
 		e->define("typeof",
 			std::make_shared<unary_fn>("typeof", type_of_any)
@@ -115,23 +112,31 @@ public:
 
         // End System
 
+        // Containers
+
+        std::shared_ptr<activation_record> containers_ar = std::make_shared<activation_record>();
+        containers_ar->szAlias = "Containers";
+        containers_ar->environment = std::make_shared<scope<std::any>>();
+
         // List
 
 		std::shared_ptr<activation_record> list_env_ar = std::make_shared<activation_record>();
 		list_env_ar->szAlias = "list";
 		list_env_ar->environment = std::make_shared<scope<std::any>>();
+
 		list_env_ar->environment->define("push",
-			std::make_shared<native_fn>("push", list_push, list_env_ar)->registerParameter(BuildParameter("")));
+			std::make_shared<native_fn>("push", list_push, list_env_ar)->registerParameter(BuildParameter(""))
+        );
 
 		list_env_ar->environment->define("constructor",
-			std::make_shared<native_fn>("constructor", list_constructor, list_env_ar)->setVariadic());
+			std::make_shared<native_fn>("constructor", list_constructor, list_env_ar)->setVariadic()
+        );
 
 		list_env_ar->environment->define("size",
-			(unsigned long)0);
+			(unsigned long)0
+        );
 
-		e->define("list",
-			std::make_shared<klass_definition>("list", list_env_ar),
-			true);
+		
 
 
         // Map
@@ -155,15 +160,24 @@ public:
             std::make_shared<native_fn>("constructor", map_constructor, map_env_ar)
         );
 
-        list_env_ar->environment->define("constructor",
-            std::make_shared<native_fn>("constructor", list_constructor, list_env_ar)->setVariadic());
 
-        list_env_ar->environment->define("size",
-            (unsigned long)0);
-
-        e->define("map",
+        containers_ar->environment->define("map",
             std::make_shared<klass_definition>("map", map_env_ar),
-            true);
+            true
+        );
+
+        containers_ar->environment->define("list",
+            std::make_shared<klass_definition>("list", list_env_ar),
+            true
+        );
+
+        e->define("Containers",
+            std::make_shared<klass_definition>("Containers", containers_ar),
+            true
+        );
+
+
+        // End Containers
 
         // FileSystem
 
@@ -218,6 +232,7 @@ public:
             std::make_shared<native_fn>("parent_path", fs_parent_path, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>())
         );
+
         fs_env_ar->environment->define("absolute_path",
             std::make_shared<native_fn>("absolute_path", fs_absolute_path, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>())
@@ -297,21 +312,62 @@ public:
 
         // Time
 
+        std::shared_ptr<activation_record> time_ar = std::make_shared<activation_record>();
+        time_ar->szAlias = "Time";
+        time_ar->environment = std::make_shared<scope<std::any>>();
+
         e->define("timestamp",
-            std::make_shared<native_fn>("timestamp", time_timestamp),
+            std::make_shared<native_fn>("timestamp", time_timestamp, time_ar),
             true
         );
 
         e->define("time_str",
-            std::make_shared<native_fn>("time_str", time_timestamp_to_timestring)
+            std::make_shared<native_fn>("time_str", time_timestamp_to_timestring, time_ar)
             ->registerParameter(BuildParameter<long long>()),
             true
         );
 
         e->define("time_str_f",
-            std::make_shared<native_fn>("time_str_f", time_timestamp_to_timestring_f)
+            std::make_shared<native_fn>("time_str_f", time_timestamp_to_timestring_f, time_ar)
             ->registerParameter(BuildParameter<long long>())
             ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
+        e->define("Time",
+            std::make_shared<klass_definition>("Time", time_ar),
+            true
+        );
+
+        // Language
+
+        std::shared_ptr<activation_record> language_ar = std::make_shared<activation_record>();
+        language_ar->szAlias = "Language";
+        language_ar->environment = std::make_shared<scope<std::any>>();
+
+        language_ar->environment->define("e",
+            std::make_shared<native_fn>("e", print_environment, language_ar),
+            true
+        );
+
+        language_ar->environment->define("flush_imports",
+            std::make_shared<native_fn>("flush_imports", flush_imports, language_ar),
+            true
+        );
+
+        language_ar->environment->define("flush_import",
+            std::make_shared<native_fn>("flush_import", flush_import, language_ar)
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
+        language_ar->environment->define("Version",
+            VERSION_NO,
+            true
+        );
+
+        e->define("Language",
+            std::make_shared<klass_definition>("Language", language_ar),
             true
         );
 
@@ -325,7 +381,7 @@ public:
 
         auto systemNamespace = context->get<std::shared_ptr<klass_definition>>("System");
 
-        auto listDefintion = context->get<std::shared_ptr<klass_definition>>("list");
+        auto listDefintion = context->get<std::shared_ptr<klass_definition>>("Containers")->Get<std::shared_ptr<klass_definition>>("list", location());
         auto lsInstance = listDefintion->create();
         std::vector<std::any> arguments;
         Utilities().getCallable(lsInstance.Get("constructor", location()))->call(i, _args(arguments));
@@ -344,7 +400,7 @@ public:
         auto fsNamespace = context->get<std::shared_ptr<klass_definition>>("FileSystem");
 
         fsNamespace->Define("WorkingDirectory", szExecutionDir, location(), true);
-        auto listDefintion = context->get<std::shared_ptr<klass_definition>>("list");
+        auto listDefintion = context->get<std::shared_ptr<klass_definition>>("Containers")->Get<std::shared_ptr<klass_definition>>("list", location());
         auto lsInstance = listDefintion->create();
         
         std::vector<std::any> arguments;

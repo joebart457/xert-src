@@ -1,4 +1,7 @@
-print("Executing in " + FileSystem.WorkingDirectory);
+print("Executing in " + FileSystem.WorkingDirectory + "\n");
+
+run _ty list = Containers.list;
+recover on ~class ProgramException~;
 
 class Op{
 

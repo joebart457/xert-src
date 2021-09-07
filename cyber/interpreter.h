@@ -62,12 +62,12 @@ public:
 
 	std::shared_ptr<execution_context> get_context();
 
+	void FlushImports();
+	void FlushImport(const std::string& szFile);
 private:
 
 	void CompleteImport(const std::string& szFile, const location& loc);
 	bool AddModule(const std::string& szFile);
-	void FlushImports();
-	void FlushImport(const std::string& szFile);
 	bool isImported(const std::string& szFile);
 	void Validate();
 	std::shared_ptr<activation_record> acceptBlock_KeepEnvironment(std::shared_ptr<block> blk);
