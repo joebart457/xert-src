@@ -183,6 +183,11 @@ public:
 		return m_opHandler->getOperator(Utilities().createOperatorSignature(szName, args));
 	}
 
+	std::any getObjectPrototype(const std::string& szTypename, const location& loc)
+	{
+		return this->get(PROTO_PREFIX + szTypename, loc);
+	}
+
 
 	template <typename Ty>
 	Ty tryGet(const std::string& szKey, Ty defaultValue)
@@ -215,6 +220,7 @@ private:
 
 
 	const unsigned int MAX_CALLSTACK{ 100 };
+	const std::string PROTO_PREFIX{ "__proto__" };
 
 	unsigned int m_index{ 0 };
 	std::vector<std::shared_ptr<activation_record>> m_records;

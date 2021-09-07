@@ -86,16 +86,14 @@ class variable_declaration :
 	public statement {
 	friend class interpreter;
 public:
-	variable_declaration(const std::string& szTypename, const std::string& szName, std::shared_ptr<expression> value, const location& loc)
-		:statement("variable_declaration", loc), m_szTypename{ szTypename }, m_szName{ szName }, m_value{ value }{}
+	variable_declaration(const param& var,  const location& loc)
+		:statement("variable_declaration", loc), m_var{ var }{}
 	~variable_declaration(){}
 
 	virtual void accept(std::shared_ptr<interpreter> i);
 
 private:
-	std::string m_szTypename{ "" };
-	std::string m_szName{ "" };
-	std::shared_ptr<expression> m_value{ nullptr };
+	param m_var;
 };
 
 

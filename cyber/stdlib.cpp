@@ -1,9 +1,42 @@
 #include "stdlib.h"
 
+#include <ctime>
 
 #include "db_framework.h"
 #include "ufhndl.h"
 #include "Utilities.h"
+
+
+// Time
+
+std::any time_timestamp(std::shared_ptr<interpreter> i, _args args)
+{
+	std::time_t result = std::time(nullptr);
+	return result;
+}
+
+std::any time_timestamp_to_timestring(std::shared_ptr<interpreter> i, _args args)
+{
+	std::time_t timestamp = args.get<long long>(0);
+	std::tm timeStruct;
+	localtime_s(&timeStruct, &timestamp);
+	char buffer[32];
+
+	std::strftime(buffer, 32, "%x %X", &timeStruct); // see documentation for format specifiers
+	return std::string(buffer);
+}
+
+std::any time_timestamp_to_timestring_f(std::shared_ptr<interpreter> i, _args args)
+{
+	std::time_t timestamp = args.get<long long>(0);
+	std::string szFormat = args.get<std::string>(1);
+	std::tm timeStruct;
+	localtime_s(&timeStruct, &timestamp);
+	char buffer[64];
+
+	std::strftime(buffer, 64, szFormat.c_str(), &timeStruct); // see documentation for format specifiers
+	return std::string(buffer);
+}
 
 
 

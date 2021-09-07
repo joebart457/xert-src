@@ -215,20 +215,22 @@ public:
 
 	std::shared_ptr<variable_declaration> parse_variable_declaration()
 	{
-		std::string type;
+		param p;
 		if (match_builtin()) {
-			type = m_pi.previous().lexeme();
+			p.type = m_pi.previous().lexeme();
+			p.class_specifier = "";
 		}
 		else {
-			type = m_pi.consume(TOKEN_TYPE_WORD, "expect type specifier in declaration").lexeme();
+			p.class_specifier = m_pi.consume(TOKEN_TYPE_WORD, "expect type specifier in declaration").lexeme();
+			p.type = "";
 		}
-		token name = m_pi.consume(TOKEN_TYPE_WORD, "expect variable name in declaration");
-		std::shared_ptr<expression> expr = nullptr;
+		p.name = m_pi.consume(TOKEN_TYPE_WORD, "expect variable name in declaration").lexeme();
+		p.default_value = nullptr;
 		if (m_pi.match(Keywords().EQUAL())) {
-			expr = parse_expression();
+			p.default_value = parse_expression();
 		}
-		m_pi.consume(Keywords().SEMI(), "expect ';' at end of statement");
-		return std::make_shared<variable_declaration>(type, name.lexeme(), expr, name.loc());
+		token tok = m_pi.consume(Keywords().SEMI(), "expect ';' at end of statement");
+		return std::make_shared<variable_declaration>(p, tok.loc());
 	}
 
 	std::shared_ptr<if_statement> parse_if()
@@ -638,6 +640,8 @@ private:
 		Keywords().INT(),
 		Keywords().FLOAT(),
 		Keywords().DOUBLE(),
+		Keywords().LONGDOUBLE(),
+		Keywords().LONGLONG(),
 		Keywords().CHAR(),
 		Keywords().STRING(),
 		Keywords().BOOL()

@@ -135,15 +135,18 @@ void interpreter::acceptFunctionDeclaration(std::shared_ptr<function_declaration
 
 void interpreter::acceptVariableDeclaration(std::shared_ptr<variable_declaration> var_decl)
 {
-	if (var_decl->m_value != nullptr) {
-		std::any val = acceptExpression(var_decl->m_value);
-		std::string type = Utilities().getTypeString(val);
-		if (var_decl->m_szTypename != "" && type != var_decl->m_szTypename) {
-			throw ProgramException("type mismatch in variable declaration: " + type + " != " + var_decl->m_szTypename, var_decl->m_loc);
-		}
-		m_context->define(var_decl->m_szName, val, false, var_decl->m_loc);
+	if (var_decl->m_var.default_value != nullptr) {
+		std::any val = acceptExpression(var_decl->m_var.default_value);
+
+		val = assert_or_convert_type(var_decl->m_var, val, var_decl->m_loc);
+		m_context->define(var_decl->m_var.name, val, false, var_decl->m_loc);
+	} 
+	else {
+		// Here we avoid using param.class_specifier 
+		// this is because custom class prototypes are not currently allowed/supported
+		std::any val = m_context->getObjectPrototype(var_decl->m_var.type, var_decl->m_loc);
+		m_context->define(var_decl->m_var.name, val, false, var_decl->m_loc);
 	}
-	// TODO: Else do protos
 }
 
 void interpreter::acceptInjectStatement(std::shared_ptr<inject_statement> inject_stmt)

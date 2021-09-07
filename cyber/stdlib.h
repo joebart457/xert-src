@@ -6,6 +6,10 @@
 #include "callable.h"
 #include "interpreter.h"
 
+// Time
+std::any time_timestamp(std::shared_ptr<interpreter> i, _args args);
+std::any time_timestamp_to_timestring(std::shared_ptr<interpreter> i, _args args);
+std::any time_timestamp_to_timestring_f(std::shared_ptr<interpreter> i, _args args);
 
 
 // DB Methods

@@ -48,6 +48,12 @@ std::string Utilities::stringify(const std::any& obj)
 	else if (obj.type() == typeid(unsigned long)) {
 		oss << std::any_cast<unsigned long>(obj);
 	}
+	else if (obj.type() == typeid(long long)) {
+		oss << std::any_cast<long long>(obj);
+	}
+	else if (obj.type() == typeid(long double)) {
+		oss << std::any_cast<long double>(obj);
+	}
 	else if (obj.type() == typeid(std::string)) {
 		oss << std::any_cast<std::string>(obj);
 	}
@@ -105,6 +111,12 @@ bool Utilities::isTruthy(const std::any& obj)
 	}
 	else if (obj.type() == typeid(double)) {
 		return std::any_cast<double>(obj);
+	}
+	else if (obj.type() == typeid(long double)) {
+		return std::any_cast<long double>(obj);
+	}
+	else if (obj.type() == typeid(long long)) {
+		return std::any_cast<long long>(obj);
 	}
 	else if (obj.type() == typeid(std::string)) {
 		return std::any_cast<std::string>(obj).size() > 0;

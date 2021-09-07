@@ -26,6 +26,8 @@ public:
 	static std::string STRING() { return "string"; }
 	static std::string IGNORE(){ return "ignore"; }
 	static std::string BOOL() { return "bool"; }
+	static std::string LONGDOUBLE() { return "longdouble"; }
+	static std::string LONGLONG() { return "longlong"; }
 
 
 	static std::string DIRECTIVE() { return "directive"; }
