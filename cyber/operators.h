@@ -25,6 +25,8 @@ std::any index_list_string(std::shared_ptr<interpreter> i, std::any& lhs, std::a
 std::any index_string_int(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
 std::any index_string_unsignedlong(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
 
+std::any index_map_string(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
+
 
 // End Custom operators
 

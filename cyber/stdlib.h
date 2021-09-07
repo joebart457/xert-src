@@ -21,14 +21,16 @@ std::any db_run_prepared_query(std::shared_ptr<interpreter> i, _args args);
 std::any list_push(std::shared_ptr<interpreter> i, _args args);
 std::any list_constructor(std::shared_ptr<interpreter> i, _args args);
 
-
-std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs);
+// Map methods
+std::any map_add(std::shared_ptr<interpreter> i, _args args);
+std::any map_delete(std::shared_ptr<interpreter> i, _args args);
+std::any map_constructor(std::shared_ptr<interpreter> i, _args args);
 
 
 // stdlib
 std::any print(std::shared_ptr<interpreter> i, _args args);
 std::any print_environment(std::shared_ptr<interpreter> i, _args args);
-
+std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs);
 
 // FileSystem
 std::any fs_relative_path(std::shared_ptr<interpreter> i, _args args);

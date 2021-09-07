@@ -113,8 +113,36 @@ std::any list_constructor(std::shared_ptr<interpreter> i, _args args)
 }
 
 
+// Map methods
+std::any map_add(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+
+	std::string szName = args.get<std::string>(0);
+	std::any value = args.at(1);
+
+	context->define(szName, value , true, location());
+	return nullptr;
+}
 
 
+std::any map_delete(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+
+	std::string szName = args.get<std::string>(0);
+
+	return context->remove(szName);
+}
+
+
+std::any map_constructor(std::shared_ptr<interpreter> i, _args args)
+{
+	return nullptr;
+}
+
+
+// Std
 
 std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs)
 {

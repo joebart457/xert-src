@@ -348,6 +348,35 @@ void interpreter::acceptPanicStatement(std::shared_ptr<panic_statement> panic_st
 	throw PanicException(val, panic_stmt->m_loc);
 }
 
+void interpreter::acceptClassExentsionStatement(std::shared_ptr<class_extension> ce_stmt)
+{
+	if (ce_stmt->m_func_decl == nullptr) {
+		return;
+	}
+	std::any parent_klass = acceptExpression(ce_stmt->m_parent);
+	std::shared_ptr<function_declaration> fn = ce_stmt->m_func_decl;
+
+	if (parent_klass.type() == typeid(klass_instance)) {
+		klass_instance instance = std::any_cast<klass_instance>(parent_klass);
+		instance.Define(fn->m_szName,
+			std::make_shared<custom_fn>(fn->m_szName, instance.ar(), fn->m_body->m_statements, fn->m_params, fn->m_loc),
+			ce_stmt->m_loc,
+			true
+		);
+	}
+	else if (parent_klass.type() == typeid(std::shared_ptr<klass_definition>)) {
+		std::shared_ptr<klass_definition> klass_def = std::any_cast<std::shared_ptr<klass_definition>>(parent_klass);
+		klass_def->Define(fn->m_szName,
+			std::make_shared<custom_fn>(fn->m_szName, klass_def->ar(), fn->m_body->m_statements, fn->m_params, fn->m_loc),
+			ce_stmt->m_loc,
+			true
+		);
+	}
+	else {
+		throw ProgramException("expect klass_definition or klass_instance as extension parent but got " + Utilities().getTypeString(parent_klass), ce_stmt->m_loc);
+	}
+}
+
 
 
 void interpreter::acceptExpressionStatement(std::shared_ptr<expression_statement> expr_stmt)
@@ -490,7 +519,7 @@ std::any interpreter::acceptInitializer(std::shared_ptr<initializer> expr_intial
 	for (auto arg : expr_intializer->arguments) {
 		args.push_back(acceptExpression(arg));
 	}
-	std::any klass = m_context->get(expr_intializer->szTypeName, expr_intializer->m_loc);
+	std::any klass = acceptExpression(expr_intializer->expr);
 	if (klass.type() != typeid(std::shared_ptr<klass_definition>)) {
 		throw ProgramException("expect valid class type in initializer", expr_intializer->m_loc);
 	}

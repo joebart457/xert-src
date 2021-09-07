@@ -84,6 +84,16 @@ std::any index_string_unsignedlong(std::shared_ptr<interpreter> i, std::any& lhs
     throw ProgramException("string index out of range", location());
 }
 
+
+std::any index_map_string(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
+{
+    std::string szName = std::any_cast<std::string>(rhs);
+
+    klass_instance instance = std::any_cast<klass_instance>(lhs);
+    return instance.Get(szName, location());
+}
+
+
 /* Custom casts */
 
 

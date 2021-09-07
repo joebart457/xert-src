@@ -79,6 +79,11 @@ public:
 		return m_ar->environment->toString();
 	}
 
+	std::shared_ptr<activation_record> ar()
+	{
+		return m_ar;
+	}
+
 private:
 	std::string m_szSignature{ "class_instance_0" };
 	std::string m_szType{ "class_instance" };
@@ -185,6 +190,11 @@ public:
 	std::string getSignature()
 	{
 		return "class " + m_szName + " :r" + std::to_string(m_refIndex);
+	}
+
+	std::shared_ptr<activation_record> ar()
+	{
+		return m_ar;
 	}
 
 private:

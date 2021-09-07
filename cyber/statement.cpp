@@ -21,6 +21,12 @@ void variable_declaration::accept(std::shared_ptr<interpreter> i)
 }
 
 
+void class_extension::accept(std::shared_ptr<interpreter> i)
+{
+	i->acceptClassExentsionStatement(std::static_pointer_cast<class_extension>(shared_from_this()));
+}
+
+
 void inject_statement::accept(std::shared_ptr<interpreter> i)
 {
 	i->acceptInjectStatement(std::static_pointer_cast<inject_statement>(shared_from_this()));

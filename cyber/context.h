@@ -151,6 +151,11 @@ public:
 		throw ProgramException("unable to define value to key '" + szKey + "'; key already defined", loc);
 	}
 
+	bool remove(const std::string& szKey)
+	{
+		return current_ar()->environment->remove(szKey);
+	}
+
 	
 	void output(const std::string& exclude = "")
 	{

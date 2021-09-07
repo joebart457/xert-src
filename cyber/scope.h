@@ -55,6 +55,17 @@ public:
 		}
 	}
 
+	bool remove(const std::string& szKey)
+	{
+		if (!exists_local(szKey)) {
+			return false;
+		}
+		else {
+			m_lookup.erase(szKey);
+			return true;
+		}
+	}
+
 	bool assign(const std::string& szKey, _Ty val)
 	{
 		if (exists_local(szKey)) {

@@ -97,6 +97,22 @@ private:
 };
 
 
+class class_extension :
+	public statement {
+	friend class interpreter;
+public:
+	class_extension(std::shared_ptr<expression> parent, std::shared_ptr<function_declaration> func_decl, const location& loc)
+		:statement("class_extension", loc), m_parent{ parent }, m_func_decl{func_decl}{}
+	~class_extension() {}
+
+	virtual void accept(std::shared_ptr<interpreter> i);
+
+private:
+	std::shared_ptr<expression> m_parent{ nullptr };
+	std::shared_ptr<function_declaration> m_func_decl{ nullptr };
+};
+
+
 class inject_statement :
 	public statement {
 	friend class interpreter;

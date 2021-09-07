@@ -57,7 +57,9 @@ public:
 		if (m_pi.match(Keywords().INJECT())) {
 			return parse_inject();
 		}
-
+		if (m_pi.match(Keywords().EXTENSION())) {
+			return parse_class_extension();
+		}
 		throw ParsingException("unrecognized token in toplevel: " + m_pi.current().toStr() + "; expect declaration only in toplevel",  m_pi.current().loc());
 	}
 
@@ -109,7 +111,9 @@ public:
 		if (m_pi.match(Keywords().LCURLY())) {
 			return parse_block();
 		}
-
+		if (m_pi.match(Keywords().EXTENSION())) {
+			return parse_class_extension();
+		}
 		return parse_expression_stmt();
 	}
 
@@ -141,7 +145,9 @@ public:
 		if (m_pi.match(Keywords().FUNCTION())) {
 			return parse_function_declaration();
 		}
-
+		if (m_pi.match(Keywords().EXTENSION())) {
+			return parse_class_extension();
+		}
 		if (match_variable_declaration()) {
 			return parse_variable_declaration();
 		}
@@ -189,6 +195,15 @@ public:
 		m_pi.consume(Keywords().LCURLY(), "expect function body");
 		std::shared_ptr<block> body = parse_block();
 		return std::make_shared<function_declaration>(name.lexeme(), parameters, body, name.loc());
+	}
+
+	std::shared_ptr<class_extension> parse_class_extension()
+	{
+		token tok = m_pi.previous();
+		std::shared_ptr<expression> expr = parse_expression();
+		m_pi.consume(Keywords().FUNCTION(), "expect function declaration in extension statement");
+		std::shared_ptr<function_declaration> fn_decl = parse_function_declaration();
+		return std::make_shared<class_extension>(expr, fn_decl, tok.loc());
 	}
 
 	std::shared_ptr<class_declaration> parse_class_declaration()
@@ -500,6 +515,21 @@ public:
 	}
 
 
+	std::shared_ptr<expression> parse_get()
+	{
+		std::shared_ptr<expression> expr = parse_primary();
+		while (true) {
+			if (m_pi.match(Keywords().DOT())) {
+				token name = m_pi.consume(TOKEN_TYPE_WORD, "expect 'IDENTIFIER' after '.'");
+				expr = std::make_shared<get>(expr, name.lexeme(), name.loc());
+			}
+			else {
+				break;
+			}
+		}
+		return expr;
+	}
+
 	std::shared_ptr<expression> parse_primary() {
 
 		if (m_pi.match(Keywords().FALSE())) {
@@ -586,8 +616,8 @@ public:
 		}
 
 		if (m_pi.match(Keywords().NEW())) {
-			token name = m_pi.consume(TOKEN_TYPE_WORD, "expect sytnax: new <typename>(<initializer-list>)");
-			m_pi.consume(Keywords().LPAREN(), "expect arguments list in initializer");
+			std::shared_ptr<expression> expr = parse_get();
+			token tok = m_pi.consume(Keywords().LPAREN(), "expect arguments list in initializer");
 			std::vector<std::shared_ptr<expression>> args;
 			if (!m_pi.match(Keywords().RPAREN())) {
 				do {
@@ -596,7 +626,7 @@ public:
 				m_pi.consume(Keywords().RPAREN(), "expect enclosing ')' in function call");
 			}
 
-			return std::make_shared<initializer>(name.lexeme(), args, name.loc());
+			return std::make_shared<initializer>(expr, args, tok.loc());
 		}
 
 		if (m_pi.match(TOKEN_TYPE_INJECTED_STRING)) {

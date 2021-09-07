@@ -32,6 +32,7 @@ public:
 
 	static std::string DIRECTIVE() { return "directive"; }
 	static std::string INJECT() { return "inject"; }
+	static std::string EXTENSION() { return "extension"; }
 
 	static std::string IF() { return "if"; }
 	static std::string ELSE() { return "else"; }

@@ -269,11 +269,11 @@ class initializer :
 	friend class interpreter;
 public:
 	initializer(
-		std::string szTypeName,											// typename to initialize
+		std::shared_ptr<expression> expr,											// typename to initialize
 		std::vector<std::shared_ptr<expression>> arguments,		// arguments to pass to constructor
 		const location& loc											// location of expression
 	)
-		:expression("intializer", loc), szTypeName{ szTypeName }, arguments{ arguments }{}
+		:expression("intializer", loc), expr{ expr }, arguments{ arguments }{}
 	~initializer() {}
 
 
@@ -281,7 +281,7 @@ public:
 
 
 protected:
-	std::string szTypeName;
+	std::shared_ptr<expression> expr{ nullptr };
 	std::vector<std::shared_ptr<expression>> arguments;
 };
 

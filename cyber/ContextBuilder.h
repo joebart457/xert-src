@@ -133,6 +133,38 @@ public:
 			std::make_shared<klass_definition>("list", list_env_ar),
 			true);
 
+
+        // Map
+
+        std::shared_ptr<activation_record> map_env_ar = std::make_shared<activation_record>();
+        map_env_ar->szAlias = "map";
+        map_env_ar->environment = std::make_shared<scope<std::any>>();
+
+        map_env_ar->environment->define("add",
+            std::make_shared<native_fn>("add", map_add, map_env_ar)
+            ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter(""))
+        );
+
+        map_env_ar->environment->define("remove",
+            std::make_shared<native_fn>("remove", map_delete, map_env_ar)
+            ->registerParameter(BuildParameter<std::string>())
+        );
+
+        map_env_ar->environment->define("constructor",
+            std::make_shared<native_fn>("constructor", map_constructor, map_env_ar)
+        );
+
+        list_env_ar->environment->define("constructor",
+            std::make_shared<native_fn>("constructor", list_constructor, list_env_ar)->setVariadic());
+
+        list_env_ar->environment->define("size",
+            (unsigned long)0);
+
+        e->define("map",
+            std::make_shared<klass_definition>("map", map_env_ar),
+            true);
+
         // FileSystem
 
         std::shared_ptr<activation_record> fs_env_ar = std::make_shared<activation_record>();
@@ -405,6 +437,12 @@ public:
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_list_string)
             ->registerParameter(BuildParameter<klass_definition>("", "list"))
+            ->registerParameter(BuildParameter<std::string>())
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<binary_fn>("[", index_map_string)
+            ->registerParameter(BuildParameter<klass_definition>("", "map"))
             ->registerParameter(BuildParameter<std::string>())
         );
 
@@ -4989,6 +5027,7 @@ public:
 			tokenizer_rule(Keywords().RECOVER(), "recover"),
             tokenizer_rule(Keywords().ON(), "on"),
             tokenizer_rule(Keywords().PANIC(), "panic"),
+            tokenizer_rule(Keywords().EXTENSION(), "extension"),
             tokenizer_rule(Keywords().BOOL(), "bool"),
 
 
