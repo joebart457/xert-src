@@ -262,7 +262,7 @@ std::any not_null(std::shared_ptr<interpreter> i, std::any& rhs)
 
 std::any negate_int(std::shared_ptr<interpreter> i, std::any& rhs)
 {
-    return std::any_cast<int>(rhs);
+    return -std::any_cast<int>(rhs);
 }
 
 std::any negate_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs)
@@ -272,27 +272,27 @@ std::any negate_unsignedlong(std::shared_ptr<interpreter> i, std::any& rhs)
 
 std::any negate_float(std::shared_ptr<interpreter> i, std::any& rhs)
 {
-    return std::any_cast<float>(rhs);
+    return -std::any_cast<float>(rhs);
 }
 
 std::any negate_double(std::shared_ptr<interpreter> i, std::any& rhs)
 {
-    return std::any_cast<double>(rhs);
+    return -std::any_cast<double>(rhs);
 }
 
 std::any negate_longlong(std::shared_ptr<interpreter> i, std::any& rhs)
 {
-    return std::any_cast<long long>(rhs);
+    return -std::any_cast<long long>(rhs);
 }
 
 std::any negate_longdouble(std::shared_ptr<interpreter> i, std::any& rhs)
 {
-    return std::any_cast<long double>(rhs);
+    return -std::any_cast<long double>(rhs);
 }
 
 std::any negate_bool(std::shared_ptr<interpreter> i, std::any& rhs)
 {
-    return std::any_cast<bool>(rhs);
+    throw ProgramException("Unsupported Operation", location());
 }
 
 std::any negate_string(std::shared_ptr<interpreter> i, std::any& rhs)
@@ -302,7 +302,7 @@ std::any negate_string(std::shared_ptr<interpreter> i, std::any& rhs)
 
 std::any negate_null(std::shared_ptr<interpreter> i, std::any& rhs)
 {
-    return std::any_cast<std::nullptr_t>(rhs);
+    throw ProgramException("Unsupported Operation", location());
 }
 
 

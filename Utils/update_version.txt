@@ -1,0 +1,142 @@
+class XertVersion{
+	int STD_LIB_VERSION = 0;
+	int INTERPRETER_VERSION = 0;
+	int PARSER_VERSION = 0;
+	int TOKENIZER_VERSION = 0;
+	
+	u_int i_STD_LIB_VERSION = 0u;
+	u_int i_INTERPRETER_VERSION = 0u;
+	u_int i_PARSER_VERSION = 0u;
+	u_int i_TOKENIZER_VERSION = 0u;
+	
+	string szVersionFile = "";
+	
+	function constructor(string szVersionFile){
+		this.szVersionFile = szVersionFile;
+		ExtractVersions();
+	}
+	
+	function Finalize(){
+		function createOutputString(string versionName, int versionNo){
+			return "#define " + versionName + "\t\t\tstd::string(\"" + String.pad(versionNo::string, String.get_char("0"), 6u) + "\")";
+		}
+		FileSystem.replace_line(szVersionFile, createOutputString("STD_LIB_VERSION", STD_LIB_VERSION), i_STD_LIB_VERSION);
+		FileSystem.replace_line(szVersionFile, createOutputString("INTERPRETER_VERSION", INTERPRETER_VERSION), i_INTERPRETER_VERSION);
+		FileSystem.replace_line(szVersionFile, createOutputString("PARSER_VERSION", PARSER_VERSION), i_PARSER_VERSION);
+		FileSystem.replace_line(szVersionFile, createOutputString("TOKENIZER_VERSION", TOKENIZER_VERSION), i_TOKENIZER_VERSION);
+		
+	}
+	
+	function Update(list versionsToUpdate){
+		u_int counter = 0u;
+		while (counter < versionsToUpdate.size){
+			if (versionsToUpdate[counter] == "STD_LIB_VERSION"){
+				print("Updating STD_LIB_VERSION from version " + String.create(STD_LIB_VERSION) + " to version " + String.create(STD_LIB_VERSION + 1) + "\n");
+				STD_LIB_VERSION = STD_LIB_VERSION + 1;
+			} 
+			else if (versionsToUpdate[counter] == "INTERPRETER_VERSION"){
+				print("Updating INTERPRETER_VERSION from version " + String.create(INTERPRETER_VERSION) + " to version " + String.create(INTERPRETER_VERSION + 1) + "\n");
+				INTERPRETER_VERSION = INTERPRETER_VERSION + 1;
+			}
+			else if (versionsToUpdate[counter] == "PARSER_VERSION"){
+				print("Updating PARSER_VERSION from version " + String.create(PARSER_VERSION) + " to version " + String.create(PARSER_VERSION + 1) + "\n");
+				PARSER_VERSION = PARSER_VERSION + 1;
+			}
+			else if (versionsToUpdate[counter] == "TOKENIZER_VERSION"){
+				print("Updating TOKENIZER_VERSION from version " + String.create(TOKENIZER_VERSION) + " to version " + String.create(TOKENIZER_VERSION + 1) + "\n");
+				TOKENIZER_VERSION = TOKENIZER_VERSION + 1;
+			}
+			else {
+				panic("unable to resolve version update: "+ String.create(versionsToUpdate[counter]));
+			}
+			
+			counter = counter + 1;
+		}
+	}
+	
+	function ExtractVersions(){
+		u_int padding = 6u;
+		string data = FileSystem.read_to_string(szVersionFile);
+		list fileData = String.split(data, "\n");
+		u_int counter = 0u;
+		while (counter < fileData.size){
+			string currentLine = String.trim(fileData[counter]);
+
+			if (String.find(currentLine, "STD_LIB_VERSION") != -1){
+				list raw = String.split(currentLine, "\"");
+				STD_LIB_VERSION = raw[1]::int;
+				i_STD_LIB_VERSION = counter;
+			}
+			else if (String.find(currentLine, "INTERPRETER_VERSION") != -1){
+				list raw = String.split(currentLine, "\"");
+				INTERPRETER_VERSION = raw[1]::int;
+				i_INTERPRETER_VERSION = counter;
+			}
+			else if (String.find(currentLine, "PARSER_VERSION") != -1){
+				list raw = String.split(currentLine, "\"");
+				PARSER_VERSION = raw[1]::int;
+				i_PARSER_VERSION = counter;
+			}
+			else if (String.find(currentLine, "TOKENIZER_VERSION") != -1){
+				list raw = String.split(currentLine, "\"");
+				TOKENIZER_VERSION = raw[1]::int;
+				i_TOKENIZER_VERSION = counter;
+			}
+
+			counter = counter + 1;
+		}
+		
+		if (i_TOKENIZER_VERSION == 0 || i_PARSER_VERSION == 0 || i_INTERPRETER_VERSION == 0 || i_STD_LIB_VERSION == 0){
+			panic("Unable to extract complete version information from file "+String.create(szVersionFile));
+		}
+	}
+}
+
+class VersionManager{
+	map supportedVersioning = new Containers.map();
+	
+	_ty v = null;
+	string szUpdatesFile = "";
+	function constructor(string buildFile, string updatedNamesFile)
+	{
+		v = new XertVersion(buildFile); 
+		InitializeSupportedVersioning();
+		this.szUpdatesFile = updatedNamesFile;
+		v.Update(GetVersionsToIncrement());
+		v.Finalize();
+	}
+	
+	function InitializeSupportedVersioning(){
+		supportedVersioning.add("stdlib.h", "STD_LIB_VERSION");
+		supportedVersioning.add("interpreter.h", "INTERPRETER_VERSION");
+		supportedVersioning.add("parser.h", "PARSER_VERSION");
+		supportedVersioning.add("tokenizer.h", "TOKENIZER_VERSION");
+	}
+	
+	
+	function GetVersionsToIncrement(){
+		list versionsToUpdate = new Containers.list();
+		string data = FileSystem.read_to_string(this.szUpdatesFile);
+		list ls = String.split(data, "\n");
+		u_int counter = 0u;
+		while (counter < ls.size){
+			string currentLine = String.trim(ls[counter]);
+			list splitStr = String.split(currentLine, "modified:");
+			if (splitStr.size == 2){
+				string szModFile = String.trim(splitStr[1]);
+				if (supportedVersioning.exists(szModFile)){
+					versionsToUpdate.push(supportedVersioning[szModFile]);				
+				}
+			}
+			counter = counter + 1;
+		}
+		return versionsToUpdate;
+	}
+	
+}
+
+function main(){
+	_ty vm = new VersionManager("C:/zzz_WIP/xert/cyber/BuildDefinitions.h", FileSystem.relative_path("../out.txt"));
+}
+
+main();

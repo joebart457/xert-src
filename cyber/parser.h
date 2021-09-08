@@ -247,7 +247,7 @@ public:
 		token tok = m_pi.consume(Keywords().SEMI(), "expect ';' at end of statement");
 		return std::make_shared<variable_declaration>(p, tok.loc());
 	}
-
+	
 	std::shared_ptr<if_statement> parse_if()
 	{
 		token tok = m_pi.consume(Keywords().LPAREN(), "Expect (<condition>) stmt after 'if'.");
@@ -421,7 +421,7 @@ public:
 
 	std::shared_ptr<expression> parse_equality() {
 		std::shared_ptr<expression> expr = parse_comparison();
-		while (m_pi.match(Keywords().EQUALEQUAL()) || m_pi.match("notequal")) {
+		while (m_pi.match(Keywords().EQUALEQUAL()) || m_pi.match(Keywords().BANGEQUAL())) {
 			token op = m_pi.previous();
 			std::shared_ptr<expression> rhs = parse_comparison();
 			expr = std::make_shared<binary>(expr, op.lexeme(), rhs, op.loc());

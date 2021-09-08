@@ -6,6 +6,7 @@
 #include "ufhndl.h"
 #include "Utilities.h"
 #include "StringUtilities.h"
+#include "exceptions.h"
 
 // Time
 
@@ -126,7 +127,6 @@ std::any map_add(std::shared_ptr<interpreter> i, _args args)
 	return nullptr;
 }
 
-
 std::any map_delete(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
@@ -136,10 +136,15 @@ std::any map_delete(std::shared_ptr<interpreter> i, _args args)
 	return context->remove(szName);
 }
 
-
 std::any map_constructor(std::shared_ptr<interpreter> i, _args args)
 {
 	return nullptr;
+}
+
+std::any map_exists(std::shared_ptr<interpreter> i, _args args)
+{
+	auto context = Utilities().fetch_context(i);
+	return context->exists(args.get<std::string>(0));
 }
 
 
@@ -198,12 +203,28 @@ std::any string_trim(std::shared_ptr<interpreter> i, _args args)
 
 std::any string_find(std::shared_ptr<interpreter> i, _args args)
 {
-	return StringUtilities().find(args.get<std::string>(0), args.get<std::string>(1));
+	return static_cast<long long>(StringUtilities().find(args.get<std::string>(0), args.get<std::string>(1)));
 }
 
 std::any string_substr(std::shared_ptr<interpreter> i, _args args)
 {
 	return StringUtilities().substr(args.get<std::string>(0), args.get<unsigned long>(1), args.get<unsigned long>(2));
+}
+
+std::any string_pad(std::shared_ptr<interpreter> i, _args args)
+{
+	// TODO Refactor 
+	return StringUtilities().pad(args.get<std::string>(0), args.get<char>(1), args.get<unsigned long>(2));
+}
+
+std::any string_to_char(std::shared_ptr<interpreter> i, _args args)
+{
+	// TODO Refactor 
+	std::string src = args.get<std::string>(0);
+	if (src.size() != 1) {
+		throw PanicException(ProgramException("unable to convert string of size " + std::to_string(src.size()) + "to char", location()), location());
+	}
+	return src.at(0);
 }
 
 // Language

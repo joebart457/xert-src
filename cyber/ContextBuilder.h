@@ -117,6 +117,20 @@ public:
             true
         );
 
+        string_ar->environment->define("pad",
+            std::make_shared<native_fn>("pad", string_pad)
+            ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter<char>())
+            ->registerParameter(BuildParameter<unsigned long>()),
+            true
+        );
+
+        string_ar->environment->define("get_char",
+            std::make_shared<native_fn>("get_char", string_to_char)
+            ->registerParameter(BuildParameter<std::string>()),
+            true
+        );
+
         e->define("String",
             std::make_shared<klass_definition>("String", string_ar),
             true
@@ -222,6 +236,11 @@ public:
 
         map_env_ar->environment->define("constructor",
             std::make_shared<native_fn>("constructor", map_constructor, map_env_ar)
+        );
+
+        map_env_ar->environment->define("exists",
+            std::make_shared<native_fn>("exists", map_exists, map_env_ar)
+            ->registerParameter(BuildParameter<std::string>())
         );
 
 

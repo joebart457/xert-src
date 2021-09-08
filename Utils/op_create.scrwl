@@ -63,7 +63,11 @@ class Op{
 		result = result +"\n{\n";
 		if (ty1.isUnaryOperationSupported(this.operation)){
 			if (this.operation == "negate"){
-				result = result + "\treturn "+ty1.getCast()+"(rhs);\n";
+				if (ty1.typeName == "null"){
+					result = result + "\treturn nullptr;\n";
+				} else {
+					result = result + "\treturn - "+ty1.getCast()+"(rhs);\n";
+				}
 			} 
 			else if (this.operation == "not"){
 				result = result + "\treturn !Utilities().isTruthy(rhs);\n";
@@ -209,7 +213,7 @@ class Op{
 function in(_ty item, list ls)
 {
 	int counter = 0;
-	while (counter < ls.size){
+	while (counter < ls.size::int){
 		
 		if (ls[counter] == item){
 			return true;
@@ -237,7 +241,7 @@ class DataType{
 	function isOperationSupported(string operation, string type)
 	{
 		int counter = 0;
-		while (counter < this.supportedOperations.size){
+		while (counter < this.supportedOperations.size::int){
 			if (this.supportedOperations[counter][0] == operation 
 				&& this.supportedOperations[counter][1] == type)
 			{
@@ -251,7 +255,7 @@ class DataType{
 	function isUnaryOperationSupported(string operation)
 	{
 		int counter = 0;
-		while (counter < this.supportedOperations.size){
+		while (counter < this.supportedOperations.size::int){
 			if (this.supportedOperations[counter][0] == operation)
 			{
 				return true;
@@ -820,7 +824,6 @@ list types = new list(
 	
 	new DataType("bool","bool",
 		new list(
-			new list("negate", ""),
 			new list("not", ""),
 			
 			new list("add", "int"),
@@ -935,7 +938,6 @@ list types = new list(
 	),
 	new DataType("null", "std::nullptr_t",
 		new list(
-			new list("negate", ""),
 			new list("not", ""),
 			
 			new list("equalequal", "null"),
@@ -956,13 +958,13 @@ list types = new list(
 
 function createBinaryContextDefinitions(){
 	int counter = 0;
-	while (counter < binaryOperations.size){
+	while (counter < binaryOperations.size::int){
 		Op op = binaryOperations[counter];
 		int counter2 = 0;
-		while (counter2 < types.size){
+		while (counter2 < types.size::int){
 			DataType ty1 = types[counter2];
 			int counter3 = 0;
-			while (counter3 < types.size){
+			while (counter3 < types.size::int){
 				DataType ty2 = types[counter3];
 				print(op.createOperatorDefintion(ty1, ty2));
 				print("\n");
@@ -977,10 +979,10 @@ function createBinaryContextDefinitions(){
 
 function createUnaryContextDefinitions(){
 	int counter = 0;
-	while (counter < unaryOperations.size){
+	while (counter < unaryOperations.size::int){
 		Op op = unaryOperations[counter];
 		int counter2 = 0;
-		while (counter2 < types.size){
+		while (counter2 < types.size::int){
 			DataType ty1 = types[counter2];
 			print(op.createUnaryOperatorDefinition(ty1));
 			print("\n");
@@ -994,11 +996,11 @@ function createUnaryContextDefinitions(){
 
 function createUnaryOperatorDeclarations(){
 	int counter = 0;
-	while (counter < unaryOperations.size){
+	while (counter < unaryOperations.size::int){
 		Op op = unaryOperations[counter];
 		int counter2 = 0;
 		print("\n/*\n-\n- start " + op.operation + "\n-\n*/\n\n");
-		while (counter2 < types.size){
+		while (counter2 < types.size::int){
 			DataType ty1 = types[counter2];
 			print(op.createNativeUnaryOperatorDeclaraion(ty1));
 			print("\n");
@@ -1011,14 +1013,14 @@ function createUnaryOperatorDeclarations(){
 
 function createBinaryOperatorDeclarations(){
 	int counter = 0;
-	while (counter < binaryOperations.size){
+	while (counter < binaryOperations.size::int){
 		Op op = binaryOperations[counter];
 		int counter2 = 0;
 		print("\n/*\n-\n- start " + op.operation + "\n-\n*/\n\n");
-		while (counter2 < types.size){
+		while (counter2 < types.size::int){
 			DataType ty1 = types[counter2];
 			int counter3 = 0;
-			while (counter3 < types.size){
+			while (counter3 < types.size::int){
 				DataType ty2 = types[counter3];
 				print(op.createNativeOperatorDeclaraion(ty1, ty2));
 				print("\n");
@@ -1036,11 +1038,11 @@ function createBinaryOperatorDeclarations(){
 
 function createUnaryOperatorDefinitions(){
 	int counter = 0;
-	while (counter < unaryOperations.size){
+	while (counter < unaryOperations.size::int){
 		Op op = unaryOperations[counter];
 		int counter2 = 0;
 		print("\n/*\n-\n- start " + op.operation + "\n-\n*/\n\n");
-		while (counter2 < types.size){
+		while (counter2 < types.size::int){
 			DataType ty1 = types[counter2];
 			print(op.createNativeUnaryOperatorDefinition(ty1));
 			print("\n");
@@ -1054,14 +1056,14 @@ function createUnaryOperatorDefinitions(){
 
 function createBinaryOperatorDefintions(){
 	int counter = 0;
-	while (counter < binaryOperations.size){
+	while (counter < binaryOperations.size::int){
 		Op op = binaryOperations[counter];
 		int counter2 = 0;
 		print("\n/*\n-\n- start " + op.operation + "\n-\n*/\n\n");
-		while (counter2 < types.size){
+		while (counter2 < types.size::int){
 			DataType ty1 = types[counter2];
 			int counter3 = 0;
-			while (counter3 < types.size){
+			while (counter3 < types.size::int){
 				DataType ty2 = types[counter3];
 				print(op.createNativeOperatorDefinition(ty1, ty2));
 				print("\n");

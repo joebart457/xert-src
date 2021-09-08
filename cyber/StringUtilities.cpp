@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <iomanip>
 
 bool StringUtilities::contains(const std::string& s, const std::string& match)
 {
@@ -85,3 +86,9 @@ std::string StringUtilities::substr(const std::string& src, unsigned long start,
 	return src.substr(start, end);
 }
 
+std::string StringUtilities::pad(const std::string& src, char fill, unsigned int width)
+{
+	std::ostringstream oss;
+	oss << std::setw(width) << std::internal << std::setfill(fill) << src;
+	return oss.str();
+}

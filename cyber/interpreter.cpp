@@ -538,10 +538,6 @@ std::any interpreter::acceptListInitializer(std::shared_ptr<list_initializer> ex
 
 std::any interpreter::assert_or_convert_type(const param& p, std::any obj, const location& loc)
 {
-	if (p.type == "") {
-		return obj;
-	}
-
 	std::string szType = Utilities().getTypeString(obj);
 
 	if (p.class_specifier != "") {
@@ -555,7 +551,7 @@ std::any interpreter::assert_or_convert_type(const param& p, std::any obj, const
 		throw ProgramException("Type mismatch " + std::string(obj.type().name()) + " != " + p.type + "::" + p.class_specifier, loc, Severity().MEDIUM());
 	}
 	else {
-		if (szType != p.type) {
+		if (p.type != "" && szType != p.type) {
 			throw ProgramException("Type mismatch " + std::string(obj.type().name()) + " != " + p.type, loc, Severity().MEDIUM());
 		}
 		return obj;

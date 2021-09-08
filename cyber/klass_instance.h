@@ -7,8 +7,8 @@
 #include "context.h"
 #include "exceptions.h"
 
-class klass_instance {
-public:
+class klass_instance { 
+public: 
 	klass_instance(const std::string& type, const std::string& signature, std::shared_ptr<activation_record> ar)
 		:m_szType{ type }, m_szSignature{ signature }, m_ar{ ar } {}
 	~klass_instance() {}

@@ -25,6 +25,7 @@ std::any list_constructor(std::shared_ptr<interpreter> i, _args args);
 std::any map_add(std::shared_ptr<interpreter> i, _args args);
 std::any map_delete(std::shared_ptr<interpreter> i, _args args);
 std::any map_constructor(std::shared_ptr<interpreter> i, _args args);
+std::any map_exists(std::shared_ptr<interpreter> i, _args args);
 
 
 // stdlib
@@ -39,6 +40,8 @@ std::any string_ltrim(std::shared_ptr<interpreter> i, _args args);
 std::any string_trim(std::shared_ptr<interpreter> i, _args args);
 std::any string_find(std::shared_ptr<interpreter> i, _args args);
 std::any string_substr(std::shared_ptr<interpreter> i, _args args);
+std::any string_pad(std::shared_ptr<interpreter> i, _args args);
+std::any string_to_char(std::shared_ptr<interpreter> i, _args args);
 
 
 // Language
@@ -55,7 +58,7 @@ std::any fs_read_file(std::shared_ptr<interpreter> i, _args args);
 std::any fs_real_file_to_string(std::shared_ptr<interpreter> i, _args args);
 std::any fs_read_line_from_file(std::shared_ptr<interpreter> i, _args args);
 std::any fs_write_to_file(std::shared_ptr<interpreter> i, _args args);
-std::any fs_write_line_to_file(std::shared_ptr<interpreter> i, _args args);
+std::any fs_write_line_to_file(std::shared_ptr<interpreter> i, _args args); 
 std::any fs_count_lines(std::shared_ptr<interpreter> i, _args args);
 std::any fs_current_path(std::shared_ptr<interpreter> i, _args args);
 std::any fs_parent_path(std::shared_ptr<interpreter> i, _args args);

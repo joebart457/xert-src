@@ -111,6 +111,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>"C:\Program Files\Git\cmd\git" status | findstr "\.h" &gt; $(SolutionDir)\out.txt  &amp;&amp; "C:\Program Files\xert\xert.exe" $(SolutionDir)/Utils/update_version.txt</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>(git) Detecting modifications and (xert) Updating version</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -141,6 +147,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>"C:\Program Files\Git\cmd\git" status | findstr "\.h" &gt; $(SolutionDir)\out.txt  &amp;&amp; "C:\Program Files\xert\xert.exe" $(SolutionDir)/Utils/update_version.txt</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>(git) Detecting modifications and (xert) Updating version</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BuildDefinitions.h" />

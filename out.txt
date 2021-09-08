@@ -1,0 +1,8 @@
+	modified:   BuildDefinitions.h
+	modified:   ContextBuilder.h
+	modified:   StringUtilities.h
+	modified:   callable.h
+	modified:   exceptions.h
+	modified:   klass_instance.h
+	modified:   parser.h
+	modified:   stdlib.h

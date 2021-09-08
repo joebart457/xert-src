@@ -17,6 +17,7 @@ public:
 	static std::string& trim(std::string& s, const char* t = " \t\n\r\f\v");
 	static long long find(const std::string& src, const std::string& search);
 	static std::string substr(const std::string& src, unsigned long start, unsigned long end);
+	static std::string pad(const std::string& src, char fill, unsigned int width);
 };
 
 #endif
