@@ -121,8 +121,8 @@ public:
         string_ar->environment->define("pad",
             std::make_shared<native_fn>("pad", string_pad)
             ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<char>())
-            ->registerParameter(BuildParameter<unsigned long>()),
+            ->registerParameter(BuildParameter<int8_t>())
+            ->registerParameter(BuildParameter<uint64_t>()),
             true
         );
 
@@ -157,10 +157,10 @@ public:
         );
 
         // hMod will be defined, but in its ctor not here
-        //winlib_env_ar->environment->define("hMod",
+        // winlib_env_ar->environment->define("hMod",
         //    0,
         //    true
-        //);
+        // );
 
         winlib_env_ar->environment->define("constructor",
             std::make_shared<native_fn>("constructor", win_lib_constructor, winlib_env_ar)
@@ -736,6 +736,107 @@ public:
             std::make_shared<binary_fn>("!=", notequal_string_string)
             ->registerParameter(BuildParameter<std::string>())
             ->registerParameter(BuildParameter<std::string>())
+        );
+
+        /* Cast bool */
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_int8_t)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(int8_t).name()) + ")"
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_int16_t)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(int16_t).name()) + ")"
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_int32_t)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(int32_t).name()) + ")"
+
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_int64_t)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(int64_t).name()) + ")"
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_uint8_t)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(uint8_t).name()) + ")"
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_uint16_t)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(uint16_t).name()) + ")"
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_uint32_t)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(uint32_t).name()) + ")"
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_uint64_t)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(uint64_t).name()) + ")"
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_float)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(float).name()) + ")"
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_double)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(double).name()) + ")"
+        );
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_bool_string)
+            ->registerParameter(BuildParameter<bool>()),
+            "::(" + std::string(typeid(bool).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+
+        /* Compare bool */
+        opHandler->registerOperator(
+            std::make_shared<binary_fn>("<", lessthan_bool_bool)
+            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<bool>())
+        );
+        opHandler->registerOperator(
+            std::make_shared<binary_fn>("<=", lessthanequal_bool_bool)
+            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<bool>())
+        );
+        opHandler->registerOperator(
+            std::make_shared<binary_fn>("==", greaterthan_bool_bool)
+            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<bool>())
+        );
+        opHandler->registerOperator(
+            std::make_shared<binary_fn>(">=", greaterthanequal_bool_bool)
+            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<bool>())
+        );
+        opHandler->registerOperator(
+            std::make_shared<binary_fn>("==", equalequal_bool_bool)
+            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<bool>())
+        );
+        opHandler->registerOperator(
+            std::make_shared<binary_fn>("!=", notequal_bool_bool)
+            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<bool>())
         );
 
         /* Unary */
@@ -1585,6 +1686,11 @@ not
             ->registerParameter(BuildParameter<int8_t>()),
             "::(" + std::string(typeid(int8_t).name()) + "," + std::string(typeid(std::string).name()) + ")"
         );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int8_t_bool)
+            ->registerParameter(BuildParameter<int8_t>()),
+            "::(" + std::string(typeid(int8_t).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
         /*
 
         int16_t
@@ -2199,6 +2305,11 @@ not
             std::make_shared<unary_fn>("::", cast_int16_t_string)
             ->registerParameter(BuildParameter<int16_t>()),
             "::(" + std::string(typeid(int16_t).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int16_t_bool)
+            ->registerParameter(BuildParameter<int16_t>()),
+            "::(" + std::string(typeid(int16_t).name()) + "," + std::string(typeid(bool).name()) + ")"
         );
         /*
 
@@ -2815,6 +2926,11 @@ not
             ->registerParameter(BuildParameter<int32_t>()),
             "::(" + std::string(typeid(int32_t).name()) + "," + std::string(typeid(std::string).name()) + ")"
         );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int32_t_bool)
+            ->registerParameter(BuildParameter<int32_t>()),
+            "::(" + std::string(typeid(int32_t).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
         /*
 
         int64_t
@@ -3429,6 +3545,11 @@ not
             std::make_shared<unary_fn>("::", cast_int64_t_string)
             ->registerParameter(BuildParameter<int64_t>()),
             "::(" + std::string(typeid(int64_t).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_int64_t_bool)
+            ->registerParameter(BuildParameter<int64_t>()),
+            "::(" + std::string(typeid(int64_t).name()) + "," + std::string(typeid(bool).name()) + ")"
         );
         /*
 
@@ -4045,6 +4166,11 @@ not
             ->registerParameter(BuildParameter<uint8_t>()),
             "::(" + std::string(typeid(uint8_t).name()) + "," + std::string(typeid(std::string).name()) + ")"
         );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_uint8_t_bool)
+            ->registerParameter(BuildParameter<uint8_t>()),
+            "::(" + std::string(typeid(uint8_t).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
         /*
 
         uint16_t
@@ -4659,6 +4785,11 @@ not
             std::make_shared<unary_fn>("::", cast_uint16_t_string)
             ->registerParameter(BuildParameter<uint16_t>()),
             "::(" + std::string(typeid(uint16_t).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_uint16_t_bool)
+            ->registerParameter(BuildParameter<uint16_t>()),
+            "::(" + std::string(typeid(uint16_t).name()) + "," + std::string(typeid(bool).name()) + ")"
         );
         /*
 
@@ -5275,6 +5406,11 @@ not
             ->registerParameter(BuildParameter<uint32_t>()),
             "::(" + std::string(typeid(uint32_t).name()) + "," + std::string(typeid(std::string).name()) + ")"
         );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_uint32_t_bool)
+            ->registerParameter(BuildParameter<uint32_t>()),
+            "::(" + std::string(typeid(uint32_t).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
         /*
 
         uint64_t
@@ -5889,6 +6025,11 @@ not
             std::make_shared<unary_fn>("::", cast_uint64_t_string)
             ->registerParameter(BuildParameter<uint64_t>()),
             "::(" + std::string(typeid(uint64_t).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_uint64_t_bool)
+            ->registerParameter(BuildParameter<uint64_t>()),
+            "::(" + std::string(typeid(uint64_t).name()) + "," + std::string(typeid(bool).name()) + ")"
         );
         /*
 
@@ -6505,6 +6646,11 @@ not
             ->registerParameter(BuildParameter<float>()),
             "::(" + std::string(typeid(float).name()) + "," + std::string(typeid(std::string).name()) + ")"
         );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_float_bool)
+            ->registerParameter(BuildParameter<float>()),
+            "::(" + std::string(typeid(float).name()) + "," + std::string(typeid(bool).name()) + ")"
+        );
         /*
 
         double
@@ -7119,6 +7265,11 @@ not
             std::make_shared<unary_fn>("::", cast_double_string)
             ->registerParameter(BuildParameter<double>()),
             "::(" + std::string(typeid(double).name()) + "," + std::string(typeid(std::string).name()) + ")"
+        );
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("::", cast_double_bool)
+            ->registerParameter(BuildParameter<double>()),
+            "::(" + std::string(typeid(double).name()) + "," + std::string(typeid(bool).name()) + ")"
         );
         /* END Auto-generation */
        

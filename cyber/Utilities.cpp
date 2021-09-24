@@ -34,6 +34,30 @@ std::string Utilities::stringify(const std::any& obj)
 	if (obj.type() == typeid(int)) {
 		oss << std::any_cast<int>(obj);
 	}
+	else if (obj.type() == typeid(int8_t)) {
+		oss << std::any_cast<int8_t>(obj);
+	}
+	else if (obj.type() == typeid(int16_t)) {
+		oss << std::any_cast<int16_t>(obj);
+	}
+	else if (obj.type() == typeid(int32_t)) {
+		oss << std::any_cast<int32_t>(obj);
+	}
+	else if (obj.type() == typeid(int64_t)) {
+		oss << std::any_cast<int64_t>(obj);
+	}
+	else if (obj.type() == typeid(uint8_t)) {
+		oss << std::any_cast<uint8_t>(obj);
+	}
+	else if (obj.type() == typeid(uint16_t)) {
+		oss << std::any_cast<uint16_t>(obj);
+	}
+	else if (obj.type() == typeid(uint32_t)) {
+		oss << std::any_cast<uint32_t>(obj);
+	}
+	else if (obj.type() == typeid(uint64_t)) {
+		oss << std::any_cast<uint64_t>(obj);
+	}
 	else if (obj.type() == typeid(bool)) {
 		oss << std::boolalpha << std::any_cast<bool>(obj);
 	}
@@ -106,6 +130,30 @@ bool Utilities::isTruthy(const std::any& obj)
 	}
 	else if (obj.type() == typeid(float)) {
 		return std::any_cast<float>(obj);
+	}
+	else if (obj.type() == typeid(int8_t)) {
+		return std::any_cast<int8_t>(obj);
+	}
+	else if (obj.type() == typeid(int16_t)) {
+		return std::any_cast<int16_t>(obj);
+	}
+	else if (obj.type() == typeid(int32_t)) {
+		return std::any_cast<int32_t>(obj);
+	}
+	else if (obj.type() == typeid(int64_t)) {
+		return std::any_cast<int64_t>(obj);
+	}
+	else if (obj.type() == typeid(uint8_t)) {
+		return std::any_cast<uint8_t>(obj);
+	}
+	else if (obj.type() == typeid(uint16_t)) {
+		return std::any_cast<uint16_t>(obj);
+	}
+	else if (obj.type() == typeid(uint32_t)) {
+		return std::any_cast<uint32_t>(obj);
+	}
+	else if (obj.type() == typeid(uint64_t)) {
+		return std::any_cast<uint64_t>(obj);
 	}
 	else if (obj.type() == typeid(double)) {
 		return std::any_cast<double>(obj);

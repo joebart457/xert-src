@@ -754,6 +754,10 @@ std::any cast_int8_t_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<int8_t>(lhs));
 }
+std::any cast_int8_t_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<int8_t>(lhs));
+}
 /*
 
 int16_t
@@ -1297,6 +1301,10 @@ std::any cast_int16_t_double(std::shared_ptr<interpreter> i, std::any& lhs)
 std::any cast_int16_t_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<int16_t>(lhs));
+}
+std::any cast_int16_t_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<int16_t>(lhs));
 }
 /*
 
@@ -1842,6 +1850,10 @@ std::any cast_int32_t_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<int32_t>(lhs));
 }
+std::any cast_int32_t_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<int32_t>(lhs));
+}
 /*
 
 int64_t
@@ -2385,6 +2397,10 @@ std::any cast_int64_t_double(std::shared_ptr<interpreter> i, std::any& lhs)
 std::any cast_int64_t_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<int64_t>(lhs));
+}
+std::any cast_int64_t_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<int64_t>(lhs));
 }
 /*
 
@@ -2930,6 +2946,10 @@ std::any cast_uint8_t_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<uint8_t>(lhs));
 }
+std::any cast_uint8_t_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<uint8_t>(lhs));
+}
 /*
 
 uint16_t
@@ -3473,6 +3493,10 @@ std::any cast_uint16_t_double(std::shared_ptr<interpreter> i, std::any& lhs)
 std::any cast_uint16_t_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<uint16_t>(lhs));
+}
+std::any cast_uint16_t_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<uint16_t>(lhs));
 }
 /*
 
@@ -4018,6 +4042,10 @@ std::any cast_uint32_t_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<uint32_t>(lhs));
 }
+std::any cast_uint32_t_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<uint32_t>(lhs));
+}
 /*
 
 uint64_t
@@ -4561,6 +4589,10 @@ std::any cast_uint64_t_double(std::shared_ptr<interpreter> i, std::any& lhs)
 std::any cast_uint64_t_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<uint64_t>(lhs));
+}
+std::any cast_uint64_t_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<uint64_t>(lhs));
 }
 /*
 
@@ -5106,6 +5138,10 @@ std::any cast_float_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<float>(lhs));
 }
+std::any cast_float_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<float>(lhs));
+}
 /*
 
 double
@@ -5649,4 +5685,8 @@ std::any cast_double_double(std::shared_ptr<interpreter> i, std::any& lhs)
 std::any cast_double_string(std::shared_ptr<interpreter> i, std::any& lhs)
 {
 	return std::to_string(std::any_cast<double>(lhs));
+}
+std::any cast_double_bool(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+	return Utilities().isTruthy(std::any_cast<double>(lhs));
 }

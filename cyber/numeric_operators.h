@@ -331,6 +331,7 @@ std::any cast_int8_t_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int8_t_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int8_t_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int8_t_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_int8_t_bool(std::shared_ptr<interpreter> i, std::any& lhs);
 /*
 
 int16_t
@@ -502,6 +503,7 @@ std::any cast_int16_t_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int16_t_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int16_t_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int16_t_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_int16_t_bool(std::shared_ptr<interpreter> i, std::any& lhs);
 /*
 
 int32_t
@@ -673,6 +675,7 @@ std::any cast_int32_t_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int32_t_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int32_t_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int32_t_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_int32_t_bool(std::shared_ptr<interpreter> i, std::any& lhs);
 /*
 
 int64_t
@@ -844,6 +847,7 @@ std::any cast_int64_t_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int64_t_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int64_t_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_int64_t_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_int64_t_bool(std::shared_ptr<interpreter> i, std::any& lhs);
 /*
 
 uint8_t
@@ -1015,6 +1019,7 @@ std::any cast_uint8_t_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint8_t_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint8_t_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint8_t_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_uint8_t_bool(std::shared_ptr<interpreter> i, std::any& lhs);
 /*
 
 uint16_t
@@ -1186,6 +1191,7 @@ std::any cast_uint16_t_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint16_t_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint16_t_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint16_t_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_uint16_t_bool(std::shared_ptr<interpreter> i, std::any& lhs);
 /*
 
 uint32_t
@@ -1357,6 +1363,7 @@ std::any cast_uint32_t_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint32_t_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint32_t_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint32_t_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_uint32_t_bool(std::shared_ptr<interpreter> i, std::any& lhs);
 /*
 
 uint64_t
@@ -1528,6 +1535,7 @@ std::any cast_uint64_t_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint64_t_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint64_t_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_uint64_t_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_uint64_t_bool(std::shared_ptr<interpreter> i, std::any& lhs);
 /*
 
 float
@@ -1699,6 +1707,7 @@ std::any cast_float_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_float_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_float_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_float_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_float_bool(std::shared_ptr<interpreter> i, std::any& lhs);
 /*
 
 double
@@ -1870,3 +1879,4 @@ std::any cast_double_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_double_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_double_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_double_string(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_double_bool(std::shared_ptr<interpreter> i, std::any& lhs);

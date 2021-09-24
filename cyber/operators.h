@@ -59,3 +59,22 @@ std::any cast_string_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_string_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_string_string(std::shared_ptr<interpreter> i, std::any& lhs);
 
+
+std::any cast_bool_int8_t(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_int16_t(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_int32_t(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_int64_t(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_uint8_t(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_uint16_t(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_uint32_t(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_float(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_double(std::shared_ptr<interpreter> i, std::any& lhs);
+std::any cast_bool_string(std::shared_ptr<interpreter> i, std::any& lhs);
+
+std::any lessthan_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
+std::any lessthanequal_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
+std::any greaterthan_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
+std::any greaterthanequal_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
+std::any equalequal_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
+std::any notequal_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);

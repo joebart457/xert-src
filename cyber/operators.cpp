@@ -346,4 +346,88 @@ std::any cast_string_string(std::shared_ptr<interpreter> i, std::any& lhs)
     return std::any_cast<std::string>(lhs);
 }
 
+/* Boolean support */
+
+std::any cast_bool_int8_t(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<int8_t>(lhsVal);
+}
+std::any cast_bool_int16_t(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<int16_t>(lhsVal);
+}
+std::any cast_bool_int32_t(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<int32_t>(lhsVal);
+}
+std::any cast_bool_int64_t(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<int64_t>(lhsVal);
+}
+std::any cast_bool_uint8_t(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<uint8_t>(lhsVal);
+}
+std::any cast_bool_uint16_t(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<uint16_t>(lhsVal);
+}
+std::any cast_bool_uint32_t(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<uint32_t>(lhsVal);
+}
+std::any cast_bool_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<uint64_t>(lhsVal);
+}
+std::any cast_bool_float(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<float>(lhsVal);
+}
+std::any cast_bool_double(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return static_cast<double>(lhsVal);
+}
+std::any cast_bool_string(std::shared_ptr<interpreter> i, std::any& lhs)
+{
+    bool lhsVal = std::any_cast<bool>(lhs);
+    return std::to_string(lhsVal);
+}
+
+
+std::any lessthan_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
+{
+    return std::any_cast<bool>(lhs) < std::any_cast<bool>(rhs);
+}
+std::any lessthanequal_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
+{
+    return std::any_cast<bool>(lhs) <= std::any_cast<bool>(rhs);
+}
+std::any greaterthan_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
+{
+    return std::any_cast<bool>(lhs) > std::any_cast<bool>(rhs);
+}
+std::any greaterthanequal_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
+{
+    return std::any_cast<bool>(lhs) >= std::any_cast<bool>(rhs);
+}
+std::any equalequal_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
+{
+    return std::any_cast<bool>(lhs) == std::any_cast<bool>(rhs);
+}
+std::any notequal_bool_bool(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
+{
+    return std::any_cast<bool>(lhs) != std::any_cast<bool>(rhs);
+}
+
 /* End Custom Defined Binary Operators */

@@ -214,7 +214,7 @@ std::any string_substr(std::shared_ptr<interpreter> i, _args args)
 std::any string_pad(std::shared_ptr<interpreter> i, _args args)
 {
 	// TODO Refactor 
-	return StringUtilities().pad(args.get<std::string>(0), args.get<char>(1), args.get<unsigned long>(2));
+	return StringUtilities().pad(args.get<std::string>(0), args.get<uint8_t>(1), args.get<uint64_t>(2));
 }
 
 std::any string_to_char(std::shared_ptr<interpreter> i, _args args)
@@ -224,7 +224,7 @@ std::any string_to_char(std::shared_ptr<interpreter> i, _args args)
 	if (src.size() != 1) {
 		throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "unable to convert string of size " + std::to_string(src.size()) + " to char", Severity().MEDIUM());
 	}
-	return src.at(0);
+	return static_cast<uint8_t>(src.at(0));
 }
 
 // Language
