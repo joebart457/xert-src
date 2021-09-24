@@ -250,6 +250,21 @@ private:
 	std::vector<switch_case> m_cases;
 };
 
+class try_catch_statement :
+	public statement {
+	friend class interpreter;
+public:
+	try_catch_statement(std::shared_ptr<statement> run,
+		std::vector<std::pair<std::shared_ptr<variable_declaration>, std::shared_ptr<block>>> catches,
+		const location& loc)
+		:statement("try_catch_statement", loc), m_try{ run }, m_catches{ catches } {}
+	~try_catch_statement() {}
+
+	virtual void accept(std::shared_ptr<interpreter> i);
+private:
+	std::shared_ptr<statement> m_try{ nullptr };
+	std::vector<std::pair<std::shared_ptr<variable_declaration>, std::shared_ptr<block>>> m_catches;
+};
 
 
 class run_recover_statement :

@@ -18,7 +18,6 @@ public:
 
 	std::vector<std::shared_ptr<statement>> parse(std::vector<token> toks)
 	{
-
 		m_pi.init(toks);
 
 		std::vector<std::shared_ptr<statement>> stmts;
@@ -84,7 +83,9 @@ public:
 		if (match_variable_declaration()) {
 			return parse_variable_declaration();
 		}
-
+		if (m_pi.match(Keywords().TRY())) {
+			return parse_try_catch();
+		}
 		if (m_pi.match(Keywords().IF())) {
 			return parse_if();
 		}
@@ -124,6 +125,7 @@ public:
 			return parse_inject();
 		}
 		// Remove^
+
 		if (m_pi.match(Keywords().IF())) {
 			return parse_if();
 		}
@@ -132,6 +134,9 @@ public:
 		}
 		if (m_pi.match(Keywords().RETURN())) {
 			return parse_return();
+		}
+		if (m_pi.match(Keywords().TRY())) {
+			return parse_try_catch();
 		}
 		if (m_pi.match(Keywords().BREAK())) {
 			token tok = m_pi.previous();
@@ -228,7 +233,7 @@ public:
 	}
 
 
-	std::shared_ptr<variable_declaration> parse_variable_declaration()
+	std::shared_ptr<variable_declaration> parse_variable_declaration(bool embedded = false)
 	{
 		param p;
 		if (match_builtin()) {
@@ -239,12 +244,16 @@ public:
 			p.class_specifier = m_pi.consume(TOKEN_TYPE_WORD, "expect type specifier in declaration").lexeme();
 			p.type = "";
 		}
+		token tok = m_pi.previous();
 		p.name = m_pi.consume(TOKEN_TYPE_WORD, "expect variable name in declaration").lexeme();
 		p.default_value = nullptr;
 		if (m_pi.match(Keywords().EQUAL())) {
 			p.default_value = parse_expression();
 		}
-		token tok = m_pi.consume(Keywords().SEMI(), "expect ';' at end of statement");
+		
+		if (!embedded) {
+			m_pi.consume(Keywords().SEMI(), "expect ';' at end of statement");
+		}
 		return std::make_shared<variable_declaration>(p, tok.loc());
 	}
 	
@@ -312,6 +321,24 @@ public:
 			expr = std::make_shared<primary>(nullptr, tok.loc());
 		}
 		return std::make_shared<return_statement>(expr, tok.loc());
+	}
+
+	std::shared_ptr<try_catch_statement> parse_try_catch()
+	{
+		token tok = m_pi.previous();
+		std::shared_ptr<statement> stmt = parse_statement();
+		std::vector<std::pair<std::shared_ptr<variable_declaration>, std::shared_ptr<block>>> catches;
+		do {
+			m_pi.consume(Keywords().CATCH(), "expect catch clause");
+			m_pi.consume(Keywords().LPAREN(), "expect syntax catch(<variable declaration>)");
+			std::shared_ptr<variable_declaration> vardecl = parse_variable_declaration(true);
+			m_pi.consume(Keywords().RPAREN(), "expect syntax catch(<variable declaration>)");
+			m_pi.consume(Keywords().LCURLY(), "expect block in catch clause");
+			std::shared_ptr<block> b = parse_block();
+			catches.push_back(std::make_pair(vardecl, b));
+		} while (!m_pi.atEnd() && m_pi.match(m_pi.current(), Keywords().CATCH()));
+		
+		return std::make_shared<try_catch_statement>(stmt, catches, tok.loc());
 	}
 
 	std::shared_ptr<run_recover_statement> parse_run_recover()

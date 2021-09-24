@@ -7330,6 +7330,8 @@ not
             tokenizer_rule(Keywords().ON(), "on"),
             tokenizer_rule(Keywords().PANIC(), "panic"),
             tokenizer_rule(Keywords().EXTENSION(), "extension"),
+            tokenizer_rule(Keywords().TRY(), "try"),
+            tokenizer_rule(Keywords().CATCH(), "catch"),
 
             tokenizer_rule(Keywords().BOOL(), "bool"),
             tokenizer_rule(Keywords().CHAR(), "char", std::make_shared<std::string>(typeid(char).name())),

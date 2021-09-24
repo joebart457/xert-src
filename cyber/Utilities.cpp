@@ -223,7 +223,7 @@ std::shared_ptr<callable> Utilities::getCallable(std::any callee) {
 }
 
 
-std::string Utilities::getTypeString(std::any& obj)
+std::string Utilities::getTypeString(std::any obj)
 {
 	if (obj.type() == typeid(klass_instance)) {
 		return std::any_cast<klass_instance>(obj).getType();

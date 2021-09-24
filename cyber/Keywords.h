@@ -17,6 +17,8 @@ public:
 	static std::string RECOVER() { return "recover"; }
 	static std::string ON() { return "on"; }
 	static std::string PANIC() { return "panic"; }
+	static std::string TRY() { return "try"; }
+	static std::string CATCH() { return "catch"; }
 
 	// Types
 

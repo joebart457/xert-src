@@ -24,11 +24,12 @@ public:
 	static std::string createOperatorSignature(const std::string& szName, std::vector<std::any> args);
 	static std::string createOperatorSignature(const std::string& szName, std::any arg, const std::string& szTypeName);
 	static std::shared_ptr<callable> getCallable(std::any callee);
-	static std::string getTypeString(std::any& obj);
+	static std::string getTypeString(std::any obj);
 	static std::shared_ptr<activation_record> extractScope(std::any& obj);
 	static std::shared_ptr<klass_definition> BuildErrorObject(const std::string szType, const std::string szMsg, const std::string& szSeverity);
 	static std::any strToAppropriateInt(const std::string& src);
 	static std::any strToAppropriateUInt(const std::string& src);
+
 };
 
 #endif

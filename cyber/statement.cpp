@@ -80,6 +80,12 @@ void switch_statement::accept(std::shared_ptr<interpreter> i)
 }
 
 
+void try_catch_statement::accept(std::shared_ptr<interpreter> i)
+{
+	i->acceptTryCatchStatement(std::static_pointer_cast<try_catch_statement>(shared_from_this()));
+}
+
+
 void run_recover_statement::accept(std::shared_ptr<interpreter> i)
 {
 	i->acceptRunRecoverStatement(std::static_pointer_cast<run_recover_statement>(shared_from_this()));

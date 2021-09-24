@@ -319,6 +319,50 @@ void interpreter::acceptSwitchStatement(std::shared_ptr<switch_statement> switch
 }
 
 
+void interpreter::acceptTryCatchStatement(std::shared_ptr<try_catch_statement> tc_stmt)
+{
+	try {
+		acceptStatement(tc_stmt->m_try);
+	}
+	catch (PanicException err) {
+		bool caught{ false };
+		for (auto c : tc_stmt->m_catches) {
+			std::string errType = Utilities().getTypeString(err.value());
+			if ((c.first->m_var.class_specifier != "" && c.first->m_var.class_specifier == errType)
+				|| c.first->m_var.type == errType) {
+				caught = true;
+				m_context->push_ar();
+				m_context->define(c.first->m_var.name, err.value(), false, c.first->getLocation());
+				try {
+					// this is so we don't nest blocks unneccessarily
+					interpret(c.second->m_statements);
+					m_context->pop_ar();
+				}
+				catch (BreakException pe) {
+					m_context->pop_ar();
+					throw pe;
+				}
+				catch (ReturnException pe) {
+					m_context->pop_ar();
+					throw pe;
+				}
+				catch (PanicException pe) {
+					m_context->pop_ar();
+					throw pe;
+				}
+				catch (ProgramException pe) {
+					m_context->pop_ar();
+					throw pe;
+				}
+			}
+		}
+		if (!caught) {
+			throw err;
+		}
+	}
+}
+
+
 void interpreter::acceptRunRecoverStatement(std::shared_ptr<run_recover_statement> rr_stmt)
 {
 	if (rr_stmt->m_szName != "") {
