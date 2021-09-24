@@ -1,4 +1,6 @@
 	modified:   BuildDefinitions.h
 	modified:   ContextBuilder.h
-	modified:   numeric_operators.h
-	modified:   operators.h
+	modified:   StringUtilities.h
+	modified:   db_helper.h
+	modified:   stdlib.h
+	modified:   ufhndl.h

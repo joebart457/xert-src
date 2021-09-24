@@ -18,7 +18,7 @@ void FileHandle::copyFile(const std::string& source, const std::string& dest) {
 	std::filesystem::copy(source, dest, copyOptions);
 }
 
-uintmax_t FileHandle::removeAll(const std::string& source) {
+uint64_t FileHandle::removeAll(const std::string& source) {
 	return std::filesystem::remove_all(source);
 }
 
@@ -39,12 +39,12 @@ std::vector<std::string> FileHandle::readFile(const std::string& filepath) {
 	}
 }
 
-std::string FileHandle::readLine(const std::string& filepath, unsigned int lineNumber) {
+std::string FileHandle::readLine(const std::string& filepath, uint64_t lineNumber) {
 	std::string fileData;
 	std::ifstream f(filepath);
 	if (f.is_open()) {
 		std::string line;
-		unsigned int counter = 0;
+		uint64_t counter = 0;
 		while (std::getline(f, line)) {
 			if (counter == lineNumber) {
 				fileData = line;
@@ -60,7 +60,7 @@ std::string FileHandle::readLine(const std::string& filepath, unsigned int lineN
 	}
 }
 
-unsigned int FileHandle::countLines(const std::string& filepath) {
+uint64_t FileHandle::countLines(const std::string& filepath) {
 	std::ifstream f(filepath);
 	if (f.is_open()) {
 		std::string line;
@@ -143,7 +143,7 @@ void FileHandle::rename(const std::string& szSource, const std::string& szRename
 	std::filesystem::rename(szSource, szRename);
 }
 
-uintmax_t FileHandle::file_size(const std::string& szFilePath)
+uint64_t FileHandle::file_size(const std::string& szFilePath)
 {
 	return std::filesystem::file_size(szFilePath);
 }
@@ -159,7 +159,7 @@ PanicException FileHandle::BuildException(const std::string& msg)
 }
 
 
-bool FileHandle::replaceLine(const std::string& szFile, const std::string& newLine, unsigned long lineNumber)
+bool FileHandle::replaceLine(const std::string& szFile, const std::string& newLine, uint64_t lineNumber)
 {
 	if (countLines(szFile) < lineNumber) {
 		return false;
@@ -169,7 +169,7 @@ bool FileHandle::replaceLine(const std::string& szFile, const std::string& newLi
 	std::ofstream outFile(szOutFile, std::ofstream::out);
 	if (inFile.is_open() && outFile.is_open()) {
 		std::string line;
-		unsigned int counter = 0;
+		uint64_t counter = 0;
 		while (std::getline(inFile, line)) {
 			if (counter == lineNumber) {
 				outFile << newLine << "\n";

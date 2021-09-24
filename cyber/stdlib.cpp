@@ -12,13 +12,13 @@
 
 std::any time_timestamp(std::shared_ptr<interpreter> i, _args args)
 {
-	std::time_t result = std::time(nullptr);
+	int64_t result = std::time(nullptr);
 	return result;
 }
 
 std::any time_timestamp_to_timestring(std::shared_ptr<interpreter> i, _args args)
 {
-	std::time_t timestamp = args.get<long long>(0);
+	int64_t timestamp = args.get<int64_t>(0);
 	std::tm timeStruct;
 	localtime_s(&timeStruct, &timestamp);
 	char buffer[32];
@@ -29,7 +29,7 @@ std::any time_timestamp_to_timestring(std::shared_ptr<interpreter> i, _args args
 
 std::any time_timestamp_to_timestring_f(std::shared_ptr<interpreter> i, _args args)
 {
-	std::time_t timestamp = args.get<long long>(0);
+	std::time_t timestamp = args.get<int64_t>(0);
 	std::string szFormat = args.get<std::string>(1);
 	std::tm timeStruct;
 	localtime_s(&timeStruct, &timestamp);
@@ -93,10 +93,10 @@ std::any list_push(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
 
-	unsigned long size = context->get<unsigned long>("size");
+	uint64_t size = context->get<uint64_t>("size");
 
 	context->define(std::to_string(size), args.at(0), false, location());
-	context->assign("size", ((unsigned long)size + 1), location());
+	context->assign("size", size + 1, location());
 
 	return nullptr;
 }
@@ -109,7 +109,7 @@ std::any list_constructor(std::shared_ptr<interpreter> i, _args args)
 	for (unsigned int i{ 0 }; i < args.size(); i++) {
 		context->define(std::to_string(i), args.at(i), false, location());
 	}
-	context->assign("size", (unsigned long)args.size(), location());
+	context->assign("size", (uint64_t)args.size(), location());
 
 	return nullptr;
 }
@@ -203,7 +203,7 @@ std::any string_trim(std::shared_ptr<interpreter> i, _args args)
 
 std::any string_find(std::shared_ptr<interpreter> i, _args args)
 {
-	return static_cast<long long>(StringUtilities().find(args.get<std::string>(0), args.get<std::string>(1)));
+	return static_cast<int64_t>(StringUtilities().find(args.get<std::string>(0), args.get<std::string>(1)));
 }
 
 std::any string_substr(std::shared_ptr<interpreter> i, _args args)
@@ -213,13 +213,11 @@ std::any string_substr(std::shared_ptr<interpreter> i, _args args)
 
 std::any string_pad(std::shared_ptr<interpreter> i, _args args)
 {
-	// TODO Refactor 
-	return StringUtilities().pad(args.get<std::string>(0), args.get<uint8_t>(1), args.get<uint64_t>(2));
+	return StringUtilities().pad(args.get<std::string>(0), args.get<uint8_t>(1), args.get<int64_t>(2));
 }
 
 std::any string_to_char(std::shared_ptr<interpreter> i, _args args)
 {
-	// TODO Refactor 
 	std::string src = args.get<std::string>(0);
 	if (src.size() != 1) {
 		throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "unable to convert string of size " + std::to_string(src.size()) + " to char", Severity().MEDIUM());
@@ -232,6 +230,11 @@ std::any string_to_char(std::shared_ptr<interpreter> i, _args args)
 std::any print_environment(std::shared_ptr<interpreter> i, _args args)
 {
 	Utilities().fetch_context(i)->output();
+	return nullptr;
+}
+
+std::any print_operators(std::shared_ptr<interpreter> i, _args args)
+{
 	Utilities().fetch_context(i)->output_operators();
 	return nullptr;
 }
@@ -286,7 +289,7 @@ std::any fs_real_file_to_string(std::shared_ptr<interpreter> i, _args args)
 
 std::any fs_read_line_from_file(std::shared_ptr<interpreter> i, _args args)
 {
-	return FileHandle().readLine(args.get<std::string>(0), args.get<unsigned long>(1));
+	return FileHandle().readLine(args.get<std::string>(0), args.get<uint64_t>(1));
 }
 
 std::any fs_write_to_file(std::shared_ptr<interpreter> i, _args args)
@@ -303,8 +306,7 @@ std::any fs_write_line_to_file(std::shared_ptr<interpreter> i, _args args)
 
 std::any fs_count_lines(std::shared_ptr<interpreter> i, _args args)
 {
-	unsigned long lineCount = FileHandle().countLines(args.get<std::string>(0));
-	return lineCount;
+	return FileHandle().countLines(args.get<std::string>(0));
 }
 
 std::any fs_current_path(std::shared_ptr<interpreter> i, _args args)
@@ -331,8 +333,7 @@ std::any fs_rename_file(std::shared_ptr<interpreter> i, _args args)
 
 std::any fs_file_size(std::shared_ptr<interpreter> i, _args args)
 {
-	uintmax_t size = FileHandle().file_size(args.get<std::string>(0));
-	return size;
+	return FileHandle().file_size(args.get<std::string>(0));
 }
 
 std::any fs_exists(std::shared_ptr<interpreter> i, _args args)
@@ -342,7 +343,7 @@ std::any fs_exists(std::shared_ptr<interpreter> i, _args args)
 
 std::any fs_replace_line(std::shared_ptr<interpreter> i, _args args)
 {
-	return FileHandle().replaceLine(args.get<std::string>(0), args.get<std::string>(1), args.get<unsigned long>(2));
+	return FileHandle().replaceLine(args.get<std::string>(0), args.get<std::string>(1), args.get<uint64_t>(2));
 }
 
 std::any fs_get_unique_name(std::shared_ptr<interpreter> i, _args args)

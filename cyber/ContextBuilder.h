@@ -122,7 +122,7 @@ public:
             std::make_shared<native_fn>("pad", string_pad)
             ->registerParameter(BuildParameter<std::string>())
             ->registerParameter(BuildParameter<int8_t>())
-            ->registerParameter(BuildParameter<uint64_t>()),
+            ->registerParameter(BuildParameter<int64_t>()),
             true
         );
 
@@ -212,7 +212,7 @@ public:
         );
 
 		list_env_ar->environment->define("size",
-			(unsigned long)0
+			(uint64_t)0
         );
 
 		
@@ -288,6 +288,8 @@ public:
         fs_env_ar->environment->define("read_line",
             std::make_shared<native_fn>("read_line", fs_read_line_from_file, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter<uint64_t>())
+                
         );
         fs_env_ar->environment->define("read_to_string",
             std::make_shared<native_fn>("read_to_string", fs_real_file_to_string, fs_env_ar)
@@ -338,7 +340,7 @@ public:
             std::make_shared<native_fn>("replace_line", fs_replace_line, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>())
             ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<unsigned long>()),
+            ->registerParameter(BuildParameter<uint64_t>()),
             true
         );
         fs_env_ar->environment->define("make_unique",
@@ -407,13 +409,13 @@ public:
 
         e->define("time_str",
             std::make_shared<native_fn>("time_str", time_timestamp_to_timestring, time_ar)
-            ->registerParameter(BuildParameter<long long>()),
+            ->registerParameter(BuildParameter<int64_t>()),
             true
         );
 
         e->define("time_str_f",
             std::make_shared<native_fn>("time_str_f", time_timestamp_to_timestring_f, time_ar)
-            ->registerParameter(BuildParameter<long long>())
+            ->registerParameter(BuildParameter<int64_t>())
             ->registerParameter(BuildParameter<std::string>()),
             true
         );
@@ -431,6 +433,11 @@ public:
 
         language_ar->environment->define("e",
             std::make_shared<native_fn>("e", print_environment, language_ar),
+            true
+        );
+
+        language_ar->environment->define("o",
+            std::make_shared<native_fn>("o", print_operators, language_ar),
             true
         );
 

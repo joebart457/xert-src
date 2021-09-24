@@ -75,7 +75,7 @@ public:
         std::string szColumn;
         for (unsigned int i = 0; i < (unsigned int)argc; i++) {
             szColumn = StringUtilities().lower(azColName[i]);
-            std::any val = argv[i] ? std::string(reinterpret_cast<const char *>(argv[i])) : nullptr;
+            std::any val = argv[i] != nullptr? std::string(reinterpret_cast<const char *>(argv[i])) : nullptr;
             row.Define(szColumn, val, location(), true);
         }
         context->results.push_back(row);
@@ -111,7 +111,7 @@ public:
                 for (unsigned int i = 0; i < bind_parameter_count; i++) {
 
                     //  Bind-parameter indexing is 1-based.
-                    if (args.at(i).type() == typeid(int)) {
+                    if (args.at(i).type() == typeid(int32_t)) {
                         rc = sqlite3_bind_int(stmt, i + 1, std::any_cast<int>(args.at(i)));
                     }
                     else if (args.at(i).type() == typeid(double)) {
@@ -141,7 +141,7 @@ public:
                         int columnType = sqlite3_column_type(stmt, colIndex); // SQLITE_INTEGER, SQLITE_FLOAT, SQLITE_TEXT, SQLITE_BLOB OR SQLITE_NULL
                         if (include_unexpected) {
                             if (columnType == SQLITE_INTEGER) {
-                                row.Define(szColumnName, sqlite3_column_int(stmt, colIndex), location(), true);
+                                row.Define(szColumnName, static_cast<int32_t>(sqlite3_column_int(stmt, colIndex)), location(), true);
                             }
                             else if (columnType == SQLITE_FLOAT) {
                                 row.Define(szColumnName, sqlite3_column_double(stmt, colIndex), location(), true);
@@ -160,7 +160,7 @@ public:
                         else {
                             if (row.Exists(szColumnName)) {
                                 if (columnType == SQLITE_INTEGER) {
-                                    row.Assign(szColumnName, sqlite3_column_int(stmt, colIndex), location());
+                                    row.Assign(szColumnName, static_cast<int32_t>(sqlite3_column_int(stmt, colIndex)), location());
                                 }
                                 else if (columnType == SQLITE_FLOAT) {
                                     row.Assign(szColumnName, sqlite3_column_double(stmt, colIndex), location());

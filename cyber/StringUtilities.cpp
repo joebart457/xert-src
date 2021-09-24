@@ -86,7 +86,7 @@ std::string StringUtilities::substr(const std::string& src, uint64_t start, uint
 	return src.substr(start, end);
 }
 
-std::string StringUtilities::pad(const std::string& src, char fill, unsigned int width)
+std::string StringUtilities::pad(const std::string& src, char fill, int64_t width)
 {
 	std::ostringstream oss;
 	oss << std::setw(width) << std::internal << std::setfill(fill) << src;
