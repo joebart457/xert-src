@@ -60,6 +60,9 @@
     <ClCompile Include="win_std_lib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="numeric_operators.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="callable.h">
@@ -147,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BuildDefinitions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="numeric_operators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

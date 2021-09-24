@@ -39,8 +39,8 @@ std::any native_fn::call(std::shared_ptr<interpreter> c, _args args)
 		std::vector<std::any> cleanedArgs;
 		if (!m_variadic) {
 			if (args.size() != m_params.size()) {
-				throw ProgramException("parity_mismatch", "expected " + std::to_string(m_params.size())
-					+ " arguments but got " + std::to_string(args.size()), location());
+				throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected " + std::to_string(m_params.size())
+					+ " arguments but got " + std::to_string(args.size()), Severity().MEDIUM());
 			}
 
 			for (unsigned int i{ 0 }; i < m_params.size(); i++) {
@@ -51,8 +51,8 @@ std::any native_fn::call(std::shared_ptr<interpreter> c, _args args)
 		else {
 
 			if (args.size() < m_variadic_after) {
-				throw ProgramException("parity_mismatch", "expected at least " + std::to_string(m_params.size())
-					+ " arguments but got " + std::to_string(args.size()), location());
+				throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected at least " + std::to_string(m_params.size())
+					+ " arguments but got " + std::to_string(args.size()), Severity().MEDIUM());
 			}
 
 			unsigned int i{ 0 };
@@ -107,9 +107,9 @@ std::shared_ptr<native_fn> native_fn::setVariadic()
 
 std::shared_ptr<native_fn> native_fn::setVariadicAfter(unsigned int index)
 {
-	if (!m_variadic) throw ProgramException("cannot set variadic index of non-variadic function", location(), Severity().FATAL());
-	if (index > m_params.size()) throw ProgramException("variadic index must be less than parameter size", location(), Severity().FATAL());
-	m_variadic_after = index;
+	if (!m_variadic) throw ExceptionBuilder().Build(ExceptionTypes().PRECOMPILE(), "cannot set variadic index of non-variadic function", Severity().FATAL());
+	if (index > m_params.size()) throw ExceptionBuilder().Build(ExceptionTypes().PRECOMPILE(), "variadic index must be less than parameter size", Severity().FATAL());
+
 	return std::static_pointer_cast<native_fn>(shared_from_this());
 }
 
@@ -132,8 +132,8 @@ std::any custom_fn::call(std::shared_ptr<interpreter> c, _args arguments)
 
 		// Check parity
 		if (arguments.size() != m_params.size()) {
-			throw ProgramException("parity_mismatch", "expected " + std::to_string(m_params.size())
-				+ " arguments but got " + std::to_string(arguments.size()), m_loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected " + std::to_string(m_params.size())
+				+ " arguments but got " + std::to_string(arguments.size()), Severity().MEDIUM(), m_loc);
 		}
 
 		// Clean arguments and define parameters in this scope
@@ -191,7 +191,7 @@ std::any unary_fn::call(std::shared_ptr<interpreter> c, _args args)
 {
 	Utilities().check_context(c);
 	if (args.size() != 1) {
-		throw ProgramException("parity_mismatch", "expected 1 argument but got " + std::to_string(args.size()), location());
+		throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected 1 argument but got " + std::to_string(args.size()), Severity().MEDIUM());
 	}
 
 
@@ -219,7 +219,7 @@ std::any binary_fn::call(std::shared_ptr<interpreter> c,  _args args)
 {
 	Utilities().check_context(c);
 	if (args.size() != m_params.size() || m_params.size() != 2) {
-		throw ProgramException("parity_mismatch", "expected 2 arguments but got " + std::to_string(args.size()), location());
+		throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected 2 arguments but got " + std::to_string(args.size()), Severity().MEDIUM());
 	}
 
 	std::vector<std::any> cleanedArgs;
@@ -256,8 +256,8 @@ std::any loaded_native_fn::call(std::shared_ptr<interpreter> c, _args args)
 		std::vector<std::any> cleanedArgs;
 		if (!m_variadic) {
 			if (args.size() != m_params.size()) {
-				throw ProgramException("parity_mismatch", "expected " + std::to_string(m_params.size())
-					+ " arguments but got " + std::to_string(args.size()), location());
+				throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected " + std::to_string(m_params.size())
+					+ " arguments but got " + std::to_string(args.size()), Severity().MEDIUM());
 			}
 
 			for (unsigned int i{ 0 }; i < m_params.size(); i++) {
@@ -268,8 +268,8 @@ std::any loaded_native_fn::call(std::shared_ptr<interpreter> c, _args args)
 		else {
 
 			if (args.size() < m_variadic_after) {
-				throw ProgramException("parity_mismatch", "expected at least " + std::to_string(m_params.size())
-					+ " arguments but got " + std::to_string(args.size()), location());
+				throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected at least " + std::to_string(m_params.size())
+					+ " arguments but got " + std::to_string(args.size()), Severity().MEDIUM());
 			}
 
 			unsigned int i{ 0 };
@@ -324,8 +324,8 @@ std::shared_ptr<loaded_native_fn> loaded_native_fn::setVariadic()
 
 std::shared_ptr<loaded_native_fn> loaded_native_fn::setVariadicAfter(unsigned int index)
 {
-	if (!m_variadic) throw ProgramException("cannot set variadic index of non-variadic function", location(), Severity().FATAL());
-	if (index > m_params.size()) throw ProgramException("variadic index must be less than parameter size", location(), Severity().FATAL());
+	if (!m_variadic) throw ExceptionBuilder().Build(ExceptionTypes().PRECOMPILE(), "cannot set variadic index of non-variadic function", Severity().FATAL());
+	if (index > m_params.size()) throw ExceptionBuilder().Build(ExceptionTypes().PRECOMPILE(), "variadic index must be less than parameter size", Severity().FATAL());
 	m_variadic_after = index;
 	return std::static_pointer_cast<loaded_native_fn>(shared_from_this());
 }

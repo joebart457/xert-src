@@ -20,5 +20,13 @@ std::shared_ptr<callable> OperatorHandler::getOperator(std::string szName)
 	if (m_operators.count(szName)) {
 		return m_operators[szName];
 	}
-	throw ProgramException("Undefined operator '" + szName + "'", location(), Severity().CRITICAL());
+	throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "Undefined operator '" + szName + "'", Severity().CRITICAL());
+}
+
+
+void OperatorHandler::output()
+{
+	for (auto it = m_operators.begin(); it != m_operators.end(); it++) {
+		std::cout << it->first << ":=" << (it->second == nullptr ? "<null>" : it->second->getSignature()) << std::endl;
+	}
 }

@@ -170,6 +170,7 @@
     <ClInclude Include="language_main.h" />
     <ClInclude Include="list_crawler.h" />
     <ClInclude Include="location.h" />
+    <ClInclude Include="numeric_operators.h" />
     <ClInclude Include="OperatorHandler.h" />
     <ClInclude Include="operators.h" />
     <ClInclude Include="parser.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="expression.cpp" />
     <ClCompile Include="interpreter.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="numeric_operators.cpp" />
     <ClCompile Include="OperatorHandler.cpp" />
     <ClCompile Include="operators.cpp" />
     <ClCompile Include="scope.cpp" />

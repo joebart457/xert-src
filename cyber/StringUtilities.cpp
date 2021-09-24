@@ -78,7 +78,7 @@ long long StringUtilities::find(const std::string& src, const std::string& searc
 	return found;
 }
 
-std::string StringUtilities::substr(const std::string& src, unsigned long start, unsigned long end)
+std::string StringUtilities::substr(const std::string& src, uint64_t start, uint64_t end)
 {
 	if (start > src.size() || end > src.size()) {
 		return "";

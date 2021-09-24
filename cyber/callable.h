@@ -47,12 +47,12 @@ public:
 	{
 		if (index < m_data.size()) {
 			if (m_data.at(index).type() != typeid(_Ty)) {
-				throw ProgramException("unable to retrieve object from callable arguments; type mismatch "
-					+std::string(m_data.at(index).type().name())+" != "+std::string(typeid(_Ty).name()), location());
+				throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "unable to retrieve object from callable arguments; type mismatch "
+					+std::string(m_data.at(index).type().name())+" != "+std::string(typeid(_Ty).name()), Severity().MEDIUM());
 			}
 			return std::any_cast<_Ty>(m_data.at(index));
 		}
-		throw ProgramException("index out of range "+std::to_string(m_data.size())+" < "+std::to_string(index), location());
+		throw ExceptionBuilder().Build(ExceptionTypes().PRECOMPILE(), "index out of range "+std::to_string(m_data.size())+" < "+std::to_string(index), Severity().HIGH());
 	}
 
 private:
@@ -74,6 +74,7 @@ public:
 	virtual std::string getSignature();
 
 protected:
+	bool m_bMayThrow{ false };
 	std::string m_szName{ "" };
 	std::vector<param> m_params;
 };
@@ -98,6 +99,10 @@ public:
 
 	std::shared_ptr<native_fn> registerParameter(const param& p);
 
+	std::shared_ptr<native_fn> mayThrow() {
+		m_bMayThrow = true;
+		return std::static_pointer_cast<native_fn>(shared_from_this());
+	}
 private:
 	func m_hFn;
 	std::shared_ptr<activation_record> m_enclosing{ nullptr };
@@ -119,6 +124,11 @@ public:
 	std::any call(std::shared_ptr<interpreter> c, _args arguments);
 
 	void setEnclosing(std::shared_ptr<activation_record> ar);
+
+	std::shared_ptr<custom_fn> mayThrow() {
+		m_bMayThrow = true;
+		return std::static_pointer_cast<custom_fn>(shared_from_this());
+	}
 private:
 	std::shared_ptr<activation_record> m_enclosing;
 	std::vector<std::shared_ptr<statement>> m_body;
@@ -143,6 +153,10 @@ public:
 
 	virtual std::string getSignature();
 
+	std::shared_ptr<unary_fn> mayThrow() {
+		m_bMayThrow = true;
+		return std::static_pointer_cast<unary_fn>(shared_from_this());
+	}
 
 private:
 	unary_func m_hFn;
@@ -164,6 +178,10 @@ public:
 
 	std::shared_ptr<binary_fn> registerParameter(const param& p);
 
+	std::shared_ptr<binary_fn> mayThrow() {
+		m_bMayThrow = true;
+		return std::static_pointer_cast<binary_fn>(shared_from_this());
+	}
 private:
 	binary_func m_hFn;
 };
@@ -189,6 +207,10 @@ public:
 
 	std::shared_ptr<loaded_native_fn> registerParameter(const param& p);
 
+	std::shared_ptr<loaded_native_fn> mayThrow() {
+		m_bMayThrow = true;
+		return std::static_pointer_cast<loaded_native_fn>(shared_from_this());
+	}
 private:
 	hFunc m_hFn;
 	std::shared_ptr<activation_record> m_enclosing{ nullptr };

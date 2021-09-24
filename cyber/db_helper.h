@@ -36,7 +36,7 @@ public:
         }
         int rc = sqlite3_open(szPath.c_str(), &m_db);
         if (rc) {
-            throw ProgramException("sql error: " + std::string(sqlite3_errmsg(m_db)), location());
+            throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error (-1): " + std::string(sqlite3_errmsg(m_db)), Severity().MEDIUM());
         }
     }
 
@@ -60,7 +60,7 @@ public:
         if (rc != SQLITE_OK) {
             std::string  szErr = zErrMsg;
             sqlite3_free(zErrMsg);
-            throw ProgramException("sql error: " + szErr, location());
+            throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error (0): " + szErr, Severity().MEDIUM());
         }
         else {
             return context.results;
@@ -99,13 +99,13 @@ public:
             int rc = 0;
             rc = sqlite3_prepare_v2(m_db, sql.c_str(), -1, &stmt, 0);
             if (rc != SQLITE_OK) {
-                throw ProgramException("sql error: 1" + std::string(sqlite3_errmsg(m_db)), location());
+                throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error (1): " + std::string(sqlite3_errmsg(m_db)), Severity().MEDIUM());
             }
 
             for (int bindIndex = 0; bindIndex < numBinds; bindIndex++) {
                 unsigned int bind_parameter_count = sqlite3_bind_parameter_count(stmt);
                 if (bind_parameter_count != args.size()) {
-                    throw ProgramException("sql error: expected " + std::to_string(bind_parameter_count) + " binds but got " + std::to_string(args.size()), location());
+                    throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error: expected " + std::to_string(bind_parameter_count) + " binds but got " + std::to_string(args.size()), Severity().MEDIUM());
                 }
 
                 for (unsigned int i = 0; i < bind_parameter_count; i++) {
@@ -125,10 +125,10 @@ public:
                         rc = sqlite3_bind_text(stmt, i + 1, bindValue.c_str(), strlen(bindValue.c_str()), nullptr);
                     }
                     else {
-                        throw ProgramException("sql error: unsupported parameter type; object type was: " + std::string(args.at(i).type().name()), location());
+                        throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error: unsupported parameter type; object type was: " + std::string(args.at(i).type().name()), Severity().MEDIUM());
                     }
                     if (rc != SQLITE_OK) {
-                        throw ProgramException("sql error: 2" + std::string(sqlite3_errmsg(m_db)), location());
+                        throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error (2): " + std::string(sqlite3_errmsg(m_db)), Severity().MEDIUM());
                     }
                 }
 
@@ -154,7 +154,7 @@ public:
                                 row.Define(szColumnName, nullptr, location(), true);
                             }
                             else {
-                                throw ProgramException("sql error: unsupported column return type of column " + szColumnName, location());
+                                throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error: unsupported column return type of column " + szColumnName, Severity().MEDIUM());
                             }
                         }
                         else {
@@ -173,11 +173,11 @@ public:
                                     row.Assign(szColumnName, nullptr, location());
                                 }
                                 else {
-                                    throw ProgramException("sql error: unsupported column return type of column " + szColumnName, location());
+                                    throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error: unsupported column return type of column " + szColumnName, Severity().MEDIUM());
                                 }
                             }
                             else {
-                                throw ProgramException("sql error: unable to map column '" + szColumnName + "' to value", location());
+                                throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error: unable to map column '" + szColumnName + "' to value", Severity().MEDIUM());
                             }
                         }
                     }
@@ -186,19 +186,19 @@ public:
                     rc = sqlite3_step(stmt);
                 }
                 if (rc != SQLITE_DONE) {
-                    throw ProgramException("sql error: 3" + std::string(sqlite3_errmsg(m_db)), location());
+                    throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error (3): " + std::string(sqlite3_errmsg(m_db)), Severity().MEDIUM());
                 }
                 //  Reset the statement after each bind.
 
                 rc = sqlite3_reset(stmt);
                 if (rc != SQLITE_OK) {
-                    throw ProgramException("sql error: 4" + std::string(sqlite3_errmsg(m_db)), location());
+                    throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error (4): " + std::string(sqlite3_errmsg(m_db)), Severity().MEDIUM());
                 }
             }
 
             rc = sqlite3_finalize(stmt);  //  Finalize the prepared statement.
             if (rc != SQLITE_OK) {
-                throw ProgramException("sql error: 6" + std::string(sqlite3_errmsg(m_db)), location());
+                throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "sql error (5): " + std::string(sqlite3_errmsg(m_db)), Severity().MEDIUM());
             }
             return results;
         }
@@ -215,7 +215,7 @@ private:
     void check_db()
     {
         if (m_db == nullptr) {
-            throw ProgramException("db was null", location(), Severity().CRITICAL());
+            throw ExceptionBuilder().Build(ExceptionTypes().SQL(), "db was null", Severity().HIGH());
         }
         m_queryCount++;
     }

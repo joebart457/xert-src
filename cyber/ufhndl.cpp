@@ -155,9 +155,7 @@ bool FileHandle::exists(const std::string& szFilePath)
 
 PanicException FileHandle::BuildException(const std::string& msg)
 {
-	PanicException pe(IOException(msg, location()), location());
-	pe.addStackTrace(msg, location());
-	return pe;
+	return ExceptionBuilder().Build(ExceptionTypes().IO(), msg, Severity().MEDIUM());
 }
 
 

@@ -76,7 +76,7 @@ class Op{
 			}
 		} 
 		else {
-			result = result + "\tthrow ProgramException(\"Unsupported Operation\", location());\n";
+			result = result + "\tthrow Exceptions().Build(ExceptionTypes().NOT_SUPPORTED(), \"NotSupportedException\", Severity().HIGH());\n";
 		}
 		result = result + "}\n";
 		return result;
@@ -199,7 +199,7 @@ class Op{
 			}			
 		} 
 		else {
-			result = result + "\tthrow ProgramException(\"Unsupported Operation\", location());\n";
+			result = result + "\tthrow Exceptions().Build(ExceptionTypes().NOT_SUPPORTED(), \"NotSupportedException\", Severity().HIGH());\n";
 		}
 		result = result + "}\n";
 		return result;

@@ -60,7 +60,7 @@ public:
 		if (m_pi.match(Keywords().EXTENSION())) {
 			return parse_class_extension();
 		}
-		throw ParsingException("unrecognized token in toplevel: " + m_pi.current().toStr() + "; expect declaration only in toplevel",  m_pi.current().loc());
+		throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unrecognized token in toplevel: " + m_pi.current().toStr() + "; expect declaration only in toplevel", Severity().HIGH(), m_pi.current().loc());
 	}
 
 	std::shared_ptr<statement> parse_all()
@@ -187,7 +187,7 @@ public:
 					parameters.push_back(p);
 				}
 				else {
-					throw ParsingException("expect parameter list in function declaration", name.loc());
+					throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "expect parameter list in function declaration", Severity().HIGH(), name.loc());
 				}
 			} while (!m_pi.atEnd() && m_pi.match(Keywords().COMMA()));
 			m_pi.consume(Keywords().RPAREN(), "expect syntax: function <id>(*params){ //... }");
@@ -285,7 +285,7 @@ public:
 				m_pi.consume(Keywords().COLON(), "Expect ':' after 'default' in switch case");
 				sc.isDefault = true;
 			}
-			throw ParsingException("Unexpected token in switch case", m_pi.current().loc());
+			throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "Unexpected token in switch case", Severity().HIGH(), m_pi.current().loc());
 		} while (m_pi.current().type() == Keywords().CASE() || m_pi.current().type() == Keywords().DEFAULT() || m_pi.current().type() == Keywords().LCURLY());
 		return std::make_shared<switch_statement>(expr, switch_cases, tok.loc());
 	}
@@ -391,7 +391,7 @@ public:
 				return std::make_shared<assignment>(g->lhs, g->identifier, value, tok.loc());
 			}
 			else {
-				throw ParsingException("Invalid assignment target.", m_pi.previous().loc());
+				throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "Invalid assignment target.", Severity().HIGH(), m_pi.previous().loc());
 			}
 		}
 
@@ -551,37 +551,21 @@ public:
 				return std::make_shared<primary>(std::stof(value.lexeme()), value.loc());
 			}
 			catch (std::invalid_argument) {
-				throw ParsingException("unable to parse float value at: " + value.toStr(), m_pi.previous().loc());
+				throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse float value at: " + value.toStr(), Severity().HIGH(), m_pi.previous().loc());
 			}
 			catch (std::out_of_range) {
-				throw ParsingException("unable to parse float value at: " + value.toStr(), m_pi.previous().loc());
+				throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse float value at: " + value.toStr(), Severity().HIGH(), m_pi.previous().loc());
 			}
 		}
 
 		if (m_pi.match(TOKEN_TYPE_INTEGER)) {
 			token value = m_pi.previous();
-			try {
-				return std::make_shared<primary>(std::stoi(value.lexeme()), value.loc());
-			}
-			catch (std::invalid_argument) {
-				throw ParsingException("unable to parse integer value at: " + value.toStr(), m_pi.previous().loc());
-			}
-			catch (std::out_of_range) {
-				throw ParsingException("unable to parse integer value at: " + value.toStr(), m_pi.previous().loc());
-			}
+			return std::make_shared<primary>(Utilities().strToAppropriateInt(value.lexeme()), value.loc());
 		}
 
 		if (m_pi.match(TOKEN_TYPE_UNSIGNED)) {
 			token value = m_pi.previous();
-			try {
-				return std::make_shared<primary>(std::stoul(value.lexeme()), value.loc());
-			}
-			catch (std::invalid_argument) {
-				throw ParsingException("unable to parse integer value at: " + value.toStr(), m_pi.previous().loc());
-			}
-			catch (std::out_of_range) {
-				throw ParsingException("unable to parse integer value at: " + value.toStr(), m_pi.previous().loc());
-			}
+			return std::make_shared<primary>(Utilities().strToAppropriateUInt(value.lexeme()), value.loc());
 		}
 
 		if (m_pi.match(TOKEN_TYPE_DOUBLE)) {
@@ -590,10 +574,10 @@ public:
 				return std::make_shared<primary>(std::stod(value.lexeme()), value.loc());
 			}
 			catch (std::invalid_argument) {
-				throw ParsingException("unable to parse double value at: " + value.toStr(), m_pi.previous().loc());
+				throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse double value at: " + value.toStr(), Severity().HIGH(), m_pi.previous().loc());
 			}
 			catch (std::out_of_range) {
-				throw ParsingException("unable to parse double value at: " + value.toStr(), m_pi.previous().loc());
+				throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse double value at: " + value.toStr(), Severity().HIGH(), m_pi.previous().loc());
 			}
 		}
 
@@ -631,7 +615,7 @@ public:
 
 		if (m_pi.match(TOKEN_TYPE_INJECTED_STRING)) {
 			token tok = m_pi.previous();
-			throw ParsingException("token type '" + std::string(TOKEN_TYPE_INJECTED_STRING) + "' is not supported", tok.loc());
+			throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "token type '" + std::string(TOKEN_TYPE_INJECTED_STRING) + "' is not supported", Severity().HIGH(), tok.loc());
 		}
 
 		if (m_pi.match(Keywords().LBRACKET())) {
@@ -646,7 +630,7 @@ public:
 			return std::make_shared<list_initializer>(args, tok.loc());
 		}
 
-		throw ParsingException("unexpected token in primary \"" + m_pi.current().toStr() + "\"", m_pi.current().loc());
+		throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unexpected token in primary \"" + m_pi.current().toStr() + "\"", Severity().HIGH(), m_pi.current().loc());
 	}
 
 private:
@@ -666,15 +650,18 @@ private:
 	}
 
 	const std::vector<std::string> builtin_typenames {
-		Keywords().UINT(),
-		Keywords().INT(),
-		Keywords().FLOAT(),
-		Keywords().DOUBLE(),
-		Keywords().LONGDOUBLE(),
-		Keywords().LONGLONG(),
-		Keywords().CHAR(),
+		Keywords().BOOL(),
 		Keywords().STRING(),
-		Keywords().BOOL()
+		Keywords().UINT8_T(),
+		Keywords().UINT16_T(),
+		Keywords().UINT32_T(),
+		Keywords().UINT64_T(),
+		Keywords().INT8_T(),
+		Keywords().INT16_T(),
+		Keywords().INT32_T(),
+		Keywords().INT64_T(),
+		Keywords().FLOAT_T(),
+		Keywords().DBLFLOAT_T(),
 	};
 
 	bool match_variable_declaration() {

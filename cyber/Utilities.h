@@ -12,6 +12,7 @@ class callable;
 class execution_context;
 class interpreter;
 struct activation_record;
+class klass_definition;
 
 class Utilities
 {
@@ -25,6 +26,9 @@ public:
 	static std::shared_ptr<callable> getCallable(std::any callee);
 	static std::string getTypeString(std::any& obj);
 	static std::shared_ptr<activation_record> extractScope(std::any& obj);
+	static std::shared_ptr<klass_definition> BuildErrorObject(const std::string szType, const std::string szMsg, const std::string& szSeverity);
+	static std::any strToAppropriateInt(const std::string& src);
+	static std::any strToAppropriateUInt(const std::string& src);
 };
 
 #endif

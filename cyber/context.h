@@ -61,7 +61,7 @@ public:
 		m_index++;
 		if (m_index >= MAX_CALLSTACK) {
 			pop_ar();
-			throw ProgramException("stack overflow", location());
+			throw ExceptionBuilder().Build(ExceptionTypes().SYSTEM(), "stack overflow", Severity().CRITICAL());
 		}
 	}
 
@@ -98,21 +98,21 @@ public:
 		for (unsigned int i{ 0 }; i < matches.size(); i++) {
 			std::string key = matches.at(i);
 			if (i > 0 && ar == nullptr) {
-				throw ProgramException("unable to retrieve value with key '" + szKey + "'", location());
+				throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to retrieve value with key '" + szKey + "'", Severity().MEDIUM());
 			}
 			if (ar == nullptr) {
 				obj = get(key, location());
 			}
 			else {
 				if (!ar->environment->get(key, obj)) {
-					throw ProgramException("unable to retrieve value with key '" + szKey + "'", location());
+					throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to retrieve value with key '" + szKey + "'", Severity().MEDIUM());
 				}
 			}
 			ar = Utilities().extractScope(obj);
 		}
 
 		if (obj.type() != typeid(Ty)) {
-			throw ProgramException("type mismatch in assertion type " + std::string(obj.type().name()) + " != " + std::string(typeid(Ty).name()), location());
+			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "type mismatch in assertion type " + Utilities().getTypeString(obj) + " != " + std::string(typeid(Ty).name()), Severity().HIGH());
 		}
 		return std::any_cast<Ty>(obj);
 	}
@@ -128,7 +128,7 @@ public:
 				return out;
 			}
 		}
-		throw ProgramException("unable to retrieve value with key '" + szKey + "'", loc);
+		throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to retrieve value with key '" + szKey + "'", Severity().MEDIUM(), loc);
 	}
 	
 	template <typename Ty>
@@ -136,7 +136,7 @@ public:
 	{
 		std::any obj = get(szKey, location());
 		if (obj.type() != typeid(Ty)) {
-			throw ProgramException("type mismatch in assertion type " + std::string(obj.type().name()) + " != " + std::string(typeid(Ty).name()), location());
+			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "type mismatch in assertion type " + Utilities().getTypeString(obj) + " != " + std::string(typeid(Ty).name()), Severity().HIGH());
 		}
 		return std::any_cast<Ty>(obj);
 	}
@@ -151,7 +151,7 @@ public:
 				return Utilities().getCallable(out);
 			}
 		}
-		throw ProgramException("unable to retrieve callable with key '" + szKey + "'", loc);
+		throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to retrieve value with key '" + szKey + "'", Severity().MEDIUM(), loc);
 	}
 
 
@@ -164,7 +164,7 @@ public:
 				return;
 			}
 		}
-		throw ProgramException("unable to assign value to key '" + szKey + "'; key not found or type mismatch", loc);
+		throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to assign value to key '" + szKey + "' key not found or type mismatch", Severity().MEDIUM());
 	}
 	
 
@@ -177,7 +177,7 @@ public:
 				return;
 			}
 		}
-		throw ProgramException("unable to define value to key '" + szKey + "'; key already defined", loc);
+		throw ExceptionBuilder().Build(ExceptionTypes().VARIABLE_REDEFINITION(), "unable to define value for key '" + szKey + "' key already defined", Severity().MEDIUM());
 	}
 
 	bool remove(const std::string& szKey)
@@ -193,6 +193,11 @@ public:
 		}
 	}
 
+	void output_operators(const std::string& exclude = "")
+	{
+		m_opHandler->output();
+	}
+
 	std::shared_ptr<activation_record> top()
 	{
 		rlist_crawler<std::shared_ptr<activation_record>> crawler(m_records);
@@ -202,7 +207,7 @@ public:
 
 	std::shared_ptr<activation_record> current_ar()
 	{
-		if (m_records.size() == 0) throw ProgramException("no activation record to execute", location(), Severity().CRITICAL());
+		if (m_records.size() == 0) throw ExceptionBuilder().Build(ExceptionTypes().SYSTEM(), "no activation record to execute", Severity().CRITICAL());
 		return m_records.at(m_records.size() - 1);
 	}
 

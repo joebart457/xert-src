@@ -38,7 +38,7 @@ void interpreter::CompleteImport(const std::string& szFile, const location& loc)
 		m_imports[szFile] = true;
 		return;
 	}
-	throw PanicException(ImportException("unable to complete import of module '" + szFile + "'", loc), loc);
+	throw ExceptionBuilder().Build(ExceptionTypes().IMPORT(), "unable to complete import of module '" + szFile + "'", Severity().HIGH(), loc);
 }
 
 bool interpreter::AddModule(const std::string& szFile)
@@ -154,7 +154,7 @@ void interpreter::acceptInjectStatement(std::shared_ptr<inject_statement> inject
 
 	std::any inFile = acceptExpression(inject_stmt->m_expr);
 	if (inFile.type() != typeid(std::string)) {
-		throw ProgramException("expect <expr> to resolve to filename in inject_statement", location());
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "expect <expr> to resolve to filename in inject_statement", Severity().MEDIUM(), inject_stmt->m_loc);
 	}
 	std::string szInFile = FileHandle().absolute_path(std::any_cast<std::string>(inFile));
 	if (!AddModule(szInFile)) {
@@ -225,7 +225,7 @@ void interpreter::acceptBreakStatement(std::shared_ptr<break_statement> break_st
 
 void interpreter::acceptDirectiveStatement(std::shared_ptr<directive_statement> directive_stmt)
 {
-	throw ProgramException("NotSupportedException", location());
+	throw ExceptionBuilder().Build(ExceptionTypes().NOT_SUPPORTED(), "NotSupportedException", Severity().HIGH(), directive_stmt->m_loc);
 }
 
 void interpreter::acceptBlock(std::shared_ptr<block> blk)
@@ -348,7 +348,7 @@ void interpreter::acceptPanicStatement(std::shared_ptr<panic_statement> panic_st
 	throw PanicException(val, panic_stmt->m_loc);
 }
 
-void interpreter::acceptClassExentsionStatement(std::shared_ptr<class_extension> ce_stmt)
+void interpreter::acceptClassExtensionStatement(std::shared_ptr<class_extension> ce_stmt)
 {
 	if (ce_stmt->m_func_decl == nullptr) {
 		return;
@@ -373,7 +373,7 @@ void interpreter::acceptClassExentsionStatement(std::shared_ptr<class_extension>
 		);
 	}
 	else {
-		throw ProgramException("expect klass_definition or klass_instance as extension parent but got " + Utilities().getTypeString(parent_klass), ce_stmt->m_loc);
+		throw ExceptionBuilder().Build(ExceptionTypes().PRECOMPILE(), "expect klass_definition or klass_instance as extension parent but got " + Utilities().getTypeString(parent_klass), Severity().HIGH(), ce_stmt->m_loc);
 	}
 }
 
@@ -418,7 +418,7 @@ std::any interpreter::acceptAssignment(std::shared_ptr<assignment> assignmnt)
 			instance->Assign(assignmnt->name, val, assignmnt->m_loc);
 			return val;
 		}
-		throw ProgramException("invalid assignment target", assignmnt->m_loc);
+		throw ExceptionBuilder().Build(ExceptionTypes().PRECOMPILE(), "invalid assignment target", Severity().HIGH(), assignmnt->m_loc);
 	}
 	else {
 		m_context->assign(assignmnt->name, val, assignmnt->m_loc);
@@ -486,7 +486,7 @@ std::any interpreter::acceptGet(std::shared_ptr<get> expr_get)
 		return std::any_cast<std::shared_ptr<klass_definition>>(lhs)->Get(expr_get->identifier, expr_get->m_loc);
 	}
 
-	throw ProgramException("Unable to perform get on non-container type", expr_get->m_loc);
+	throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "Unable to perform get on non-container type", Severity().MEDIUM(), expr_get->m_loc);
 }
 std::any interpreter::acceptGroup(std::shared_ptr<group> expr_group)
 {
@@ -521,7 +521,7 @@ std::any interpreter::acceptInitializer(std::shared_ptr<initializer> expr_intial
 	}
 	std::any klass = acceptExpression(expr_intializer->expr);
 	if (klass.type() != typeid(std::shared_ptr<klass_definition>)) {
-		throw ProgramException("expect valid class type in initializer", expr_intializer->m_loc);
+		throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "expect valid class type in initializer", Severity().MEDIUM(), expr_intializer->m_loc);
 	}
 	std::shared_ptr<klass_definition> klass_def = std::any_cast<std::shared_ptr<klass_definition>>(klass);
 	klass_instance ki = klass_def->create();
@@ -533,7 +533,7 @@ std::any interpreter::acceptInitializer(std::shared_ptr<initializer> expr_intial
 
 std::any interpreter::acceptListInitializer(std::shared_ptr<list_initializer> expr_list_initializer)
 {
-	throw ProgramException("NotSupportedException", expr_list_initializer->m_loc);
+	throw ExceptionBuilder().Build(ExceptionTypes().NOT_SUPPORTED(), "NotSupportedException", Severity().HIGH(), expr_list_initializer->m_loc);
 }
 
 std::any interpreter::assert_or_convert_type(const param& p, std::any obj, const location& loc)
@@ -544,15 +544,24 @@ std::any interpreter::assert_or_convert_type(const param& p, std::any obj, const
 		// Need this test for klass_instance type for now because of how we use class_specifier
 		if (obj.type() == typeid(klass_instance)) {
 			if (szType != p.class_specifier) {
-				throw ProgramException("Type mismatch klass_instance::" + std::any_cast<klass_instance>(obj).getType() + " != " + p.type + "::" + p.class_specifier, loc, Severity().MEDIUM());
+				throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), 
+					"Type mismatch klass_instance::" + Utilities().getTypeString(obj) + " != " + p.type + "::" + p.class_specifier, 
+					Severity().MEDIUM(), loc
+				);
 			}
 			return obj;
 		}
-		throw ProgramException("Type mismatch " + std::string(obj.type().name()) + " != " + p.type + "::" + p.class_specifier, loc, Severity().MEDIUM());
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(),
+			"Type mismatch klass_instance::" + Utilities().getTypeString(obj) + " != " + p.type + "::" + p.class_specifier,
+			Severity().MEDIUM(), loc
+		);
 	}
 	else {
 		if (p.type != "" && szType != p.type) {
-			throw ProgramException("Type mismatch " + std::string(obj.type().name()) + " != " + p.type, loc, Severity().MEDIUM());
+			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(),
+				"Type mismatch klass_instance::" + Utilities().getTypeString(obj) + " != " + p.type + "::" + p.class_specifier,
+				Severity().MEDIUM(), loc
+			);
 		}
 		return obj;
 	}

@@ -40,7 +40,7 @@ public:
 	void acceptSwitchStatement(std::shared_ptr<switch_statement> switch_stmt);
 	void acceptRunRecoverStatement(std::shared_ptr<run_recover_statement> rr_stmt);
 	void acceptPanicStatement(std::shared_ptr<panic_statement> panic_stmt);
-	void acceptClassExentsionStatement(std::shared_ptr<class_extension> ce_stmt);
+	void acceptClassExtensionStatement(std::shared_ptr<class_extension> ce_stmt);
 
 
 	std::any acceptExpression(std::shared_ptr<expression> expr);

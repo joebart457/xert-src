@@ -19,20 +19,20 @@ public:
 
 	void Define(std::string szName, std::any value, const location& loc, bool overwrite) {
 		if (!m_ar->environment->define(szName, value, overwrite)) {
-			throw ProgramException("unable to define value " + szName, loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to define value for key '" + szName + "'", Severity().MEDIUM(), loc);
 		}
 	}
 
 	void Assign(std::string szName, std::any value, const location& loc) {
 		if (!m_ar->environment->assign(szName, value)) {
-			throw ProgramException("unable to assign value " + szName, loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to assign value to key '" + szName + "'", Severity().MEDIUM(), loc);
 		}
 	}
 
 	std::any Get(std::string szName, const location& loc) {
 		std::any out;
 		if (!m_ar->environment->get(szName, out)) {
-			throw ProgramException("unable to get value from key " + szName, loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to retrieve value with key '" + szName + "'", Severity().MEDIUM(), loc);
 		}
 		return out;
 	}
@@ -41,10 +41,10 @@ public:
 	Ty Get(std::string szName, const location& loc) {
 		std::any out;
 		if (!m_ar->environment->get(szName, out)) {
-			throw ProgramException("unable to get value from key " + szName, loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to retrieve value with key '" + szName + "'", Severity().MEDIUM());
 		}
 		if (out.type() != typeid(Ty)) {
-			throw ProgramException("type mismatch in assertion type " + std::string(out.type().name()) + " != " + std::string(typeid(Ty).name()), loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "type mismatch in assertion type " + Utilities().getTypeString(out) + " != " + std::string(typeid(Ty).name()), Severity().HIGH());
 		}
 		return std::any_cast<Ty>(out);
 	}
@@ -137,20 +137,20 @@ public:
 
 	void Define(std::string szName, std::any value, const location& loc, bool overwrite) {
 		if (!m_ar->environment->define(szName, value, overwrite)) {
-			throw ProgramException("unable to define value " + szName, loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to define value for key '" + szName + "'", Severity().MEDIUM(), loc);
 		}
 	}
 
 	void Assign(std::string szName, std::any value, const location& loc) {
 		if (!m_ar->environment->assign(szName, value)) {
-			throw ProgramException("unable to assign value " + szName, loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to assign value to key '" + szName + "'", Severity().MEDIUM(), loc);
 		}
 	}
 
 	std::any Get(std::string szName, const location& loc) {
 		std::any out;
 		if (!m_ar->environment->get(szName, out)) {
-			throw ProgramException("unable to get value from key " + szName, loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to retrieve value with key '" + szName + "'", Severity().MEDIUM(), loc);
 		}
 		return out;
 	}
@@ -159,10 +159,10 @@ public:
 	Ty Get(std::string szName, const location& loc) {
 		std::any out;
 		if (!m_ar->environment->get(szName, out)) {
-			throw ProgramException("unable to get value from key " + szName, loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "unable to retrieve value with key '" + szName + "'", Severity().MEDIUM());
 		}
 		if (out.type() != typeid(Ty)) {
-			throw ProgramException("type mismatch in assertion type " + std::string(out.type().name()) + " != " + std::string(typeid(Ty).name()), loc);
+			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "type mismatch in assertion type " + Utilities().getTypeString(out) + " != " + std::string(typeid(Ty).name()), Severity().HIGH());
 		}
 		return std::any_cast<Ty>(out);
 	}

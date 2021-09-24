@@ -11,8 +11,7 @@
 void Utilities::check_context(std::shared_ptr<interpreter> i)
 {
 	if (i == nullptr) {
-		location loc;
-		throw ProgramException("cannot execute code using null interpreter", loc, Severity().FATAL());
+		throw ExceptionBuilder().Build(ExceptionTypes().SYSTEM(), "cannot execute code using null interpreter", Severity().FATAL());
 	}
 }
 
@@ -23,8 +22,7 @@ std::shared_ptr<execution_context> Utilities::fetch_context(std::shared_ptr<inte
 		context_ptr = i->get_context();
 	}
 	if (i == nullptr || context_ptr == nullptr) {
-		location loc;
-		throw ProgramException("cannot execute code in null context", loc, Severity().FATAL());
+		throw ExceptionBuilder().Build(ExceptionTypes().SYSTEM(), "cannot execute code using null context", Severity().FATAL());
 	}
 	return context_ptr;
 }
@@ -122,7 +120,7 @@ bool Utilities::isTruthy(const std::any& obj)
 		return std::any_cast<std::string>(obj).size() > 0;
 	}
 
-	throw ProgramException("Unsupported object type '" + std::string(obj.type().name()), location());
+	throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "Unsupported object type '" + std::string(obj.type().name()), Severity().LOW());
 }
 
 
@@ -172,7 +170,7 @@ std::shared_ptr<callable> Utilities::getCallable(std::any callee) {
 		return std::any_cast<std::shared_ptr<custom_fn>>(callee);
 	}
 	else {
-		throw ProgramException("unable to convert type " + std::string(callee.type().name()) + " to callable type", location());
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "unable to convert type " + std::string(callee.type().name()) + " to callable type", Severity().MEDIUM());
 	}
 }
 
@@ -195,4 +193,65 @@ std::shared_ptr<activation_record> Utilities::extractScope(std::any& obj)
 		return std::any_cast<std::shared_ptr<klass_definition>>(obj)->ar();
 	}
 	return nullptr;
+}
+
+
+
+std::shared_ptr<klass_definition> Utilities::BuildErrorObject(const std::string szType, const std::string szMsg, const std::string& szSeverity)
+{
+	std::shared_ptr<activation_record> err_env_ar = std::make_shared<activation_record>();
+	err_env_ar->szAlias = "Err";
+	err_env_ar->environment = std::make_shared<scope<std::any>>();
+
+	err_env_ar->environment->define("type", szType, true);
+	err_env_ar->environment->define("msg", szMsg, true);
+	err_env_ar->environment->define("severity", szSeverity, true);
+
+	return std::make_shared<klass_definition>("Err", err_env_ar);
+}
+
+std::any Utilities::strToAppropriateInt(const std::string& src)
+{
+	try {
+		long long int v = std::stoll(src);
+		if (v <= INT8_MAX) {
+			return static_cast<int8_t>(v);
+		}
+		if (v <= INT16_MAX) {
+			return static_cast<int16_t>(v);
+		}
+		if (v <= INT32_MAX) {
+			return static_cast<int32_t>(v);
+		}
+		return static_cast<int64_t>(v);
+	}
+	catch (std::invalid_argument) {
+		throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse value to integer " + src, Severity().HIGH());
+	}
+	catch (std::out_of_range) {
+		throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse value to integer " + src, Severity().HIGH());
+	}
+}
+
+std::any Utilities::strToAppropriateUInt(const std::string& src)
+{
+	try {
+		unsigned long long int v = std::stoull(src);
+		if (v <= UINT8_MAX) {
+			return static_cast<uint8_t>(v);
+		}
+		if (v <= UINT16_MAX) {
+			return static_cast<uint16_t>(v);
+		}
+		if (v <= UINT32_MAX) {
+			return static_cast<uint32_t>(v);
+		}
+		return static_cast<uint64_t>(v);
+	}
+	catch (std::invalid_argument) {
+		throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse value to unsigned integer " + src, Severity().HIGH());
+	}
+	catch (std::out_of_range) {
+		throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse value to unsigned integer " + src, Severity().HIGH());
+	}
 }

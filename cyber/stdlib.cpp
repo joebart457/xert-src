@@ -208,7 +208,7 @@ std::any string_find(std::shared_ptr<interpreter> i, _args args)
 
 std::any string_substr(std::shared_ptr<interpreter> i, _args args)
 {
-	return StringUtilities().substr(args.get<std::string>(0), args.get<unsigned long>(1), args.get<unsigned long>(2));
+	return StringUtilities().substr(args.get<std::string>(0), args.get<uint64_t>(1), args.get<uint64_t>(2));
 }
 
 std::any string_pad(std::shared_ptr<interpreter> i, _args args)
@@ -222,7 +222,7 @@ std::any string_to_char(std::shared_ptr<interpreter> i, _args args)
 	// TODO Refactor 
 	std::string src = args.get<std::string>(0);
 	if (src.size() != 1) {
-		throw PanicException(ProgramException("unable to convert string of size " + std::to_string(src.size()) + "to char", location()), location());
+		throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "unable to convert string of size " + std::to_string(src.size()) + " to char", Severity().MEDIUM());
 	}
 	return src.at(0);
 }
@@ -232,6 +232,7 @@ std::any string_to_char(std::shared_ptr<interpreter> i, _args args)
 std::any print_environment(std::shared_ptr<interpreter> i, _args args)
 {
 	Utilities().fetch_context(i)->output();
+	Utilities().fetch_context(i)->output_operators();
 	return nullptr;
 }
 

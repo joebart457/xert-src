@@ -58,11 +58,11 @@ std::any win_lib_get_function(std::shared_ptr<interpreter> i, _args args)
 	std::string szFnName = args.get<std::string>(0);
 	HMODULE hMod = context->get<HMODULE>("hMod");
 	if (!hMod) {
-		throw PanicException(std::string("could not load dynamic libaray; handle was invalid"), location());
+		throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "could not load dynamic libaray; handle was invalid", Severity().MEDIUM());
 	}
 	hFunc fn = (hFunc)GetProcAddress(hMod, szFnName.c_str());
 	if (!fn) {
-		throw PanicException(std::string("could not locate the function"), location());
+		throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "could not locate the function", Severity().MEDIUM());
 	}
 	return std::make_shared<loaded_native_fn>(szFnName, fn)->setVariadic()->setVariadicAfter(0);
 }

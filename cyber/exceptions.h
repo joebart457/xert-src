@@ -17,10 +17,30 @@ public:
 	static std::string FATAL() { return "FATAL"; }
 };
 
+class ExceptionTypes {
+public:
+	static std::string IO() { return "IOException"; }
+	static std::string PARSING() { return "ParsingException"; }
+	static std::string RUNTIME() { return "RuntimeException"; }
+	static std::string TYPE_MISMATCH() { return "TypeMismatchException"; }
+	static std::string UNRESOLVED_SYMBOL() { return "UnresolvedSymbolException"; }
+	static std::string VARIABLE_REDEFINITION() { return "VariableRedefinitionException"; }
+	static std::string SQL() { return "SQLException"; }
+	static std::string IMPORT() { return "ImportException"; }
+	static std::string NOT_SUPPORTED() { return "NotSupportedException"; }
+	static std::string INVALID_ARGUMENT() { return "InvalidArgumentException"; }
+	static std::string DIVIDE_BY_ZERO() { return "DivideByZeroException"; }
+	static std::string PRECOMPILE() { return "PreCompileException"; }
+	static std::string PROGRAM() { return "ProgramException"; }
+	static std::string SYSTEM() { return "SystemException"; }
+	static std::string FATAL() { return "FatalException"; }
+};
+
 struct err_trace {
 	std::string szMsg{ "" };
 	location loc;
 };
+
 
 class ProgramException {
 public:
@@ -145,4 +165,24 @@ public:
 	ImportException(const std::string& msg, const location& loc)
 		:ProgramException("ImportException", msg, loc, Severity().LOW()) {}
 	~ImportException() {}
+};
+
+
+class ExceptionBuilder {
+public:
+	static void Throw(const std::string szType, const std::string szMsg, const std::string& szSeverity) {
+		throw PanicException(Utilities().BuildErrorObject(szType, szMsg, szSeverity), location());
+	}
+
+	static void Throw(const std::string szType, const std::string szMsg, const std::string& szSeverity, const location& loc) {
+		throw PanicException(Utilities().BuildErrorObject(szType, szMsg, szSeverity), loc);
+	}
+
+	static PanicException Build(const std::string szType, const std::string szMsg, const std::string& szSeverity) {
+		return PanicException(Utilities().BuildErrorObject(szType, szMsg, szSeverity), location());
+	}
+
+	static PanicException Build(const std::string szType, const std::string szMsg, const std::string& szSeverity, const location& loc) {
+		return PanicException(Utilities().BuildErrorObject(szType, szMsg, szSeverity), loc);
+	}
 };
