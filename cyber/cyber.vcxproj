@@ -170,14 +170,14 @@
     <ClInclude Include="Keywords.hpp" />
     <ClInclude Include="klass_instance.h" />
     <ClInclude Include="language_main.h" />
-    <ClInclude Include="list_crawler.h" />
+    <ClInclude Include="list_crawler.hpp" />
     <ClInclude Include="location.h" />
     <ClInclude Include="network.hpp" />
     <ClInclude Include="network_helper.h" />
     <ClInclude Include="numeric_operators.h" />
     <ClInclude Include="operator_handler.h" />
     <ClInclude Include="operators.h" />
-    <ClInclude Include="parser.h" />
+    <ClInclude Include="parser.hpp" />
     <ClInclude Include="parser_interface.hpp" />
     <ClInclude Include="scope.h" />
     <ClInclude Include="Serializer.hpp" />

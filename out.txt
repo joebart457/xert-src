@@ -1,23 +1,6 @@
-	deleted:    BuildDefinitions.h
-	deleted:    ContextBuilder.h
-	deleted:    Keywords.h
-	deleted:    OperatorHandler.h
-	modified:   Serializer.hpp
-	modified:   callable.h
+	modified:   ContextBuilder.hpp
 	modified:   context.h
-	deleted:    db_framework.h
-	modified:   db_helper.h
-	deleted:    environment.h
-	deleted:    exceptions.h
-	modified:   klass_instance.h
-	modified:   language_main.h
-	modified:   parser.h
-	deleted:    pickler.h
-	deleted:    ufhndl.h
-	modified:   win_std_lib.h
-	BuildDefinitions.hpp
-	ContextBuilder.hpp
-	FileHandle.hpp
-	Keywords.hpp
-	exceptions.hpp
-	operator_handler.h
+	deleted:    list_crawler.h
+	deleted:    parser.h
+	list_crawler.hpp
+	parser.hpp

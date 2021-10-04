@@ -77,7 +77,7 @@
     <ClInclude Include="location.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser.h">
+    <ClInclude Include="parser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="parser_interface.hpp">
@@ -104,7 +104,7 @@
     <ClInclude Include="Keywords.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="list_crawler.h">
+    <ClInclude Include="list_crawler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="context.h">

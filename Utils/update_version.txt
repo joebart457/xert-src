@@ -109,8 +109,8 @@ class VersionManager{
 	function InitializeSupportedVersioning(){
 		supportedVersioning.add("stdlib.h", "STD_LIB_VERSION");
 		supportedVersioning.add("interpreter.h", "INTERPRETER_VERSION");
-		supportedVersioning.add("parser.h", "PARSER_VERSION");
-		supportedVersioning.add("tokenizer.h", "TOKENIZER_VERSION");
+		supportedVersioning.add("parser.hpp", "PARSER_VERSION");
+		supportedVersioning.add("tokenizer.hpp", "TOKENIZER_VERSION");
 	}
 	
 	

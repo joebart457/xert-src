@@ -6,7 +6,7 @@
 #include "exceptions.hpp"
 #include "expression.h"
 #include "tokenizer.hpp"
-#include "parser.h"
+#include "parser.hpp"
 
 #include "klass_instance.h"
 #include "callable.h"

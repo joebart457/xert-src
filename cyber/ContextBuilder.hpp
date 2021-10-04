@@ -20,7 +20,7 @@
 #include "operators.h"
 #include "numeric_operators.h"
 #include "stdlib.h"
-#include "parser.h"
+#include "parser.hpp"
 #include "network_helper.h"
 
 #include "BuildDefinitions.hpp"

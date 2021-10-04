@@ -1,0 +1,4 @@
+Project naming conventions:
+	- *.hpp ext: standalone headers
+	- CamelCase: static classes
+	- underscore_delimited: nonstatic classes/function libraries 
