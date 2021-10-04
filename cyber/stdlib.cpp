@@ -3,13 +3,13 @@
 #include <ctime>
 #include <thread>
 
-#include "db_framework.h"
-#include "ufhndl.h"
+#include "FileHandle.hpp"
 #include "Utilities.h"
 #include "StringUtilities.h"
-#include "exceptions.h"
+#include "exceptions.hpp"
 #include "network_helper.h"
 #include "Serializer.hpp"
+#include "db_helper.h"
 
 // Time
 
@@ -351,7 +351,7 @@ std::any fs_replace_line(std::shared_ptr<interpreter> i, _args args)
 
 std::any fs_get_unique_name(std::shared_ptr<interpreter> i, _args args)
 {
-	return FileHandle().getUniqueName(args.get<std::string>(0));
+	return FileHandle().getUniqueName(args.get<std::string>(0), args.get<uint32_t>(1));
 }
 
 

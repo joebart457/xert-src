@@ -24,10 +24,7 @@
     <ClCompile Include="statement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="environment.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OperatorHandler.cpp">
+    <ClCompile Include="operator_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -92,22 +89,19 @@
     <ClInclude Include="tokenizer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="exceptions.h">
+    <ClInclude Include="exceptions.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="environment.h">
+    <ClInclude Include="operator_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OperatorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ContextBuilder.h">
+    <ClInclude Include="ContextBuilder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="klass_instance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Keywords.h">
+    <ClInclude Include="Keywords.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="list_crawler.h">
@@ -128,12 +122,6 @@
     <ClInclude Include="sqlite3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="db_framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pickler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="operators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -143,7 +131,7 @@
     <ClInclude Include="Utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ufhndl.h">
+    <ClInclude Include="FileHandle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="language_main.h">
@@ -152,7 +140,7 @@
     <ClInclude Include="win_std_lib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BuildDefinitions.h">
+    <ClInclude Include="BuildDefinitions.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="numeric_operators.h">

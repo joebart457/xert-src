@@ -11,9 +11,8 @@
 
 #include "db_helper.h"
 #include "interpreter.h"
-#include "environment.h"
-#include "OperatorHandler.h"
-#include "Keywords.h"
+#include "operator_handler.h"
+#include "Keywords.hpp"
 #include "context.h"
 #include "tokenizer.hpp"
 #include "klass_instance.h"
@@ -21,11 +20,10 @@
 #include "operators.h"
 #include "numeric_operators.h"
 #include "stdlib.h"
-#include "db_framework.h"
 #include "parser.h"
 #include "network_helper.h"
 
-#include "BuildDefinitions.h"
+#include "BuildDefinitions.hpp"
 
 #ifdef BUILD_WINDOWS
 #include "win_std_lib.h"
@@ -346,7 +344,8 @@ public:
         );
         fs_env_ar->environment->define("make_unique",
             std::make_shared<native_fn>("make_unique", fs_get_unique_name, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>()),
+            ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter<uint32_t>()),
             true
         );
         fs_env_ar->environment->define("WorkingDirectory",
@@ -669,9 +668,9 @@ public:
     }
 
 
-	static std::shared_ptr<OperatorHandler> BuildOperatorHandler()
+	static std::shared_ptr<operator_handler> BuildOperatorHandler()
 	{
-		std::shared_ptr<OperatorHandler> opHandler = std::make_shared<OperatorHandler>();
+		std::shared_ptr<operator_handler> opHandler = std::make_shared<operator_handler>();
 		
         // Custom Ops
         

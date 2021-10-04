@@ -12,9 +12,9 @@
 #include "list_crawler.h"
 #include "scope.h"
 #include "location.h"
-#include "exceptions.h"
+#include "exceptions.hpp"
 #include "callable.h"
-#include "OperatorHandler.h"
+#include "operator_handler.h"
 #include "Utilities.h"
 #include "StringUtilities.h"
 
@@ -31,12 +31,12 @@ class execution_context {
 public:
 	execution_context(
 		std::shared_ptr<activation_record> ar, 
-		std::shared_ptr<OperatorHandler> opHandler)
+		std::shared_ptr<operator_handler> opHandler)
 		:m_opHandler{ opHandler }
 	{
 		push_ar(ar);
 		if (m_opHandler == nullptr) {
-			m_opHandler = std::make_shared<OperatorHandler>();
+			m_opHandler = std::make_shared<operator_handler>();
 		}
 	}
 	~execution_context() {}
@@ -303,7 +303,7 @@ private:
 
 	unsigned int m_index{ 0 };
 	std::vector<std::shared_ptr<activation_record>> m_records;
-	std::shared_ptr<OperatorHandler> m_opHandler{ nullptr };
+	std::shared_ptr<operator_handler> m_opHandler{ nullptr };
 	std::mutex m_mutex;
 };
 

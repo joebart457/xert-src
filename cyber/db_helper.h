@@ -12,7 +12,7 @@
 #include <any>
 
 #include "klass_instance.h"
-#include "exceptions.h"
+#include "exceptions.hpp"
 #include "sqlite3.h"
 #include "StringUtilities.h"
 

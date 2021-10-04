@@ -6,7 +6,7 @@
 #include "klass_instance.h"
 #include "interpreter.h"
 #include "context.h"
-#include "BuildDefinitions.h"
+#include "BuildDefinitions.hpp"
 
 void Utilities::check_context(std::shared_ptr<interpreter> i)
 {

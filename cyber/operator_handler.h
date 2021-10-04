@@ -7,11 +7,11 @@
 #include <memory>
 
 
-class OperatorHandler
+class operator_handler
 {
 public:
-	OperatorHandler(){}
-	~OperatorHandler(){}
+	operator_handler(){}
+	~operator_handler(){}
 
 	void registerOperator(std::shared_ptr<callable> op, const std::string& signatureOverride = "");
 	std::shared_ptr<callable> getOperator(std::string szName);

@@ -136,7 +136,7 @@ class VersionManager{
 }
 
 function main(){
-	_ty vm = new VersionManager("C:/zzz_WIP/xert/cyber/BuildDefinitions.h", FileSystem.relative_path("../out.txt"));
+	_ty vm = new VersionManager("C:/zzz_WIP/xert/cyber/BuildDefinitions.hpp", FileSystem.relative_path("../out.txt"));
 }
 
 main();

@@ -1,6 +1,6 @@
 /* Auto-generated */
 #include "interpreter.h"
-#include "exceptions.h"
+#include "exceptions.hpp"
 #include "Utilities.h"
 
 

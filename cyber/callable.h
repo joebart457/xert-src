@@ -11,10 +11,10 @@
 #include <mutex>
 
 #include "statement.h"
-#include "exceptions.h" 
+#include "exceptions.hpp" 
 #include "location.h"
 
-#include "BuildDefinitions.h"
+#include "BuildDefinitions.hpp"
 
 class interpreter;
 struct activation_record;

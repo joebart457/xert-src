@@ -1,5 +1,5 @@
 #pragma once
-#include "BuildDefinitions.h"
+#include "BuildDefinitions.hpp"
 
 #ifdef BUILD_WINDOWS
 

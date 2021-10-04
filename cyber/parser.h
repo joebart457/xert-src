@@ -5,8 +5,8 @@
 #include "parser_interface.hpp"
 #include "statement.h"
 #include "expression.h"
-#include "exceptions.h"
-#include "Keywords.h"
+#include "exceptions.hpp"
+#include "Keywords.hpp"
 
 
 

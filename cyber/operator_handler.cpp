@@ -1,9 +1,8 @@
-#include "OperatorHandler.h"
+#include "operator_handler.h"
 
+#include "exceptions.hpp"
 
-#include "exceptions.h"
-
-void OperatorHandler::registerOperator(std::shared_ptr<callable> op, const std::string& signatureOverride)
+void operator_handler::registerOperator(std::shared_ptr<callable> op, const std::string& signatureOverride)
 {
 	if (op == nullptr) return;
 	if (signatureOverride.empty()) {
@@ -15,7 +14,7 @@ void OperatorHandler::registerOperator(std::shared_ptr<callable> op, const std::
 	}
 }
 
-std::shared_ptr<callable> OperatorHandler::getOperator(std::string szName)
+std::shared_ptr<callable> operator_handler::getOperator(std::string szName)
 {
 	if (m_operators.count(szName)) {
 		return m_operators[szName];
@@ -24,7 +23,7 @@ std::shared_ptr<callable> OperatorHandler::getOperator(std::string szName)
 }
 
 
-void OperatorHandler::output()
+void operator_handler::output()
 {
 	for (auto it = m_operators.begin(); it != m_operators.end(); it++) {
 		std::cout << it->first << ":=" << (it->second == nullptr ? "<null>" : it->second->getSignature()) << std::endl;

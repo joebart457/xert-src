@@ -159,17 +159,15 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="BuildDefinitions.h" />
+    <ClInclude Include="BuildDefinitions.hpp" />
     <ClInclude Include="callable.h" />
     <ClInclude Include="context.h" />
-    <ClInclude Include="ContextBuilder.h" />
-    <ClInclude Include="db_framework.h" />
+    <ClInclude Include="ContextBuilder.hpp" />
     <ClInclude Include="db_helper.h" />
-    <ClInclude Include="environment.h" />
-    <ClInclude Include="exceptions.h" />
+    <ClInclude Include="exceptions.hpp" />
     <ClInclude Include="expression.h" />
     <ClInclude Include="interpreter.h" />
-    <ClInclude Include="Keywords.h" />
+    <ClInclude Include="Keywords.hpp" />
     <ClInclude Include="klass_instance.h" />
     <ClInclude Include="language_main.h" />
     <ClInclude Include="list_crawler.h" />
@@ -177,11 +175,10 @@
     <ClInclude Include="network.hpp" />
     <ClInclude Include="network_helper.h" />
     <ClInclude Include="numeric_operators.h" />
-    <ClInclude Include="OperatorHandler.h" />
+    <ClInclude Include="operator_handler.h" />
     <ClInclude Include="operators.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="parser_interface.hpp" />
-    <ClInclude Include="pickler.h" />
     <ClInclude Include="scope.h" />
     <ClInclude Include="Serializer.hpp" />
     <ClInclude Include="sqlite3.h" />
@@ -189,19 +186,18 @@
     <ClInclude Include="stdlib.h" />
     <ClInclude Include="StringUtilities.h" />
     <ClInclude Include="tokenizer.hpp" />
-    <ClInclude Include="ufhndl.h" />
+    <ClInclude Include="FileHandle.hpp" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="win_std_lib.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="callable.cpp" />
-    <ClCompile Include="environment.cpp" />
     <ClCompile Include="expression.cpp" />
     <ClCompile Include="interpreter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="network_helper.cpp" />
     <ClCompile Include="numeric_operators.cpp" />
-    <ClCompile Include="OperatorHandler.cpp" />
+    <ClCompile Include="operator_handler.cpp" />
     <ClCompile Include="operators.cpp" />
     <ClCompile Include="scope.cpp" />
     <ClCompile Include="sqlite3.c" />

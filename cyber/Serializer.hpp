@@ -5,10 +5,10 @@
 #include <sstream>
 
 #include "tokenizer.hpp"
-#include "BuildDefinitions.h"
+#include "BuildDefinitions.hpp"
 #include "klass_instance.h"
 #include "callable.h"
-#include "exceptions.h"
+#include "exceptions.hpp"
 
 class Serializer {
 public:

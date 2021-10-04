@@ -3,9 +3,8 @@
 
 #include <sstream>
 
-#include "exceptions.h"
+#include "exceptions.hpp"
 #include "expression.h"
-#include "OperatorHandler.h"
 #include "tokenizer.hpp"
 #include "parser.h"
 
@@ -14,7 +13,7 @@
 #include "context.h"
 #include "Utilities.h"
 
-#include "ufhndl.h"
+#include "FileHandle.hpp"
 
 interpreter::interpreter(
 	std::shared_ptr<execution_context> context,

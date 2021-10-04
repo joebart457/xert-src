@@ -1,7 +1,7 @@
 #include "operators.h"
 
 #include "klass_instance.h"
-#include "exceptions.h"
+#include "exceptions.hpp"
 #include "Utilities.h"
 
 #include <stdexcept>
