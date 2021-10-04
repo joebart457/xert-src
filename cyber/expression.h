@@ -8,6 +8,7 @@
 #include "location.h"
 
 class interpreter;
+class statement;
 
 class expression :
 	public std::enable_shared_from_this<expression>
@@ -301,4 +302,21 @@ public:
 
 protected:
 	std::vector<std::shared_ptr<expression>> elements;
+};
+
+class object_literal :
+	public expression {
+	friend class interpreter;
+public:
+	object_literal(
+		std::vector<std::shared_ptr<statement>> stmts, // list of elements to initialize
+		const location& loc									// location of expression
+	)
+		:expression("object_literal", loc), statements{ stmts }{}
+	~object_literal() {}
+
+	virtual std::any visit(std::shared_ptr<interpreter> i);
+
+protected:
+	std::vector<std::shared_ptr<statement>> statements;
 };

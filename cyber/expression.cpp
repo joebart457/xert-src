@@ -1,6 +1,7 @@
 #include "expression.h"
 
 #include "interpreter.h"
+#include "statement.h"
 
 std::any expression::visit(std::shared_ptr<interpreter> i)
 {
@@ -75,3 +76,8 @@ std::any list_initializer::visit(std::shared_ptr<interpreter> i)
 	return i->acceptListInitializer(std::static_pointer_cast<list_initializer>(this->shared_from_this()));
 }
 
+std::any object_literal::visit(std::shared_ptr<interpreter> i)
+{
+	return i->acceptObjectLiteral(std::static_pointer_cast<object_literal>(this->shared_from_this()));
+
+}

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <any>
 #include <iostream>
+#include <mutex>
 
 #include "list_crawler.h"
 #include "scope.h"
@@ -42,6 +43,8 @@ public:
 
 	void push_ar(std::string szAlias = "")
 	{
+		std::scoped_lock(m_mutex);
+
 		activation_record ar;
 		ar.id = m_index;
 		ar.szAlias = szAlias;
@@ -51,6 +54,8 @@ public:
 
 	void push_ar(std::shared_ptr<activation_record> ar)
 	{
+		std::scoped_lock(m_mutex);
+
 		if (ar == nullptr) {
 			ar = std::make_shared<activation_record>();
 			ar->id = m_index;
@@ -68,6 +73,8 @@ public:
 
 	std::shared_ptr<activation_record> pop_ar()
 	{
+		std::scoped_lock(m_mutex);
+
 		if (m_records.size() > 0 && m_index > 0) {
 			std::shared_ptr<activation_record> ar = m_records.at(m_records.size() - 1);
 			m_records.pop_back();
@@ -79,6 +86,8 @@ public:
 
 	bool exists(const std::string& szKey)
 	{
+		std::scoped_lock(m_mutex);
+
 		rlist_crawler<std::shared_ptr<activation_record>> crawler(m_records);
 		while (!crawler.end()) {
 			if (crawler.next()->environment->exists_local(szKey)) {
@@ -91,6 +100,8 @@ public:
 	template <typename Ty>
 	Ty get_coalesce(const std::string& szKey, const std::string& delim = ".")
 	{
+		std::scoped_lock(m_mutex);
+
 		std::vector<std::string> matches = StringUtilities().split(szKey, delim);
 		list_crawler<std::string> crwlMatches(matches);
 		std::shared_ptr<activation_record> ar = nullptr;
@@ -120,6 +131,8 @@ public:
 
 	std::any get(const std::string& szKey, const location& loc)
 	{
+		std::scoped_lock(m_mutex);
+
 		rlist_crawler<std::shared_ptr<activation_record>> crawler(m_records);
 		while (!crawler.end()) {
 			std::shared_ptr<activation_record> ar = crawler.next();
@@ -134,6 +147,8 @@ public:
 	template <typename Ty>
 	Ty get(const std::string& szKey)
 	{
+		std::scoped_lock(m_mutex);
+
 		std::any obj = get(szKey, location());
 		if (obj.type() != typeid(Ty)) {
 			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "type mismatch in assertion type " + Utilities().getTypeString(obj) + " != " + std::string(typeid(Ty).name()), Severity().HIGH());
@@ -143,6 +158,8 @@ public:
 
 	std::shared_ptr<callable> get_callable(const std::string& szKey, const location& loc)
 	{
+		std::scoped_lock(m_mutex);
+
 		rlist_crawler<std::shared_ptr<activation_record>> crawler(m_records);
 		while (!crawler.end()) {
 			std::shared_ptr<activation_record> ar = crawler.next();
@@ -157,6 +174,8 @@ public:
 
 	void assign(const std::string& szKey, std::any value, const location& loc)
 	{
+		std::scoped_lock(m_mutex);
+
 		rlist_crawler<std::shared_ptr<activation_record>> crawler(m_records);
 		while (!crawler.end()) {
 			std::shared_ptr<activation_record> ar = crawler.next();
@@ -170,6 +189,8 @@ public:
 
 	void define(const std::string& szKey, std::any value, bool overwrite, const location& loc)
 	{
+		std::scoped_lock(m_mutex);
+
 		rlist_crawler<std::shared_ptr<activation_record>> crawler(m_records);
 		while (!crawler.end()) {
 			std::shared_ptr<activation_record> ar = crawler.next();
@@ -182,12 +203,16 @@ public:
 
 	bool remove(const std::string& szKey)
 	{
+		std::scoped_lock(m_mutex);
+
 		return current_ar()->environment->remove(szKey);
 	}
 
 	
 	void output(const std::string& exclude = "")
 	{
+		std::scoped_lock(m_mutex);
+
 		for (unsigned int i{ 0 }; i < m_records.size(); i++) {
 			std::cout << toString(*m_records.at(i), exclude) << "\n";
 		}
@@ -195,11 +220,15 @@ public:
 
 	void output_operators(const std::string& exclude = "")
 	{
+		std::scoped_lock(m_mutex);
+
 		m_opHandler->output();
 	}
 
 	std::shared_ptr<activation_record> top()
 	{
+		std::scoped_lock(m_mutex);
+
 		rlist_crawler<std::shared_ptr<activation_record>> crawler(m_records);
 		return crawler.back();
 	}
@@ -207,6 +236,8 @@ public:
 
 	std::shared_ptr<activation_record> current_ar()
 	{
+		std::scoped_lock(m_mutex);
+
 		if (m_records.size() == 0) throw ExceptionBuilder().Build(ExceptionTypes().SYSTEM(), "no activation record to execute", Severity().CRITICAL());
 		return m_records.at(m_records.size() - 1);
 	}
@@ -214,16 +245,22 @@ public:
 
 	std::shared_ptr<callable> getOperator(const std::string& szName)
 	{
+		std::scoped_lock(m_mutex);
+
 		return m_opHandler->getOperator(szName);
 	}
 
 	std::shared_ptr<callable> getOperator(const std::string& szName, std::vector<std::any> args)
 	{
+		std::scoped_lock(m_mutex);
+
 		return m_opHandler->getOperator(Utilities().createOperatorSignature(szName, args));
 	}
 
 	std::any getObjectPrototype(const std::string& szTypename, const location& loc)
 	{
+		std::scoped_lock(m_mutex);
+
 		return this->get(PROTO_PREFIX + szTypename, loc);
 	}
 
@@ -231,6 +268,8 @@ public:
 	template <typename Ty>
 	Ty tryGet(const std::string& szKey, Ty defaultValue)
 	{
+		std::scoped_lock(m_mutex);
+
 		std::any out = nullptr;
 		rlist_crawler<std::shared_ptr<activation_record>> crawler(m_records);
 		while (!crawler.end()) {
@@ -250,6 +289,7 @@ private:
 
 	std::string toString(const activation_record& ar, const std::string& exclude = "")
 	{
+		std::scoped_lock(m_mutex);
 		std::ostringstream oss;
 		oss << "<" << ar.szAlias << ":" << ar.id << ">";
 		oss << "\r\n\t" << ar.environment->toString();
@@ -264,6 +304,7 @@ private:
 	unsigned int m_index{ 0 };
 	std::vector<std::shared_ptr<activation_record>> m_records;
 	std::shared_ptr<OperatorHandler> m_opHandler{ nullptr };
+	std::mutex m_mutex;
 };
 
 #endif

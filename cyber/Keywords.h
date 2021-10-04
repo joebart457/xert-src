@@ -83,8 +83,8 @@ public:
 	static std::string TYPEOF() { return "typeof"; }
 	static std::string CAST() { return "cast"; }
 
-	static std::string FALSE() { return "false"; }
-	static std::string TRUE() { return "true"; }
+	static std::string BOOLFALSE() { return "false"; }
+	static std::string BOOLTRUE() { return "true"; }
 	static std::string NEW() { return "new"; }
 
 };

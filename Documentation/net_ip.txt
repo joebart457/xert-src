@@ -1,0 +1,80 @@
+Network.NetClient
+	-ctor(string hostname, uint16_t port, <callable> callback, bool continueOnError, bool suppressOutput)
+	-- string hostname: hostname of connection
+	-- uint16_t port: port to connect to
+	-- <callable> callback: to be called upon recieving message through connection
+	-- -- takes 1 argument of _ty type (no type/ null guarantees)
+	-- bool continueOnError: whether or not connection will exit upon error thrown from callback or when parsing recieved message
+	-- bool suppressOutput: whether or not to print debug messages
+
+	- Start()
+	-- starts listening for messages
+	-- when a message is available, calls the callback function and passes in the message object
+	!= Blocking: main thread execution will wait on messages until Stop is called
+	!= Does NOT connect to remote host, simply waits for messages in queue. To connect to remote host, Connect should be called prior to Start or StartAsync call
+
+	- StartAsync()
+	-- starts listening for messages in a new thread
+	-- when a message is available, calls the callback function and passes in the message object
+	!= NonBlocking: main thread execution will continue and messages will be processed asynchronously
+	!= Does NOT connect to remote host, simply waits for messages in queue. To connect to remote host, Connect should be called prior to Start or StartAsync call
+
+	- Stop()
+	-- Stops message thread execution
+
+	- Connect()
+	-- attempts to connect to remote host
+	-- if successful, returns true; otherwise false
+	!= does not start message callback thread (but is necessary to recieve messages), for that, Start or StartAsync should be called
+
+	- IsConnected()
+	-- returns true if client is connected to server, false otherwise
+	
+	- Disconnect()
+	-- disconnect from server
+
+Network.NetServer
+	- ctor(uint16_t port, <callable> onClientConnect, <callable> onClientValidated,<callable> onClientDisconnect, bool continueOnError, bool suppressOutput)
+	-- uint16_t port: port to host on
+	-- <callable> onClientConnect: to be called upon recieving connection attempt
+	-- -- takes 1 argument of uint32_t type
+	-- -- arg is equal to id of client connection 
+	-- -- RETURNS true to approve connection or false to deny connection
+	-- <callable> onClientValidated to be called upon connection validation
+	-- -- takes 1 argument of uint32_t type
+	-- -- arg is equal to id of client connection 
+	-- -- actual client object can be retrieved through method GetClientById(uint32_t id)
+	-- <callable> onClientDisconnect to be called upon client disconnect
+	-- -- takes 1 argument of uint32_t type
+	-- -- arg is equal to id of client connection 
+	-- -- actual client object can be retrieved through method GetClientById(uint32_t id)
+	-- bool continueOnError: whether or not connection will exit upon error thrown from callback or when parsing recieved message
+	-- bool suppressOutput: whether or not to print debug messages
+
+	- GetClientById(uint16_t id)
+	-- uint16_t id: id of client to retrieve
+	-- returns native net::connection<MsgType> pointing to client or nullptr
+
+	- Start()
+	-- starts listening for connections
+
+	- Update(uint32_t maxMessages, bool wait)
+	-- uint32_t maxMessages: maximum number of messages for this call of Update
+	-- bool wait: whether or not to wait for at least one message to be pushed to queue
+	!= Do NOT call Update inside of handler callback function, this will result in server stop
+
+	- Stop()
+	-- Stops the server
+	!= Do NOT call Stop inside of handler callback function, will result in server stop or crash
+
+
+	- MessageClient(~native~ client, _ty msg)
+	-- serializes msg object and sends to client
+	-- if client is null, does not attempt to send
+	-- ~native~ client: client of native net::connection<MsgType> to be passed in using GetClientById method
+	-- _ty msg: any object to send
+
+	-MessageAll(_ty msg)
+	-- serializes msg object and sends to all currently connected clients
+	-- _ty msg: any object to send
+	

@@ -63,6 +63,9 @@
     <ClCompile Include="numeric_operators.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="network_helper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="callable.h">
@@ -153,6 +156,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="numeric_operators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serializer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

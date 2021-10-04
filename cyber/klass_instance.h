@@ -8,6 +8,8 @@
 #include "exceptions.h"
 
 class klass_instance { 
+
+	friend class Serializer;
 public: 
 	klass_instance(const std::string& type, const std::string& signature, std::shared_ptr<activation_record> ar)
 		:m_szType{ type }, m_szSignature{ signature }, m_ar{ ar } {}
@@ -90,6 +92,8 @@ private:
 };
 
 class klass_definition {
+	friend class Serializer;
+
 public:
 	klass_definition(std::string szName, std::shared_ptr<activation_record> ar)
 		:m_szName{ szName }, m_ar{ ar }{}
@@ -97,7 +101,6 @@ public:
 
 	klass_instance create()
 	{
-
 		std::string alias = m_szName + "_instance_" + std::to_string(m_refIndex);
 		std::shared_ptr<activation_record> ar = std::make_shared<activation_record>();
 		ar->environment = m_ar->environment->copy();

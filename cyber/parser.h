@@ -16,6 +16,11 @@ public:
 	parser() {}
 	~parser() {}
 
+	void init(std::vector<token> toks)
+	{
+		m_pi.init(toks);
+	}
+
 	std::vector<std::shared_ptr<statement>> parse(std::vector<token> toks)
 	{
 		m_pi.init(toks);
@@ -559,11 +564,11 @@ public:
 
 	std::shared_ptr<expression> parse_primary() {
 
-		if (m_pi.match(Keywords().FALSE())) {
+		if (m_pi.match(Keywords().BOOLFALSE())) {
 			token value = m_pi.previous();
 			return std::make_shared<primary>(false, value.loc());
 		}
-		if (m_pi.match(Keywords().TRUE())) {
+		if (m_pi.match(Keywords().BOOLTRUE())) {
 			token value = m_pi.previous();
 			return std::make_shared<primary>(true, value.loc());
 		}
@@ -655,6 +660,20 @@ public:
 				m_pi.consume(Keywords().RBRACKET(), "expect enclosing ']' in list initialization");
 			}
 			return std::make_shared<list_initializer>(args, tok.loc());
+		}
+
+		if (m_pi.match(Keywords().LCURLY())) {
+			token tok = m_pi.previous();
+			std::vector<std::shared_ptr<statement>> stmts;
+			if (!m_pi.match(Keywords().RCURLY())) {
+				do {
+					stmts.push_back(parse_declarations());
+				} while (!m_pi.atEnd() && !m_pi.match(Keywords().RCURLY()));
+				if (m_pi.atEnd()) {
+					throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "expected enclosing } in object literal", Severity().HIGH(), tok.loc());
+				}
+			}
+			return std::make_shared<object_literal>(stmts, tok.loc());
 		}
 
 		throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unexpected token in primary \"" + m_pi.current().toStr() + "\"", Severity().HIGH(), m_pi.current().loc());

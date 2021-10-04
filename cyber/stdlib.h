@@ -69,3 +69,28 @@ std::any fs_file_size(std::shared_ptr<interpreter> i, _args args);
 std::any fs_exists(std::shared_ptr<interpreter> i, _args args);
 std::any fs_replace_line(std::shared_ptr<interpreter> i, _args args);
 std::any fs_get_unique_name(std::shared_ptr<interpreter> i, _args args);
+
+
+// Network
+
+std::any net_create_client(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_send(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_isconnected(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_connect(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_disconnect(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_start(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_start_async(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_port(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_host(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_getlasterror(std::shared_ptr<interpreter> i, _args args);
+
+std::any net_create_server(std::shared_ptr<interpreter> i, _args args);
+std::any net_server_messageclient(std::shared_ptr<interpreter> i, _args args);
+std::any net_server_messageall(std::shared_ptr<interpreter> i, _args args);
+std::any net_server_getconnectionbyid(std::shared_ptr<interpreter> i, _args args);
+std::any net_server_start(std::shared_ptr<interpreter> i, _args args);
+std::any net_server_stop(std::shared_ptr<interpreter> i, _args args);
+std::any net_server_update(std::shared_ptr<interpreter> i, _args args);
+std::any net_server_getlasterror(std::shared_ptr<interpreter> i, _args args);
+
+

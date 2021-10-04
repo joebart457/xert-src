@@ -72,15 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\zzz_WIP\shared\external_code\asio-1.18.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\zzz_WIP\shared\external_code\asio-1.18.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\zzz_WIP\shared\external_code\asio-1.18.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\zzz_WIP\shared\external_code\asio-1.18.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -170,6 +174,8 @@
     <ClInclude Include="language_main.h" />
     <ClInclude Include="list_crawler.h" />
     <ClInclude Include="location.h" />
+    <ClInclude Include="network.hpp" />
+    <ClInclude Include="network_helper.h" />
     <ClInclude Include="numeric_operators.h" />
     <ClInclude Include="OperatorHandler.h" />
     <ClInclude Include="operators.h" />
@@ -177,6 +183,7 @@
     <ClInclude Include="parser_interface.hpp" />
     <ClInclude Include="pickler.h" />
     <ClInclude Include="scope.h" />
+    <ClInclude Include="Serializer.hpp" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="statement.h" />
     <ClInclude Include="stdlib.h" />
@@ -192,6 +199,7 @@
     <ClCompile Include="expression.cpp" />
     <ClCompile Include="interpreter.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="network_helper.cpp" />
     <ClCompile Include="numeric_operators.cpp" />
     <ClCompile Include="OperatorHandler.cpp" />
     <ClCompile Include="operators.cpp" />

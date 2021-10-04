@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <mutex>
 
 #include "statement.h"
 #include "exceptions.h" 
@@ -77,6 +78,7 @@ protected:
 	bool m_bMayThrow{ false };
 	std::string m_szName{ "" };
 	std::vector<param> m_params;
+	std::mutex m_mtx;
 };
 
 

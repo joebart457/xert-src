@@ -27,6 +27,8 @@ interpreter::interpreter(
 
 void interpreter::Validate()
 {
+	std::scoped_lock(m_mutex);
+
 	if (m_context == nullptr || m_tokenizer == nullptr || m_parser == nullptr) {
 		throw std::exception("interpreter held invalid data");
 	}
@@ -34,6 +36,8 @@ void interpreter::Validate()
 
 void interpreter::CompleteImport(const std::string& szFile, const location& loc)
 {
+	std::scoped_lock(m_mutex);
+
 	if (m_imports.count(szFile) && !m_imports[szFile]) {
 		m_imports[szFile] = true;
 		return;
@@ -43,6 +47,8 @@ void interpreter::CompleteImport(const std::string& szFile, const location& loc)
 
 bool interpreter::AddModule(const std::string& szFile)
 {
+	std::scoped_lock(m_mutex);
+
 	if (m_imports.count(szFile)) {
 		return !m_imports[szFile];
 	}
@@ -52,11 +58,15 @@ bool interpreter::AddModule(const std::string& szFile)
 
 void interpreter::FlushImports()
 {
+	std::scoped_lock(m_mutex);
+
 	m_imports.clear();
 }
 
 void interpreter::FlushImport(const std::string& szFile)
 {
+	std::scoped_lock(m_mutex);
+
 	if (m_imports.count(szFile)) {
 		m_imports[szFile] = 0;
 	}
@@ -65,6 +75,8 @@ void interpreter::FlushImport(const std::string& szFile)
 
 bool interpreter::isImported(const std::string& szFile)
 {
+	std::scoped_lock(m_mutex);
+
 	if (m_imports.count(szFile)) {
 		return m_imports[szFile];
 	}
@@ -73,17 +85,23 @@ bool interpreter::isImported(const std::string& szFile)
 
 std::shared_ptr<execution_context> interpreter::get_context()
 {
+	std::scoped_lock(m_mutex);
+
 	return m_context;
 }
 
 std::shared_ptr<activation_record> interpreter::interpret(const std::string& data)
 {
+	std::scoped_lock(m_mutex);
+
 	return interpret(m_parser->parse(m_tokenizer->tokenize(data)));
 }
 
 
 std::shared_ptr<activation_record> interpreter::interpret(std::vector<std::shared_ptr<statement>> stmts)
 {
+	std::scoped_lock(m_mutex);
+
 	for (unsigned int i{ 0 }; i < stmts.size(); i++) {
 		acceptStatement(stmts.at(i));
 	}
@@ -93,6 +111,7 @@ std::shared_ptr<activation_record> interpreter::interpret(std::vector<std::share
 
 
 void interpreter::acceptStatement(std::shared_ptr<statement> stmt) {
+	std::scoped_lock(m_mutex);
 	if (stmt != nullptr) {
 		try {
 			stmt->accept(std::static_pointer_cast<interpreter>(shared_from_this()));
@@ -116,6 +135,8 @@ void interpreter::acceptStatement(std::shared_ptr<statement> stmt) {
 
 void interpreter::acceptClassDeclaration(std::shared_ptr<class_declaration> class_decl)
 {
+	std::scoped_lock(m_mutex);
+
 	std::shared_ptr<activation_record> env = acceptBlock_KeepEnvironment(class_decl->m_body);
 
 	m_context->define(class_decl->m_szName, 
@@ -126,6 +147,8 @@ void interpreter::acceptClassDeclaration(std::shared_ptr<class_declaration> clas
 
 void interpreter::acceptFunctionDeclaration(std::shared_ptr<function_declaration> func_decl)
 {
+	std::scoped_lock(m_mutex);
+
 	m_context->define(func_decl->m_szName, 
 		std::make_shared<custom_fn>(func_decl->m_szName, m_context->current_ar(), func_decl->m_body->m_statements, func_decl->m_params, func_decl->m_loc), 
 		false,
@@ -135,6 +158,8 @@ void interpreter::acceptFunctionDeclaration(std::shared_ptr<function_declaration
 
 void interpreter::acceptVariableDeclaration(std::shared_ptr<variable_declaration> var_decl)
 {
+	std::scoped_lock(m_mutex);
+
 	if (var_decl->m_var.default_value != nullptr) {
 		std::any val = acceptExpression(var_decl->m_var.default_value);
 
@@ -151,6 +176,7 @@ void interpreter::acceptVariableDeclaration(std::shared_ptr<variable_declaration
 
 void interpreter::acceptInjectStatement(std::shared_ptr<inject_statement> inject_stmt)
 {
+	std::scoped_lock(m_mutex);
 
 	std::any inFile = acceptExpression(inject_stmt->m_expr);
 	if (inFile.type() != typeid(std::string)) {
@@ -191,11 +217,15 @@ void interpreter::acceptInjectStatement(std::shared_ptr<inject_statement> inject
 
 void interpreter::acceptReturnStatement(std::shared_ptr<return_statement> return_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	throw ReturnException(acceptExpression(return_stmt->m_expr), return_stmt->m_loc);
 }
 
 void interpreter::acceptIfStatement(std::shared_ptr<if_statement> if_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	if (Utilities().isTruthy(acceptExpression(if_stmt->m_condition))) {
 		acceptStatement(if_stmt->m_then);
 	}
@@ -207,6 +237,8 @@ void interpreter::acceptIfStatement(std::shared_ptr<if_statement> if_stmt)
 
 void interpreter::acceptWhileStatement(std::shared_ptr<while_statement> while_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	while (Utilities().isTruthy(acceptExpression(while_stmt->m_condition))) {
 		try {
 			acceptStatement(while_stmt->m_then);
@@ -219,17 +251,23 @@ void interpreter::acceptWhileStatement(std::shared_ptr<while_statement> while_st
 
 void interpreter::acceptBreakStatement(std::shared_ptr<break_statement> break_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	throw BreakException(break_stmt->m_loc);
 }
 
 
 void interpreter::acceptDirectiveStatement(std::shared_ptr<directive_statement> directive_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	throw ExceptionBuilder().Build(ExceptionTypes().NOT_SUPPORTED(), "NotSupportedException", Severity().HIGH(), directive_stmt->m_loc);
 }
 
 void interpreter::acceptBlock(std::shared_ptr<block> blk)
 {
+	std::scoped_lock(m_mutex);
+
 	m_context->push_ar(std::to_string(m_arIndex));
 	try {
 		interpret(blk->m_statements);
@@ -256,6 +294,8 @@ void interpreter::acceptBlock(std::shared_ptr<block> blk)
 
 std::shared_ptr<activation_record> interpreter::acceptBlock_KeepEnvironment(std::shared_ptr<block> blk)
 {
+	std::scoped_lock(m_mutex);
+
 	m_context->push_ar(std::to_string(m_arIndex));
 	try {
 		interpret(blk->m_statements);
@@ -282,6 +322,8 @@ std::shared_ptr<activation_record> interpreter::acceptBlock_KeepEnvironment(std:
 
 void interpreter::acceptSwitchStatement(std::shared_ptr<switch_statement> switch_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	std::any test = acceptExpression(switch_stmt->m_testValue);
 
 	for (switch_case c : switch_stmt->m_cases) {
@@ -321,6 +363,8 @@ void interpreter::acceptSwitchStatement(std::shared_ptr<switch_statement> switch
 
 void interpreter::acceptTryCatchStatement(std::shared_ptr<try_catch_statement> tc_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	try {
 		acceptStatement(tc_stmt->m_try);
 	}
@@ -365,6 +409,8 @@ void interpreter::acceptTryCatchStatement(std::shared_ptr<try_catch_statement> t
 
 void interpreter::acceptRunRecoverStatement(std::shared_ptr<run_recover_statement> rr_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	if (rr_stmt->m_szName != "") {
 		m_context->define(rr_stmt->m_szName, nullptr, true, rr_stmt->m_loc);
 	}
@@ -388,12 +434,16 @@ void interpreter::acceptRunRecoverStatement(std::shared_ptr<run_recover_statemen
 
 void interpreter::acceptPanicStatement(std::shared_ptr<panic_statement> panic_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	std::any val = acceptExpression(panic_stmt->m_expr);
 	throw PanicException(val, panic_stmt->m_loc);
 }
 
 void interpreter::acceptClassExtensionStatement(std::shared_ptr<class_extension> ce_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	if (ce_stmt->m_func_decl == nullptr) {
 		return;
 	}
@@ -425,12 +475,16 @@ void interpreter::acceptClassExtensionStatement(std::shared_ptr<class_extension>
 
 void interpreter::acceptExpressionStatement(std::shared_ptr<expression_statement> expr_stmt)
 {
+	std::scoped_lock(m_mutex);
+
 	acceptExpression(expr_stmt->m_expr);
 }
 
 
 std::any interpreter::acceptExpression(std::shared_ptr<expression> expr)
 {
+	std::scoped_lock(m_mutex);
+
 	if (expr == nullptr) {
 		return nullptr;
 	}
@@ -449,6 +503,8 @@ std::any interpreter::acceptExpression(std::shared_ptr<expression> expr)
 
 std::any interpreter::acceptAssignment(std::shared_ptr<assignment> assignmnt)
 {
+	std::scoped_lock(m_mutex);
+
 	std::any val = acceptExpression(assignmnt->val);
 	if (assignmnt->lhs != nullptr) {
 		std::any lhs = acceptExpression(assignmnt->lhs);
@@ -472,16 +528,22 @@ std::any interpreter::acceptAssignment(std::shared_ptr<assignment> assignmnt)
 
 std::any interpreter::acceptLogicAnd(std::shared_ptr<logic_and> expr_logic_and)
 {
+	std::scoped_lock(m_mutex);
+
 	return Utilities().isTruthy(acceptExpression(expr_logic_and->lhs)) && Utilities().isTruthy(acceptExpression(expr_logic_and->rhs));
 }
 
 std::any interpreter::acceptLogicOr(std::shared_ptr<logic_or> expr_logic_or)
 {
+	std::scoped_lock(m_mutex);
+
 	return Utilities().isTruthy(acceptExpression(expr_logic_or->lhs)) || Utilities().isTruthy(acceptExpression(expr_logic_or->rhs));
 }
 
 std::any interpreter::acceptBinary(std::shared_ptr<binary> expr_binary)
 {
+	std::scoped_lock(m_mutex);
+
 	std::any rhs = acceptExpression(expr_binary->rhs);
 	std::any lhs = acceptExpression(expr_binary->lhs);
 
@@ -494,6 +556,8 @@ std::any interpreter::acceptBinary(std::shared_ptr<binary> expr_binary)
 
 std::any interpreter::acceptUnary(std::shared_ptr<unary> expr_unary)
 {
+	std::scoped_lock(m_mutex);
+
 	std::any rhs = acceptExpression(expr_unary->rhs);
 	std::vector<std::any> arguments = { rhs };
 
@@ -505,6 +569,7 @@ std::any interpreter::acceptUnary(std::shared_ptr<unary> expr_unary)
 
 std::any interpreter::acceptCall(std::shared_ptr<call> expr_call)
 {
+	std::scoped_lock(m_mutex);
 
 	std::vector<std::any> arguments;
 	for (unsigned int i{ 0 }; i < expr_call->arguments.size(); i++) {
@@ -521,6 +586,8 @@ std::any interpreter::acceptCall(std::shared_ptr<call> expr_call)
 
 std::any interpreter::acceptGet(std::shared_ptr<get> expr_get)
 {
+	std::scoped_lock(m_mutex);
+
 	std::any lhs = acceptExpression(expr_get->lhs);
 	
 	if (lhs.type() == typeid(klass_instance)) {
@@ -534,20 +601,28 @@ std::any interpreter::acceptGet(std::shared_ptr<get> expr_get)
 }
 std::any interpreter::acceptGroup(std::shared_ptr<group> expr_group)
 {
+	std::scoped_lock(m_mutex);
+
 	return acceptExpression(expr_group->m_expr);
 }
 
 std::any interpreter::acceptIdentifier(std::shared_ptr<expr_identifier> identifier)
 {
+	std::scoped_lock(m_mutex);
+
 	return m_context->get(identifier->name, identifier->m_loc);
 }
 
 std::any interpreter::acceptPrimary(std::shared_ptr<primary> expr_primary)
 {
+	std::scoped_lock(m_mutex);
+
 	return expr_primary->data;
 }
 std::any interpreter::acceptCast(std::shared_ptr<cast> expr_cast)
 {
+	std::scoped_lock(m_mutex);
+
 	std::any rhs = acceptExpression(expr_cast->rhs);
 	std::vector<std::any> arguments = { rhs };
 
@@ -559,6 +634,8 @@ std::any interpreter::acceptCast(std::shared_ptr<cast> expr_cast)
 
 std::any interpreter::acceptInitializer(std::shared_ptr<initializer> expr_intializer)
 {
+	std::scoped_lock(m_mutex);
+
 	std::vector<std::any> args;
 	for (auto arg : expr_intializer->arguments) {
 		args.push_back(acceptExpression(arg));
@@ -577,11 +654,25 @@ std::any interpreter::acceptInitializer(std::shared_ptr<initializer> expr_intial
 
 std::any interpreter::acceptListInitializer(std::shared_ptr<list_initializer> expr_list_initializer)
 {
+	std::scoped_lock(m_mutex);
+
 	throw ExceptionBuilder().Build(ExceptionTypes().NOT_SUPPORTED(), "NotSupportedException", Severity().HIGH(), expr_list_initializer->m_loc);
 }
 
+std::any interpreter::acceptObjectLiteral(std::shared_ptr<object_literal> obj_lit)
+{
+	std::scoped_lock(m_mutex);
+
+	std::shared_ptr<activation_record> env = acceptBlock_KeepEnvironment(std::make_shared<block>(obj_lit->statements, obj_lit->getLocation()));
+
+	return klass_instance("klass_instance", "", env);
+}
+
+
 std::any interpreter::assert_or_convert_type(const param& p, std::any obj, const location& loc)
 {
+	std::scoped_lock(m_mutex);
+
 	std::string szType = Utilities().getTypeString(obj);
 
 	if (p.class_specifier != "") {

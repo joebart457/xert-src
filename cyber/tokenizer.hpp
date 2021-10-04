@@ -245,6 +245,10 @@ private:
 				return tokenliteral();
 			}
 
+			if (m_cCurrent == '_' || isalpha(m_cCurrent)) {
+				return word();
+			}
+
 			for (unsigned int i{ 0 }; i < m_rules.size(); i++) {
 				tokenizer_rule rule = m_rules.at(i);
 				if (next(rule.length()) == rule.getValue()) {
@@ -409,6 +413,8 @@ private:
 		for (unsigned int i{ 0 }; i < m_rules.size(); i++) {
 			if (result == m_rules.at(i).getValue()) {
 				type = m_rules.at(i).getType();
+				result = m_rules.at(i).getValueOrMacro();
+				break;
 			}
 		}
 

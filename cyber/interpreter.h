@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "statement.h"
 #include "expression.h"
@@ -58,6 +59,7 @@ public:
 	std::any acceptCast(std::shared_ptr<cast> expr_cast);
 	std::any acceptInitializer(std::shared_ptr<initializer> expr_intializer);
 	std::any acceptListInitializer(std::shared_ptr<list_initializer> expr_list_initializer);
+	std::any acceptObjectLiteral(std::shared_ptr<object_literal> obj_lit);
 
 	std::any assert_or_convert_type(const param& p, std::any obj, const location& loc);
 
@@ -74,6 +76,7 @@ private:
 	std::shared_ptr<activation_record> acceptBlock_KeepEnvironment(std::shared_ptr<block> blk);
 	
 
+	std::mutex m_mutex;
 	std::shared_ptr<execution_context> m_context{ nullptr };
 	std::shared_ptr<tokenizer> m_tokenizer{ nullptr };
 	std::shared_ptr<parser> m_parser{ nullptr };

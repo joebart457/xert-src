@@ -104,7 +104,7 @@ public:
 				oss << "\n\t\t" << it->first << " := " << it->second << ",";
 			}
 			else {
-				if (!StringUtilities().contains(it->first, exclude)) {
+				if (!StringUtilities().contains(it->first, exclude)) { 
 					oss << "\n\t\t" << it->first << " := " << it->second << ",";
 				}
 			}

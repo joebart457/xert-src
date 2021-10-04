@@ -23,6 +23,7 @@
 #include "stdlib.h"
 #include "db_framework.h"
 #include "parser.h"
+#include "network_helper.h"
 
 #include "BuildDefinitions.h"
 
@@ -460,6 +461,145 @@ public:
         e->define("Language",
             std::make_shared<klass_definition>("Language", language_ar),
             true
+        );
+
+
+        // Network
+
+        std::shared_ptr<activation_record> net_env_ar = std::make_shared<activation_record>();
+        net_env_ar->szAlias = "Network";
+        net_env_ar->environment = std::make_shared<scope<std::any>>();
+
+
+        std::shared_ptr<activation_record> netclient_env_ar = std::make_shared<activation_record>();
+        netclient_env_ar->szAlias = "NetClient";
+        netclient_env_ar->environment = std::make_shared<scope<std::any>>();
+       
+
+        netclient_env_ar->environment->define("constructor",
+            std::make_shared<native_fn>("constructor", net_create_client, netclient_env_ar)
+            ->registerParameter(BuildParameter<std::string>())
+            ->registerParameter(BuildParameter<uint16_t>())
+            ->registerParameter(BuildParameter(""))
+            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<bool>())
+        );
+
+        netclient_env_ar->environment->define("Send",
+            std::make_shared<native_fn>("Send", net_client_send, netclient_env_ar)
+            ->registerParameter(BuildParameter(""))
+        );
+
+        netclient_env_ar->environment->define("IsConnected",
+            std::make_shared<native_fn>("IsConnected", net_client_isconnected, netclient_env_ar),
+            true
+        );
+
+        netclient_env_ar->environment->define("Connect",
+            std::make_shared<native_fn>("Connect", net_client_connect, netclient_env_ar),
+            true
+        );
+
+        netclient_env_ar->environment->define("Disconnect",
+            std::make_shared<native_fn>("Disconnect", net_client_disconnect, netclient_env_ar),
+            true
+        );
+
+        netclient_env_ar->environment->define("Start",
+            std::make_shared<native_fn>("Start", net_client_start, netclient_env_ar),
+            true
+        );
+
+        netclient_env_ar->environment->define("StartAsync",
+            std::make_shared<native_fn>("StartAsync", net_client_start_async, netclient_env_ar),
+            true
+        );
+
+        netclient_env_ar->environment->define("Port",
+            std::make_shared<native_fn>("Port", net_client_port, netclient_env_ar),
+            true
+        );
+
+        netclient_env_ar->environment->define("Host",
+            std::make_shared<native_fn>("Host", net_client_host, netclient_env_ar),
+            true
+        );
+
+        netclient_env_ar->environment->define("GetLastError",
+            std::make_shared<native_fn>("GetLastError", net_client_getlasterror, netclient_env_ar),
+            true
+        );
+
+        net_env_ar->environment->define("NetClient",
+            std::make_shared<klass_definition>("NetClient", netclient_env_ar));
+
+        /*
+         raw will be defined just in createTCPClient not here
+         
+        netclient_env_ar->environment->define("raw",
+            std::make_shared<NetClient>("127.0.0.1", 50000, nullptr, nullptr)
+        );
+        */
+
+        std::shared_ptr<activation_record> netserver_env_ar = std::make_shared<activation_record>();
+        netserver_env_ar->szAlias = "NetServer";
+        netserver_env_ar->environment = std::make_shared<scope<std::any>>();
+
+        netserver_env_ar->environment->define("constructor",
+            std::make_shared<native_fn>("constructor", net_create_server, netserver_env_ar)
+            ->registerParameter(BuildParameter<uint16_t>())
+            ->registerParameter(BuildParameter(""))
+            ->registerParameter(BuildParameter(""))
+            ->registerParameter(BuildParameter(""))
+            ->registerParameter(BuildParameter(""))
+            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<bool>())
+        );
+
+        netserver_env_ar->environment->define("MessageClient",
+            std::make_shared<native_fn>("MessageClient", net_server_messageclient, netserver_env_ar)
+            ->registerParameter(BuildParameter<std::shared_ptr<net::connection<MsgType>>>())
+            ->registerParameter(BuildParameter(""))
+        );
+
+        netserver_env_ar->environment->define("MessageAll",
+            std::make_shared<native_fn>("MessageAll", net_server_messageall, netserver_env_ar)
+            ->registerParameter(BuildParameter(""))
+        );
+
+        netserver_env_ar->environment->define("GetClientById",
+            std::make_shared<native_fn>("GetConnectionById", net_server_getconnectionbyid, netserver_env_ar)
+            ->registerParameter(BuildParameter<uint32_t>())
+        );
+        netserver_env_ar->environment->define("Start",
+            std::make_shared<native_fn>("Start", net_server_start, netserver_env_ar)
+        );
+        netserver_env_ar->environment->define("Stop",
+            std::make_shared<native_fn>("Stop", net_server_stop, netserver_env_ar)
+        );
+        netserver_env_ar->environment->define("Update",
+            std::make_shared<native_fn>("Update", net_server_update, netserver_env_ar)
+            ->registerParameter(BuildParameter<uint32_t>())
+            ->registerParameter(BuildParameter<bool>())
+        );
+
+        netserver_env_ar->environment->define("GetLastError",
+            std::make_shared<native_fn>("GetLastError", net_server_getlasterror, netserver_env_ar)
+        );
+
+        /*
+         raw will be defined just in createTCPClient not here
+        
+        netserver_env_ar->environment->define("raw",
+            std::make_shared<NetServer>(50000, nullptr, nullptr, nullptr, nullptr, nullptr)
+        );
+        */
+
+        net_env_ar->environment->define("NetServer",
+            std::make_shared<klass_definition>("NetServer", netserver_env_ar));
+
+        e->define("Network",
+            std::make_shared<klass_definition>("Network", net_env_ar)
         );
 
 		return e;
@@ -7318,8 +7458,8 @@ not
 			tokenizer_rule(Keywords().RETURN(), "return"),
 			tokenizer_rule(Keywords().FUNCTION(), "function"),
 			tokenizer_rule(Keywords().CLASS(), "class"),
-			tokenizer_rule(Keywords().TRUE(), "true"),
-			tokenizer_rule(Keywords().FALSE(), "false"),
+			tokenizer_rule(Keywords().BOOLTRUE(), "true"),
+			tokenizer_rule(Keywords().BOOLFALSE(), "false"),
 			tokenizer_rule(Keywords().NUL(), "null"),
 			tokenizer_rule(Keywords().BREAK(), "break"),
 			tokenizer_rule(Keywords().SWITCH(), "switch"),

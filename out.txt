@@ -1,6 +1,17 @@
+	modified:   BuildDefinitions.h
 	modified:   ContextBuilder.h
 	modified:   Keywords.h
 	modified:   Utilities.h
+	modified:   callable.h
+	modified:   context.h
+	modified:   expression.h
 	modified:   interpreter.h
+	modified:   klass_instance.h
 	modified:   parser.h
-	modified:   statement.h
+	modified:   scope.h
+	modified:   stdlib.h
+	modified:   tokenizer.hpp
+	modified:   ufhndl.h
+	Serializer.hpp
+	network.hpp
+	network_helper.h

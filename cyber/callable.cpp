@@ -30,6 +30,7 @@ std::string callable::getSignature()
 
 std::any native_fn::call(std::shared_ptr<interpreter> c, _args args)
 {
+	std::scoped_lock(m_mtx);
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(c);
 	
 	std::any ret = nullptr;
@@ -121,6 +122,7 @@ std::shared_ptr<native_fn> native_fn::registerParameter(const param& p)
 
 std::any custom_fn::call(std::shared_ptr<interpreter> c, _args arguments)
 {
+	std::scoped_lock(m_mtx);
 
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(c); // Also checks that c is not nullptr
 
@@ -135,7 +137,6 @@ std::any custom_fn::call(std::shared_ptr<interpreter> c, _args arguments)
 			throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected " + std::to_string(m_params.size())
 				+ " arguments but got " + std::to_string(arguments.size()), Severity().MEDIUM(), m_loc);
 		}
-
 		// Clean arguments and define parameters in this scope
 		for (unsigned int i{ 0 }; i < m_params.size(); i++) {
 			std::any cleanedObject = c->assert_or_convert_type(m_params.at(i), arguments.at(i), m_loc);
@@ -189,6 +190,8 @@ void custom_fn::setEnclosing(std::shared_ptr<activation_record> ar)
 
 std::any unary_fn::call(std::shared_ptr<interpreter> c, _args args)
 {
+	std::scoped_lock(m_mtx);
+
 	Utilities().check_context(c);
 	if (args.size() != 1) {
 		throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected 1 argument but got " + std::to_string(args.size()), Severity().MEDIUM());
@@ -217,6 +220,8 @@ std::string unary_fn::getSignature()
 
 std::any binary_fn::call(std::shared_ptr<interpreter> c,  _args args)
 {
+	std::scoped_lock(m_mtx);
+
 	Utilities().check_context(c);
 	if (args.size() != m_params.size() || m_params.size() != 2) {
 		throw ExceptionBuilder().Build(ExceptionTypes().PROGRAM(), "parity_mismatch, expected 2 arguments but got " + std::to_string(args.size()), Severity().MEDIUM());
@@ -247,6 +252,8 @@ std::shared_ptr<binary_fn> binary_fn::registerParameter(const param& p)
 
 std::any loaded_native_fn::call(std::shared_ptr<interpreter> c, _args args)
 {
+	std::scoped_lock(m_mtx);
+
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(c);
 
 	std::any ret = nullptr;

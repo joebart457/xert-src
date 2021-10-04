@@ -161,14 +161,68 @@ bool Utilities::isTruthy(const std::any& obj)
 	else if (obj.type() == typeid(long double)) {
 		return std::any_cast<long double>(obj);
 	}
-	else if (obj.type() == typeid(long long)) {
-		return std::any_cast<long long>(obj);
+	else if (obj.type() == typeid(std::string)) {
+		return std::any_cast<std::string>(obj).size() > 0;
+	}
+	else if (obj.type() == typeid(nullptr)) {
+		return false;
+	}
+
+	throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "Unsupported object type '" + std::string(obj.type().name()), Severity().LOW());
+}
+
+bool Utilities::isTruthyNoThrow(const std::any& obj)
+{
+	if (obj.type() == typeid(int)) {
+		return std::any_cast<int>(obj);
+	}
+	else if (obj.type() == typeid(unsigned long)) {
+		return std::any_cast<unsigned long>(obj);
+	}
+	else if (obj.type() == typeid(bool)) {
+		return std::any_cast<bool>(obj);
+	}
+	else if (obj.type() == typeid(float)) {
+		return std::any_cast<float>(obj);
+	}
+	else if (obj.type() == typeid(int8_t)) {
+		return std::any_cast<int8_t>(obj);
+	}
+	else if (obj.type() == typeid(int16_t)) {
+		return std::any_cast<int16_t>(obj);
+	}
+	else if (obj.type() == typeid(int32_t)) {
+		return std::any_cast<int32_t>(obj);
+	}
+	else if (obj.type() == typeid(int64_t)) {
+		return std::any_cast<int64_t>(obj);
+	}
+	else if (obj.type() == typeid(uint8_t)) {
+		return std::any_cast<uint8_t>(obj);
+	}
+	else if (obj.type() == typeid(uint16_t)) {
+		return std::any_cast<uint16_t>(obj);
+	}
+	else if (obj.type() == typeid(uint32_t)) {
+		return std::any_cast<uint32_t>(obj);
+	}
+	else if (obj.type() == typeid(uint64_t)) {
+		return std::any_cast<uint64_t>(obj);
+	}
+	else if (obj.type() == typeid(double)) {
+		return std::any_cast<double>(obj);
+	}
+	else if (obj.type() == typeid(long double)) {
+		return std::any_cast<long double>(obj);
 	}
 	else if (obj.type() == typeid(std::string)) {
 		return std::any_cast<std::string>(obj).size() > 0;
 	}
+	else if (obj.type() == typeid(nullptr)) {
+		return false;
+	}
 
-	throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "Unsupported object type '" + std::string(obj.type().name()), Severity().LOW());
+	return false;
 }
 
 
