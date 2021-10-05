@@ -20,6 +20,10 @@ public:
 			interp->interpret(FileHandle().readFileAsString(szFilePath));
 			return 0;
 		}
+		catch (PanicException pe) {
+			std::cout << pe.fullTrace();
+			return -1;
+		}
 		catch (ProgramException pe) {
 			std::cout << pe.fullTrace();
 			return -1;

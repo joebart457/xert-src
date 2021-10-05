@@ -32,6 +32,11 @@ std::any map_exists(std::shared_ptr<interpreter> i, _args args);
 std::any print(std::shared_ptr<interpreter> i, _args args);
 std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs);
 
+// Null
+
+std::any null_isNullType(std::shared_ptr<interpreter> i, _args args);
+
+
 // String
 
 std::any string_split(std::shared_ptr<interpreter> i, _args args);

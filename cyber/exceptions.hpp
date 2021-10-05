@@ -52,7 +52,7 @@ public:
 
 	std::string severity() { return m_szSeverity; }
 
-	std::string what()
+	virtual std::string what()
 	{
 		std::ostringstream oss;
 		oss << "{" << m_szSeverity << "}[" << m_szType << "] " << m_szMsg;

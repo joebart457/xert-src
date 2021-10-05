@@ -204,7 +204,6 @@
     <ClCompile Include="statement.cpp" />
     <ClCompile Include="stdlib.cpp" />
     <ClCompile Include="StringUtilities.cpp" />
-    <ClCompile Include="ufhndl.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="win_std_lib.cpp" />
   </ItemGroup>

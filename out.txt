@@ -1,6 +1,4 @@
 	modified:   ContextBuilder.hpp
-	modified:   context.h
-	deleted:    list_crawler.h
-	deleted:    parser.h
-	list_crawler.hpp
-	parser.hpp
+	modified:   exceptions.hpp
+	modified:   language_main.h
+	modified:   stdlib.h

@@ -64,6 +64,22 @@ public:
 			->registerParameter(BuildParameter("")),
 			true
         );
+        
+        // Null
+
+        std::shared_ptr<activation_record> null_ar = std::make_shared<activation_record>();
+        null_ar->szAlias = "Null";
+        null_ar->environment = std::make_shared<scope<std::any>>();
+
+        null_ar->environment->define("IsNullType",
+            std::make_shared<native_fn>("IsNullType", null_isNullType)
+            ->registerParameter(BuildParameter("")),
+            true
+        );
+
+        e->define("Null",
+            std::make_shared<klass_definition>("Null", null_ar)
+        );
 
         // String
 
@@ -74,26 +90,22 @@ public:
         string_ar->environment->define("split",
             std::make_shared<native_fn>("split", string_split)
             ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<std::string>()),
-            true
+            ->registerParameter(BuildParameter<std::string>())
         );
 
         string_ar->environment->define("rtrim",
             std::make_shared<native_fn>("rtrim", string_rtrim, string_ar)
-            ->registerParameter(BuildParameter<std::string>()),
-            true
+            ->registerParameter(BuildParameter<std::string>())
         );
 
         string_ar->environment->define("ltrim",
             std::make_shared<native_fn>("ltrim", string_ltrim, string_ar)
-            ->registerParameter(BuildParameter<std::string>()),
-            true
+            ->registerParameter(BuildParameter<std::string>())
         );
 
         string_ar->environment->define("trim",
             std::make_shared<native_fn>("trim", string_trim, string_ar)
-            ->registerParameter(BuildParameter<std::string>()),
-            true
+            ->registerParameter(BuildParameter<std::string>())
         );
 
         string_ar->environment->define("create",

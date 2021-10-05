@@ -171,19 +171,19 @@ std::any NetServer::DoCallback(std::shared_ptr<callable> callback, _args args)
 		return callback->call(m_iContext, args);
 	}
 	catch (PanicException pe) {
-		m_lastError = ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse message data", Severity().MEDIUM()).value();
+		m_lastError = pe.value();
 		if (!m_bContinueOnError) {
 			RequestStop(); // Can't actually stop from a handler, so must request server shutdown on its own
 		}
 	}
 	catch (ProgramException pe) {
-		m_lastError = ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse message data", Severity().MEDIUM()).value();
+		m_lastError = pe.fullTrace();
 		if (!m_bContinueOnError) {
 			RequestStop();
 		}
 	}
 	catch (std::exception e) {
-		m_lastError = ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse message data", Severity().MEDIUM()).value();
+		m_lastError = std::string(e.what());
 		if (!m_bContinueOnError) {
 			RequestStop();
 		}

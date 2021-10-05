@@ -167,6 +167,14 @@ std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs)
 	return Utilities().stringify(rhs);
 }
 
+// Null
+
+std::any null_isNullType(std::shared_ptr<interpreter> i, _args args)
+{
+	return args.at(0).type() == typeid(nullptr);
+}
+
+
 // String
 
 std::any string_split(std::shared_ptr<interpreter> i, _args args)

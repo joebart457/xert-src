@@ -51,9 +51,6 @@
     <ClCompile Include="operators.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ufhndl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="win_std_lib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
