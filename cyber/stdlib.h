@@ -6,6 +6,11 @@
 #include "callable.h"
 #include "interpreter.h"
 
+
+// Thread
+
+std::any thread_sleep(std::shared_ptr<interpreter> i, _args args);
+
 // Time
 std::any time_timestamp(std::shared_ptr<interpreter> i, _args args);
 std::any time_timestamp_to_timestring(std::shared_ptr<interpreter> i, _args args);
@@ -19,6 +24,8 @@ std::any db_run_prepared_query(std::shared_ptr<interpreter> i, _args args);
 
 // List methods
 std::any list_push(std::shared_ptr<interpreter> i, _args args);
+std::any list_remove(std::shared_ptr<interpreter> i, _args args);
+std::any list_size(std::shared_ptr<interpreter> i, _args args);
 std::any list_constructor(std::shared_ptr<interpreter> i, _args args);
 
 // Map methods
@@ -33,12 +40,10 @@ std::any print(std::shared_ptr<interpreter> i, _args args);
 std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs);
 
 // Null
-
 std::any null_isNullType(std::shared_ptr<interpreter> i, _args args);
 
 
 // String
-
 std::any string_split(std::shared_ptr<interpreter> i, _args args);
 std::any string_rtrim(std::shared_ptr<interpreter> i, _args args);
 std::any string_ltrim(std::shared_ptr<interpreter> i, _args args);
@@ -47,6 +52,13 @@ std::any string_find(std::shared_ptr<interpreter> i, _args args);
 std::any string_substr(std::shared_ptr<interpreter> i, _args args);
 std::any string_pad(std::shared_ptr<interpreter> i, _args args);
 std::any string_to_char(std::shared_ptr<interpreter> i, _args args);
+std::any string_length(std::shared_ptr<interpreter> i, _args args);
+
+// Console
+std::any console_write(std::shared_ptr<interpreter> i, _args args);
+std::any console_writeline(std::shared_ptr<interpreter> i, _args args);
+std::any console_readKey(std::shared_ptr<interpreter> i, _args args);
+std::any console_readLine(std::shared_ptr<interpreter> i, _args args);
 
 
 // Language
@@ -97,5 +109,6 @@ std::any net_server_start(std::shared_ptr<interpreter> i, _args args);
 std::any net_server_stop(std::shared_ptr<interpreter> i, _args args);
 std::any net_server_update(std::shared_ptr<interpreter> i, _args args);
 std::any net_server_getlasterror(std::shared_ptr<interpreter> i, _args args);
+std::any net_server_port(std::shared_ptr<interpreter> i, _args args);
 
 

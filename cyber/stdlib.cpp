@@ -2,6 +2,9 @@
 
 #include <ctime>
 #include <thread>
+#include <vector>
+#include <chrono>
+#include <thread>
 
 #include "FileHandle.hpp"
 #include "Utilities.h"
@@ -10,6 +13,16 @@
 #include "network_helper.h"
 #include "Serializer.hpp"
 #include "db_helper.h"
+#include "ConsoleHandle.hpp"
+
+
+// Thread
+
+std::any thread_sleep(std::shared_ptr<interpreter> i, _args args)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(args.get<uint64_t>(0)));
+	return nullptr;
+}
 
 // Time
 
@@ -50,7 +63,7 @@ std::any db_open(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
 
-	std::shared_ptr<db_helper> db = context->get<std::shared_ptr<db_helper>>("db");
+	std::shared_ptr<db_helper> db = context->get<std::shared_ptr<db_helper>>("__raw__");
 	db->open(args.get<std::string>(0));
 	return nullptr;
 }
@@ -60,7 +73,7 @@ std::any db_get(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
 
-	std::shared_ptr<db_helper> db = context->get<std::shared_ptr<db_helper>>("db");
+	std::shared_ptr<db_helper> db = context->get<std::shared_ptr<db_helper>>("__raw__");
 
 	std::vector<std::any> results = db->get(args.get<std::string>(0));
 
@@ -75,7 +88,7 @@ std::any db_run_prepared_query(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
 
-	std::shared_ptr<db_helper> db = context->get<std::shared_ptr<db_helper>>("db");
+	std::shared_ptr<db_helper> db = context->get<std::shared_ptr<db_helper>>("__raw__");
 
 	std::vector<std::any> results = db->run_prepared(
 		std::any_cast<std::string>(args.at(0)),
@@ -96,23 +109,46 @@ std::any list_push(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
 
-	uint64_t size = context->get<uint64_t>("size");
+	auto raw = context->get<std::shared_ptr<std::vector<std::any>>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
 
-	context->define(std::to_string(size), args.at(0), false, location());
-	context->assign("size", size + 1, location());
+	raw->push_back(args.at(0));
+	return nullptr;
+}
+
+std::any list_remove(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+
+	auto raw = context->get<std::shared_ptr<std::vector<std::any>>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	raw->erase(raw->begin() + args.get<int32_t>(0));
 
 	return nullptr;
 }
 
 
-std::any list_constructor(std::shared_ptr<interpreter> i, _args args)
+std::any list_size(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
 
-	for (unsigned int i{ 0 }; i < args.size(); i++) {
-		context->define(std::to_string(i), args.at(i), false, location());
+	auto raw = context->get<std::shared_ptr<std::vector<std::any>>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
 	}
-	context->assign("size", (uint64_t)args.size(), location());
+
+	return static_cast<uint32_t>(raw->size());
+}
+
+std::any list_constructor(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	context->define("__raw__", std::make_shared<std::vector<std::any>>(args.data()), false, location());
 
 	return nullptr;
 }
@@ -214,7 +250,7 @@ std::any string_trim(std::shared_ptr<interpreter> i, _args args)
 
 std::any string_find(std::shared_ptr<interpreter> i, _args args)
 {
-	return static_cast<int64_t>(StringUtilities().find(args.get<std::string>(0), args.get<std::string>(1)));
+	return StringUtilities().find(args.get<std::string>(0), args.get<std::string>(1));
 }
 
 std::any string_substr(std::shared_ptr<interpreter> i, _args args)
@@ -234,6 +270,35 @@ std::any string_to_char(std::shared_ptr<interpreter> i, _args args)
 		throw ExceptionBuilder().Build(ExceptionTypes().RUNTIME(), "unable to convert string of size " + std::to_string(src.size()) + " to char", Severity().MEDIUM());
 	}
 	return static_cast<uint8_t>(src.at(0));
+}
+
+std::any string_length(std::shared_ptr<interpreter> i, _args args)
+{
+	return static_cast<uint32_t>(args.get<std::string>(0).size());
+}
+
+
+// Console
+
+std::any console_write(std::shared_ptr<interpreter> i, _args args)
+{
+	std::cout << Utilities().stringify(args.at(0));
+	return nullptr;
+}
+std::any console_writeline(std::shared_ptr<interpreter> i, _args args)
+{
+	std::cout << Utilities().stringify(args.at(0)) << "\n";
+	return nullptr;
+}
+
+std::any console_readKey(std::shared_ptr<interpreter> i, _args args)
+{
+	return ConsoleHandle().ReadKey();
+}
+
+std::any console_readLine(std::shared_ptr<interpreter> i, _args args)
+{
+	return ConsoleHandle().ReadLine();
 }
 
 // Language
@@ -283,14 +348,25 @@ std::any fs_copy_file(std::shared_ptr<interpreter> i, _args args)
 
 std::any fs_remove_all(std::shared_ptr<interpreter> i, _args args)
 {
-	uintmax_t removed = FileHandle().removeAll(args.get<std::string>(0));
+	uint64_t removed = FileHandle().removeAll(args.get<std::string>(0));
 	return removed;
 }
 
 std::any fs_read_file(std::shared_ptr<interpreter> i, _args args)
 {
-	// Refactor to return list instead of native vector
-	return FileHandle().readFile(args.get<std::string>(0));
+	auto context = Utilities().fetch_context(i);
+	auto arrLines = FileHandle().readFile(args.get<std::string>(0));
+
+	auto listDefintion = context->get_coalesce<std::shared_ptr<klass_definition>>("Containers.list");
+
+	std::vector<std::any> arguments;
+	for (std::string line : arrLines) {
+		arguments.push_back(line);
+	}
+	auto lsInstance = listDefintion->create();
+	Utilities().getCallable(lsInstance.Get("constructor", location()))->call(i, _args(arguments));
+
+	return lsInstance;
 }
 
 std::any fs_real_file_to_string(std::shared_ptr<interpreter> i, _args args)
@@ -305,7 +381,14 @@ std::any fs_read_line_from_file(std::shared_ptr<interpreter> i, _args args)
 
 std::any fs_write_to_file(std::shared_ptr<interpreter> i, _args args)
 {
-	FileHandle().writeToFile(args.get<std::string>(0), args.get<std::vector<std::string>>(1), args.get<bool>(2));
+	klass_instance lsInstance = args.get<klass_instance>(1);
+	uint64_t size = lsInstance.Get<uint64_t>("size", location());
+	std::vector<std::string> data;
+	for (uint64_t i{ 0 }; i < size; i++) {
+		data.push_back(Utilities().stringify(lsInstance.Get(std::to_string(i), location())));
+	}
+
+	FileHandle().writeToFile(args.get<std::string>(0), data, args.get<bool>(2));
 	return nullptr;
 }
 
@@ -601,4 +684,14 @@ std::any net_server_getlasterror(std::shared_ptr<interpreter> i, _args args)
 		return nullptr;
 	}
 	return server->GetLastError();
+}
+
+std::any net_server_port(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("raw");
+	if (server == nullptr) {
+		return 0;
+	}
+	return server->Port();
 }

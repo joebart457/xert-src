@@ -56,6 +56,11 @@ public:
 		throw ExceptionBuilder().Build(ExceptionTypes().PRECOMPILE(), "index out of range "+std::to_string(m_data.size())+" < "+std::to_string(index), Severity().HIGH());
 	}
 
+	std::vector<std::any> data()
+	{
+		return m_data;
+	}
+
 private:
 	std::vector<std::any> m_data;
 };

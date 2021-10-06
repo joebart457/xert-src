@@ -211,7 +211,11 @@ public:
 		std::string fName = p.filename().string();
 		for (unsigned int i{ 0 }; i < tries; i++) {
 			auto uniqueFile = p.replace_filename("tmp" + std::to_string(i) + "__" + fName);
-			if (!std::filesystem::exists(uniqueFile)) return uniqueFile.string();
+			if (!std::filesystem::exists(uniqueFile)) {
+				std::ofstream f(uniqueFile.string());
+				f.close();
+				return uniqueFile.string();
+			}
 		}
 		throw BuildException("unable to create unique file '" + p.string() + "'");
 	}

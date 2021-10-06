@@ -22,6 +22,7 @@
 #include "stdlib.h"
 #include "parser.hpp"
 #include "network_helper.h"
+#include "Colors.hpp"
 
 #include "BuildDefinitions.hpp"
 
@@ -55,7 +56,7 @@ public:
 
 		e->define("print", 
 			std::make_shared<native_fn>("print", print)
-				->registerParameter(BuildParameter("")), 
+				->setVariadic(), 
 			true
         );
 
@@ -64,7 +65,25 @@ public:
 			->registerParameter(BuildParameter("")),
 			true
         );
-        
+
+        // Thread
+
+        std::shared_ptr<activation_record> thread_ar = std::make_shared<activation_record>();
+        thread_ar->szAlias = "Thread";
+        thread_ar->environment = std::make_shared<scope<std::any>>();
+
+
+        thread_ar->environment->define("Sleep",
+            std::make_shared<native_fn>("Sleep", thread_sleep, thread_ar)
+            ->registerParameter(BuildParameter<uint64_t>("milliseconds")),
+            true
+        );
+
+        e->define("Thread",
+            std::make_shared<klass_definition>("Thread", thread_ar),
+            true
+        );
+
         // Null
 
         std::shared_ptr<activation_record> null_ar = std::make_shared<activation_record>();
@@ -73,7 +92,7 @@ public:
 
         null_ar->environment->define("IsNullType",
             std::make_shared<native_fn>("IsNullType", null_isNullType)
-            ->registerParameter(BuildParameter("")),
+            ->registerParameter(BuildParameter("", "object")),
             true
         );
 
@@ -87,59 +106,65 @@ public:
         string_ar->szAlias = "String";
         string_ar->environment = std::make_shared<scope<std::any>>();
 
-        string_ar->environment->define("split",
-            std::make_shared<native_fn>("split", string_split)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<std::string>())
+        string_ar->environment->define("Split",
+            std::make_shared<native_fn>("Split", string_split)
+            ->registerParameter(BuildParameter<std::string>("source"))
+            ->registerParameter(BuildParameter<std::string>("delimiter"))
         );
 
-        string_ar->environment->define("rtrim",
-            std::make_shared<native_fn>("rtrim", string_rtrim, string_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        string_ar->environment->define("Rtrim",
+            std::make_shared<native_fn>("Rtrim", string_rtrim, string_ar)
+            ->registerParameter(BuildParameter<std::string>("source"))
         );
 
-        string_ar->environment->define("ltrim",
-            std::make_shared<native_fn>("ltrim", string_ltrim, string_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        string_ar->environment->define("Ltrim",
+            std::make_shared<native_fn>("Ltrim", string_ltrim, string_ar)
+            ->registerParameter(BuildParameter<std::string>("source"))
         );
 
-        string_ar->environment->define("trim",
-            std::make_shared<native_fn>("trim", string_trim, string_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        string_ar->environment->define("Trim",
+            std::make_shared<native_fn>("Trim", string_trim, string_ar)
+            ->registerParameter(BuildParameter<std::string>("source"))
         );
 
-        string_ar->environment->define("create",
-            std::make_shared<unary_fn>("create", to_string)
-            ->registerParameter(BuildParameter("")),
+        string_ar->environment->define("Create",
+            std::make_shared<unary_fn>("Create", to_string)
+            ->registerParameter(BuildParameter("","object")),
             true
         );
 
-        string_ar->environment->define("find",
-            std::make_shared<native_fn>("find", string_find)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<std::string>()),
+        string_ar->environment->define("Find",
+            std::make_shared<native_fn>("Find", string_find)
+            ->registerParameter(BuildParameter<std::string>("source"))
+            ->registerParameter(BuildParameter<std::string>("search")),
             true
         );
 
-        string_ar->environment->define("substr",
-            std::make_shared<native_fn>("substr", string_substr)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<uint64_t>())
-            ->registerParameter(BuildParameter<uint64_t>()),
+        string_ar->environment->define("SubString",
+            std::make_shared<native_fn>("SubString", string_substr)
+            ->registerParameter(BuildParameter<std::string>("source"))
+            ->registerParameter(BuildParameter<uint64_t>("from"))
+            ->registerParameter(BuildParameter<uint64_t>("to")),
             true
         );
 
-        string_ar->environment->define("pad",
-            std::make_shared<native_fn>("pad", string_pad)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<int8_t>())
-            ->registerParameter(BuildParameter<int64_t>()),
+        string_ar->environment->define("Pad",
+            std::make_shared<native_fn>("Pad", string_pad)
+            ->registerParameter(BuildParameter<std::string>("source"))
+            ->registerParameter(BuildParameter<int8_t>("pad"))
+            ->registerParameter(BuildParameter<int64_t>("width")),
             true
         );
 
-        string_ar->environment->define("get_char",
-            std::make_shared<native_fn>("get_char", string_to_char)
-            ->registerParameter(BuildParameter<std::string>()),
+        string_ar->environment->define("Char",
+            std::make_shared<native_fn>("Char", string_to_char)
+            ->registerParameter(BuildParameter<std::string>("source")),
+            true
+        );
+
+        string_ar->environment->define("Length",
+            std::make_shared<native_fn>("Length", string_length)
+            ->registerParameter(BuildParameter<std::string>("source")),
             true
         );
 
@@ -147,6 +172,88 @@ public:
             std::make_shared<klass_definition>("String", string_ar),
             true
         );
+
+        // End String
+
+        // Console
+
+        std::shared_ptr<activation_record> console_env_ar = std::make_shared<activation_record>();
+        console_env_ar->szAlias = "Console";
+        console_env_ar->environment = std::make_shared<scope<std::any>>();
+
+        console_env_ar->environment->define("Write",
+            std::make_shared<native_fn>("Write", console_write)
+            ->registerParameter(BuildParameter("", "object")),
+            true
+        );
+
+        console_env_ar->environment->define("WriteLine",
+            std::make_shared<native_fn>("WriteLine", console_writeline)
+            ->registerParameter(BuildParameter("", "object")),
+            true
+        );
+
+        console_env_ar->environment->define("ReadKey",
+            std::make_shared<native_fn>("ReadKey", console_readKey),
+            true
+        );
+
+        console_env_ar->environment->define("ReadLine",
+            std::make_shared<native_fn>("ReadLine", console_readLine),
+            true
+        );
+
+        e->define("Console",
+            std::make_shared<klass_definition>("Console", console_env_ar),
+            true);
+
+        // End Console
+
+        // Colors
+
+        std::shared_ptr<activation_record> colors_env_ar = std::make_shared<activation_record>();
+        colors_env_ar->szAlias = "Colors";
+        colors_env_ar->environment = std::make_shared<scope<std::any>>();
+
+        colors_env_ar->environment->define("BLACK", BLACK, true);
+        colors_env_ar->environment->define("BLUE", BLUE, true);
+        colors_env_ar->environment->define("GREEN", GREEN, true);
+        colors_env_ar->environment->define("CYAN", CYAN, true);
+        colors_env_ar->environment->define("RED", RED, true);
+        colors_env_ar->environment->define("MAGENTA", MAGENTA, true);
+        colors_env_ar->environment->define("BROWN", BROWN, true);
+        colors_env_ar->environment->define("LIGHTGRAY", LIGHTGRAY, true);
+        colors_env_ar->environment->define("DARKGRAY", DARKGRAY, true);
+        colors_env_ar->environment->define("LIGHTBLUE", LIGHTBLUE, true);
+        colors_env_ar->environment->define("LIGHTCYAN", LIGHTCYAN, true);
+        colors_env_ar->environment->define("LIGHTRED", LIGHTRED, true);
+        colors_env_ar->environment->define("LIGHTMAGENTA", LIGHTMAGENTA, true);
+        colors_env_ar->environment->define("YELLOW", YELLOW, true);
+        colors_env_ar->environment->define("WHITE", WHITE, true);
+        
+        colors_env_ar->environment->define("BLACK_B", BLACK_B, true);
+        colors_env_ar->environment->define("BLUE_B", BLUE_B, true);
+        colors_env_ar->environment->define("GREEN_B", GREEN_B, true);
+        colors_env_ar->environment->define("CYAN_B", CYAN_B, true);
+        colors_env_ar->environment->define("RED_B", RED_B, true);
+        colors_env_ar->environment->define("MAGENTA_B", MAGENTA_B, true);
+        colors_env_ar->environment->define("BROWN_B", BROWN_B, true);
+        colors_env_ar->environment->define("LIGHTGRAY_B", LIGHTGRAY_B, true);
+        colors_env_ar->environment->define("DARKGRAY_B", DARKGRAY_B, true);
+        colors_env_ar->environment->define("LIGHTBLUE_B", LIGHTBLUE_B, true);
+        colors_env_ar->environment->define("LIGHTCYAN_B", LIGHTCYAN_B, true);
+        colors_env_ar->environment->define("LIGHTRED_B", LIGHTRED_B, true);
+        colors_env_ar->environment->define("LIGHTMAGENTA_B", LIGHTMAGENTA_B, true);
+        colors_env_ar->environment->define("YELLOW_B", YELLOW_B, true);
+        colors_env_ar->environment->define("WHITE_B", WHITE_B, true);
+
+        e->define("Colors",
+            std::make_shared<klass_definition>("Colors", colors_env_ar),
+            true
+        );
+
+        // End Colors
+
 
         // System 
 
@@ -162,8 +269,8 @@ public:
         winlib_env_ar->szAlias = "lib";
         winlib_env_ar->environment = std::make_shared<scope<std::any>>();
 
-        winlib_env_ar->environment->define("valid",
-            std::make_shared<native_fn>("valid", win_lib_valid, winlib_env_ar),
+        winlib_env_ar->environment->define("Valid",
+            std::make_shared<native_fn>("Valid", win_lib_valid, winlib_env_ar),
             true
         );
 
@@ -179,9 +286,9 @@ public:
             true
         );
 
-        winlib_env_ar->environment->define("get_function",
-            std::make_shared<native_fn>("get_function", win_lib_get_function, winlib_env_ar)
-            ->registerParameter(BuildParameter<std::string>()),
+        winlib_env_ar->environment->define("Get",
+            std::make_shared<native_fn>("Get", win_lib_get_function, winlib_env_ar)
+            ->registerParameter(BuildParameter<std::string>("idString")),
             true
         );
 
@@ -190,7 +297,64 @@ public:
             true
         );
 
+        sys_env_ar->environment->define("win_SetConsoleOpacity",
+            std::make_shared<native_fn>("SetLayeredWindowAttributes", win_SetConsoleOpacity, sys_env_ar)
+            ->registerParameter(BuildParameter<uint8_t>("bAlpha")), 
+            true
+        );
 
+        console_env_ar->environment->define("Opacity",
+            std::make_shared<native_fn>("Opacity", win_SetConsoleOpacity)
+            ->registerParameter(BuildParameter<uint8_t>("alpha")),
+            true
+        );
+
+        console_env_ar->environment->define("SetOutputColor",
+            std::make_shared<native_fn>("SetOutputColor", win_SetOutputColor)
+            ->registerParameter(BuildParameter<uint16_t>("color")),
+            true
+        );
+
+        console_env_ar->environment->define("ResetOutputColor",
+            std::make_shared<native_fn>("ResetOutputColor", win_ResetOutputColor),
+            true
+        );
+
+        console_env_ar->environment->define("SetCursorPosition",
+            std::make_shared<native_fn>("SetCursorPosition", win_SetCursorPosition)
+            ->registerParameter(BuildParameter<int16_t>("x"))
+            ->registerParameter(BuildParameter<int16_t>("y")),
+            true
+        );
+
+        console_env_ar->environment->define("GetCursorPosition",
+            std::make_shared<native_fn>("GetCursorPosition", win_GetCursorPosition),
+            true
+        );
+
+        console_env_ar->environment->define("SetCursorVisibility",
+            std::make_shared<native_fn>("SetCursorVisibility", win_SetCursorVisibility)
+            ->registerParameter(BuildParameter<bool>("show")),
+            true
+        );
+
+        console_env_ar->environment->define("GetWindowSize",
+            std::make_shared<native_fn>("GetWindowSize", win_GetWindowSize),
+            true
+        );
+
+        console_env_ar->environment->define("GetWindowSize",
+            std::make_shared<native_fn>("GetWindowSize", win_GetWindowSize)
+            ->registerParameter(BuildParameter<std::string>("title")),
+            true
+        );
+
+        console_env_ar->environment->define("SetWindowSize",
+            std::make_shared<native_fn>("SetWindowSize", win_SetWindowSize)
+            ->registerParameter(BuildParameter<int32_t>("width"))
+            ->registerParameter(BuildParameter<int32_t>("height")),
+            true
+        );
 
         /* End Windows */
 #endif
@@ -215,18 +379,23 @@ public:
 		list_env_ar->environment = std::make_shared<scope<std::any>>();
 
 		list_env_ar->environment->define("push",
-			std::make_shared<native_fn>("push", list_push, list_env_ar)->registerParameter(BuildParameter(""))
+			std::make_shared<native_fn>("push", list_push, list_env_ar)
+            ->registerParameter(BuildParameter("", "object"))
+        );
+
+        list_env_ar->environment->define("remove",
+            std::make_shared<native_fn>("remove", list_remove, list_env_ar)
+            ->registerParameter(BuildParameter<int32_t>("index"))
         );
 
 		list_env_ar->environment->define("constructor",
-			std::make_shared<native_fn>("constructor", list_constructor, list_env_ar)->setVariadic()
+			std::make_shared<native_fn>("constructor", list_constructor, list_env_ar)
+            ->setVariadic()
         );
 
 		list_env_ar->environment->define("size",
-			(uint64_t)0
+            std::make_shared<native_fn>("size", list_size, list_env_ar)
         );
-
-		
 
 
         // Map
@@ -279,85 +448,85 @@ public:
         std::shared_ptr<activation_record> fs_env_ar = std::make_shared<activation_record>();
         fs_env_ar->szAlias = "FileSystem";
         fs_env_ar->environment = std::make_shared<scope<std::any>>();
-        fs_env_ar->environment->define("relative_path",
-            std::make_shared<native_fn>("relative_path", fs_relative_path, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("RelativePath",
+            std::make_shared<native_fn>("RelativePath", fs_relative_path, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("path"))
         );
-        fs_env_ar->environment->define("copy",
-            std::make_shared<native_fn>("copy", fs_copy_file, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("Copy",
+            std::make_shared<native_fn>("Copy", fs_copy_file, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("from"))
+            ->registerParameter(BuildParameter<std::string>("to"))
         );
-        fs_env_ar->environment->define("remove_all",
-            std::make_shared<native_fn>("remove_all", fs_remove_all, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("RemoveAll",
+            std::make_shared<native_fn>("RemoveAll", fs_remove_all, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("path"))
         );
-        fs_env_ar->environment->define("read",
-            std::make_shared<native_fn>("read", fs_read_file, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("Read",
+            std::make_shared<native_fn>("Read", fs_read_file, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("filepath"))
         );
-        fs_env_ar->environment->define("read_line",
-            std::make_shared<native_fn>("read_line", fs_read_line_from_file, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<uint64_t>())
+        fs_env_ar->environment->define("ReadLine",
+            std::make_shared<native_fn>("ReadLine", fs_read_line_from_file, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("filepath"))
+            ->registerParameter(BuildParameter<uint64_t>("lineIndex"))
                 
         );
-        fs_env_ar->environment->define("read_to_string",
-            std::make_shared<native_fn>("read_to_string", fs_real_file_to_string, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("ReadToString",
+            std::make_shared<native_fn>("ReadToString", fs_real_file_to_string, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("filepath"))
         );
-        fs_env_ar->environment->define("write",
-            std::make_shared<native_fn>("write", fs_write_to_file, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<std::vector<std::string>>())
-            ->registerParameter(BuildParameter<bool>())
+        fs_env_ar->environment->define("Write",
+            std::make_shared<native_fn>("Write", fs_write_to_file, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("filepath"))
+            ->registerParameter(BuildParameter<klass_instance>("data", "list"))
+            ->registerParameter(BuildParameter<bool>("overwrite"))
         );
-        fs_env_ar->environment->define("write_line",
-            std::make_shared<native_fn>("write_line", fs_write_line_to_file, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<bool>())
+        fs_env_ar->environment->define("WriteLine",
+            std::make_shared<native_fn>("WriteLine", fs_write_line_to_file, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("filepath"))
+            ->registerParameter(BuildParameter<std::string>("data"))
+            ->registerParameter(BuildParameter<bool>("overwrite"))
         );
-        fs_env_ar->environment->define("count_lines",
-            std::make_shared<native_fn>("count_lines", fs_count_lines, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("CountLines",
+            std::make_shared<native_fn>("CountLines", fs_count_lines, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("filepath"))
         );
-        fs_env_ar->environment->define("current_path",
-            std::make_shared<native_fn>("current_path", fs_current_path, fs_env_ar)
+        fs_env_ar->environment->define("CurrentPath",
+            std::make_shared<native_fn>("CurrentPath", fs_current_path, fs_env_ar)
         );
-        fs_env_ar->environment->define("parent_path",
-            std::make_shared<native_fn>("parent_path", fs_parent_path, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("ParentPath",
+            std::make_shared<native_fn>("ParentPath", fs_parent_path, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("path"))
         );
 
-        fs_env_ar->environment->define("absolute_path",
-            std::make_shared<native_fn>("absolute_path", fs_absolute_path, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("AbsolutePath",
+            std::make_shared<native_fn>("AbsolutePath", fs_absolute_path, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("path"))
         );
-        fs_env_ar->environment->define("rename",
-            std::make_shared<native_fn>("rename", fs_rename_file, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("Rename",
+            std::make_shared<native_fn>("Rename", fs_rename_file, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("from"))
+            ->registerParameter(BuildParameter<std::string>("to"))
         );
-        fs_env_ar->environment->define("size",
-            std::make_shared<native_fn>("size", fs_file_size, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("FileSize",
+            std::make_shared<native_fn>("FileSize", fs_file_size, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("filepath"))
         );
-        fs_env_ar->environment->define("exists",
-            std::make_shared<native_fn>("exists", fs_exists, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
+        fs_env_ar->environment->define("Exists",
+            std::make_shared<native_fn>("Exists", fs_exists, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("path"))
         );
-        fs_env_ar->environment->define("replace_line",
-            std::make_shared<native_fn>("replace_line", fs_replace_line, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<uint64_t>()),
+        fs_env_ar->environment->define("ReplaceLine",
+            std::make_shared<native_fn>("ReplaceLine", fs_replace_line, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("path"))
+            ->registerParameter(BuildParameter<std::string>("data"))
+            ->registerParameter(BuildParameter<uint64_t>("lineIndex")),
             true
         );
-        fs_env_ar->environment->define("make_unique",
-            std::make_shared<native_fn>("make_unique", fs_get_unique_name, fs_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<uint32_t>()),
+        fs_env_ar->environment->define("CreateUnique",
+            std::make_shared<native_fn>("CreateUnique", fs_get_unique_name, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("baseDir"))
+            ->registerParameter(BuildParameter<uint32_t>("attempts")),
             true
         );
         fs_env_ar->environment->define("WorkingDirectory",
@@ -372,15 +541,18 @@ public:
         // Database 
 
 		std::shared_ptr<activation_record> db_env_ar = std::make_shared<activation_record>();
-		db_env_ar->szAlias = "db";
+		db_env_ar->szAlias = "Database";
 		db_env_ar->environment = std::make_shared<scope<std::any>>();
-		db_env_ar->environment->define("open",
-			std::make_shared<native_fn>("open", db_open, db_env_ar)->registerParameter(BuildParameter<std::string>()), true);
+        db_env_ar->environment->define("Open",
+            std::make_shared<native_fn>("Open", db_open, db_env_ar)
+            ->registerParameter(BuildParameter<std::string>("filepath")),
+            true
+        );
 
-		db_env_ar->environment->define("run_prepared",
-			std::make_shared<native_fn>("run_prepared", db_run_prepared_query, db_env_ar)
-			->registerParameter(BuildParameter<std::string>())
-			->registerParameter(BuildParameter<std::shared_ptr<klass_definition>>())
+		db_env_ar->environment->define("RunPreparedQuery",
+			std::make_shared<native_fn>("RunPreparedQuery", db_run_prepared_query, db_env_ar)
+			->registerParameter(BuildParameter<std::string>("query"))
+			->registerParameter(BuildParameter<std::shared_ptr<klass_definition>>("template"))
 			->setVariadic()
 			->setVariadicAfter(2), 
 			true
@@ -388,7 +560,7 @@ public:
 
 
 		std::shared_ptr<activation_record> db_env_dbtypes_ar = std::make_shared<activation_record>();
-		db_env_dbtypes_ar->szAlias = "dbTypes";
+		db_env_dbtypes_ar->szAlias = "Types";
 		db_env_dbtypes_ar->environment = std::make_shared<scope<std::any>>();
 
 		db_env_dbtypes_ar->environment->define("INTEGER", std::string("INTEGER"), true);
@@ -398,7 +570,7 @@ public:
 		db_env_ar->environment->define("Types",
 			std::make_shared<klass_definition>("Types", db_env_dbtypes_ar), true);
 
-		db_env_ar->environment->define("db",
+		db_env_ar->environment->define("__raw__",
 			std::make_shared<db_helper>(),
 			true);
 
@@ -414,21 +586,21 @@ public:
         time_ar->szAlias = "Time";
         time_ar->environment = std::make_shared<scope<std::any>>();
 
-        e->define("timestamp",
-            std::make_shared<native_fn>("timestamp", time_timestamp, time_ar),
+        time_ar->environment->define("Now",
+            std::make_shared<native_fn>("Now", time_timestamp, time_ar),
             true
         );
 
-        e->define("time_str",
-            std::make_shared<native_fn>("time_str", time_timestamp_to_timestring, time_ar)
-            ->registerParameter(BuildParameter<int64_t>()),
+        time_ar->environment->define("ToString",
+            std::make_shared<native_fn>("ToString", time_timestamp_to_timestring, time_ar)
+            ->registerParameter(BuildParameter<int64_t>("timestamp")),
             true
         );
 
-        e->define("time_str_f",
-            std::make_shared<native_fn>("time_str_f", time_timestamp_to_timestring_f, time_ar)
-            ->registerParameter(BuildParameter<int64_t>())
-            ->registerParameter(BuildParameter<std::string>()),
+        time_ar->environment->define("ToFormattedString",
+            std::make_shared<native_fn>("ToFormattedString", time_timestamp_to_timestring_f, time_ar)
+            ->registerParameter(BuildParameter<int64_t>("timestamp"))
+            ->registerParameter(BuildParameter<std::string>("format")),
             true
         );
 
@@ -443,24 +615,33 @@ public:
         language_ar->szAlias = "Language";
         language_ar->environment = std::make_shared<scope<std::any>>();
 
-        language_ar->environment->define("e",
+        std::shared_ptr<activation_record> language_debug_ar = std::make_shared<activation_record>();
+        language_debug_ar->szAlias = "Debug";
+        language_debug_ar->environment = std::make_shared<scope<std::any>>();
+
+        language_debug_ar->environment->define("e",
             std::make_shared<native_fn>("e", print_environment, language_ar),
             true
         );
 
-        language_ar->environment->define("o",
+        language_debug_ar->environment->define("o",
             std::make_shared<native_fn>("o", print_operators, language_ar),
             true
         );
 
-        language_ar->environment->define("flush_imports",
-            std::make_shared<native_fn>("flush_imports", flush_imports, language_ar),
+        language_debug_ar->environment->define("FlushImports",
+            std::make_shared<native_fn>("FlushImports", flush_imports, language_ar),
             true
         );
 
-        language_ar->environment->define("flush_import",
-            std::make_shared<native_fn>("flush_import", flush_import, language_ar)
-            ->registerParameter(BuildParameter<std::string>()),
+        language_debug_ar->environment->define("FlushImport",
+            std::make_shared<native_fn>("FlushImport", flush_import, language_ar)
+            ->registerParameter(BuildParameter<std::string>("filepath")),
+            true
+        );
+
+        language_ar->environment->define("Debug",
+            std::make_shared<klass_definition>("Debug", language_debug_ar),
             true
         );
 
@@ -489,16 +670,16 @@ public:
 
         netclient_env_ar->environment->define("constructor",
             std::make_shared<native_fn>("constructor", net_create_client, netclient_env_ar)
-            ->registerParameter(BuildParameter<std::string>())
-            ->registerParameter(BuildParameter<uint16_t>())
-            ->registerParameter(BuildParameter(""))
-            ->registerParameter(BuildParameter<bool>())
-            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<std::string>("host"))
+            ->registerParameter(BuildParameter<uint16_t>("port"))
+            ->registerParameter(BuildParameter("", "onMessageRecieved"))
+            ->registerParameter(BuildParameter<bool>("continueOnError"))
+            ->registerParameter(BuildParameter<bool>("suppressOutput"))
         );
 
         netclient_env_ar->environment->define("Send",
             std::make_shared<native_fn>("Send", net_client_send, netclient_env_ar)
-            ->registerParameter(BuildParameter(""))
+            ->registerParameter(BuildParameter("", "object"))
         );
 
         netclient_env_ar->environment->define("IsConnected",
@@ -558,29 +739,29 @@ public:
 
         netserver_env_ar->environment->define("constructor",
             std::make_shared<native_fn>("constructor", net_create_server, netserver_env_ar)
-            ->registerParameter(BuildParameter<uint16_t>())
-            ->registerParameter(BuildParameter(""))
-            ->registerParameter(BuildParameter(""))
-            ->registerParameter(BuildParameter(""))
-            ->registerParameter(BuildParameter(""))
-            ->registerParameter(BuildParameter<bool>())
-            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<uint16_t>("port"))
+            ->registerParameter(BuildParameter("", "onClientConnect"))
+            ->registerParameter(BuildParameter("", "onClientValidated"))
+            ->registerParameter(BuildParameter("", "onClientDisconnect"))
+            ->registerParameter(BuildParameter("", "onMessageRecieved"))
+            ->registerParameter(BuildParameter<bool>("continueOnError"))
+            ->registerParameter(BuildParameter<bool>("suppressOutput"))
         );
 
         netserver_env_ar->environment->define("MessageClient",
             std::make_shared<native_fn>("MessageClient", net_server_messageclient, netserver_env_ar)
-            ->registerParameter(BuildParameter<std::shared_ptr<net::connection<MsgType>>>())
-            ->registerParameter(BuildParameter(""))
+            ->registerParameter(BuildParameter<std::shared_ptr<net::connection<MsgType>>>("client"))
+            ->registerParameter(BuildParameter("", "object"))
         );
 
         netserver_env_ar->environment->define("MessageAll",
             std::make_shared<native_fn>("MessageAll", net_server_messageall, netserver_env_ar)
-            ->registerParameter(BuildParameter(""))
+            ->registerParameter(BuildParameter("", "object"))
         );
 
         netserver_env_ar->environment->define("GetClientById",
             std::make_shared<native_fn>("GetConnectionById", net_server_getconnectionbyid, netserver_env_ar)
-            ->registerParameter(BuildParameter<uint32_t>())
+            ->registerParameter(BuildParameter<uint32_t>("id"))
         );
         netserver_env_ar->environment->define("Start",
             std::make_shared<native_fn>("Start", net_server_start, netserver_env_ar)
@@ -590,12 +771,16 @@ public:
         );
         netserver_env_ar->environment->define("Update",
             std::make_shared<native_fn>("Update", net_server_update, netserver_env_ar)
-            ->registerParameter(BuildParameter<uint32_t>())
-            ->registerParameter(BuildParameter<bool>())
+            ->registerParameter(BuildParameter<uint32_t>("maxMessages"))
+            ->registerParameter(BuildParameter<bool>("waitForMessage"))
         );
 
         netserver_env_ar->environment->define("GetLastError",
             std::make_shared<native_fn>("GetLastError", net_server_getlasterror, netserver_env_ar)
+        );
+
+        netserver_env_ar->environment->define("Port",
+            std::make_shared<native_fn>("Port", net_server_port, netserver_env_ar)
         );
 
         /*
@@ -749,11 +934,6 @@ public:
             ->registerParameter(BuildParameter<uint64_t>())
         );
 
-        opHandler->registerOperator(
-            std::make_shared<binary_fn>("[", index_list_string)
-            ->registerParameter(BuildParameter<klass_definition>("", "list"))
-            ->registerParameter(BuildParameter<std::string>())
-        );
 
         /* Index String*/
 

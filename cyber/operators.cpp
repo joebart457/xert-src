@@ -40,61 +40,110 @@ std::any type_of_any(std::shared_ptr<interpreter> i, std::any& rhs)
 }
 
 
-std::any index_list_string(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
-{
-	std::string index = std::any_cast<std::string> (rhs);
-	klass_instance instance = std::any_cast<klass_instance>(lhs);
-	return instance.Get(index, location());
-}
-
 std::any index_list_int8_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
 {
     int8_t index = std::any_cast<int8_t>(rhs);
     klass_instance instance = std::any_cast<klass_instance>(lhs);
-    return instance.Get(std::to_string(index), location());
+    auto raw = instance.Get<std::shared_ptr<std::vector<std::any>>>("__raw__", location());
+    if (raw == nullptr) {
+        throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+    }
+    if (raw->size() <= index) {
+        throw ExceptionBuilder().Build(ExceptionTypes().INVALID_ARGUMENT(), "index " + std::to_string(index) + " out of range", Severity().MEDIUM());
+    }
+    return raw->at(index);
 }
 std::any index_list_int16_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
 {
     int16_t index = std::any_cast<int16_t>(rhs);
     klass_instance instance = std::any_cast<klass_instance>(lhs);
-    return instance.Get(std::to_string(index), location());
+    auto raw = instance.Get<std::shared_ptr<std::vector<std::any>>>("__raw__", location());
+    if (raw == nullptr) {
+        throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+    }
+    if (raw->size() <= index) {
+        throw ExceptionBuilder().Build(ExceptionTypes().INVALID_ARGUMENT(), "index " + std::to_string(index) + " out of range", Severity().MEDIUM());
+    }
+    return raw->at(index);
 }
 std::any index_list_int32_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
 {
     int32_t index = std::any_cast<int32_t>(rhs);
     klass_instance instance = std::any_cast<klass_instance>(lhs);
-    return instance.Get(std::to_string(index), location());
+    auto raw = instance.Get<std::shared_ptr<std::vector<std::any>>>("__raw__", location());
+    if (raw == nullptr) {
+        throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+    }
+    if (raw->size() <= index) {
+        throw ExceptionBuilder().Build(ExceptionTypes().INVALID_ARGUMENT(), "index " + std::to_string(index) + " out of range", Severity().MEDIUM());
+    }
+    return raw->at(index);
 }
 std::any index_list_int64_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
 {
     int64_t index = std::any_cast<int64_t>(rhs);
     klass_instance instance = std::any_cast<klass_instance>(lhs);
-    return instance.Get(std::to_string(index), location());
+    auto raw = instance.Get<std::shared_ptr<std::vector<std::any>>>("__raw__", location());
+    if (raw == nullptr) {
+        throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+    }
+    if (raw->size() <= index) {
+        throw ExceptionBuilder().Build(ExceptionTypes().INVALID_ARGUMENT(), "index " + std::to_string(index) + " out of range", Severity().MEDIUM());
+    }
+    return raw->at(index);
 }
 
 std::any index_list_uint8_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
 {
     uint8_t index = std::any_cast<uint8_t>(rhs);
     klass_instance instance = std::any_cast<klass_instance>(lhs);
-    return instance.Get(std::to_string(index), location());
+    auto raw = instance.Get<std::shared_ptr<std::vector<std::any>>>("__raw__", location());
+    if (raw == nullptr) {
+        throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+    }
+    if (raw->size() <= index) {
+        throw ExceptionBuilder().Build(ExceptionTypes().INVALID_ARGUMENT(), "index " + std::to_string(index) + " out of range", Severity().MEDIUM());
+    }
+    return raw->at(index);
 }
 std::any index_list_uint16_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
 {
     uint16_t index = std::any_cast<uint16_t>(rhs);
     klass_instance instance = std::any_cast<klass_instance>(lhs);
-    return instance.Get(std::to_string(index), location());
+    auto raw = instance.Get<std::shared_ptr<std::vector<std::any>>>("__raw__", location());
+    if (raw == nullptr) {
+        throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+    }
+    if (raw->size() <= index) {
+        throw ExceptionBuilder().Build(ExceptionTypes().INVALID_ARGUMENT(), "index " + std::to_string(index) + " out of range", Severity().MEDIUM());
+    }
+    return raw->at(index);
 }
 std::any index_list_uint32_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
 {
     uint32_t index = std::any_cast<uint32_t>(rhs);
     klass_instance instance = std::any_cast<klass_instance>(lhs);
-    return instance.Get(std::to_string(index), location());
+    auto raw = instance.Get<std::shared_ptr<std::vector<std::any>>>("__raw__", location());
+    if (raw == nullptr) {
+        throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+    }
+    if (raw->size() <= index) {
+        throw ExceptionBuilder().Build(ExceptionTypes().INVALID_ARGUMENT(), "index " + std::to_string(index) + " out of range", Severity().MEDIUM());
+    }
+    return raw->at(index);
 }
 std::any index_list_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)
 {
     uint64_t index = std::any_cast<uint64_t>(rhs);
     klass_instance instance = std::any_cast<klass_instance>(lhs);
-    return instance.Get(std::to_string(index), location());
+    auto raw = instance.Get<std::shared_ptr<std::vector<std::any>>>("__raw__", location());
+    if (raw == nullptr) {
+        throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+    }
+    if (raw->size() <= index) {
+        throw ExceptionBuilder().Build(ExceptionTypes().INVALID_ARGUMENT(), "index " + std::to_string(index) + " out of range", Severity().MEDIUM());
+    }
+    return raw->at(index);
 }
 
 std::any index_string_int8_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs)

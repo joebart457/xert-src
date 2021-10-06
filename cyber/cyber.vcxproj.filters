@@ -152,5 +152,11 @@
     <ClInclude Include="Serializer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ConsoleHandle.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Colors.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

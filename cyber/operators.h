@@ -25,8 +25,6 @@ std::any index_list_uint32_t(std::shared_ptr<interpreter> i, std::any& lhs, std:
 std::any index_list_uint64_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
 
 
-std::any index_list_string(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
-
 std::any index_string_int8_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
 std::any index_string_int16_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
 std::any index_string_int32_t(std::shared_ptr<interpreter> i, std::any& lhs, std::any& rhs);
