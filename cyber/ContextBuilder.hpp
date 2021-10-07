@@ -297,12 +297,6 @@ public:
             true
         );
 
-        sys_env_ar->environment->define("win_SetConsoleOpacity",
-            std::make_shared<native_fn>("SetLayeredWindowAttributes", win_SetConsoleOpacity, sys_env_ar)
-            ->registerParameter(BuildParameter<uint8_t>("bAlpha")), 
-            true
-        );
-
         console_env_ar->environment->define("Opacity",
             std::make_shared<native_fn>("Opacity", win_SetConsoleOpacity)
             ->registerParameter(BuildParameter<uint8_t>("alpha")),
