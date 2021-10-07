@@ -456,7 +456,7 @@ public:
             std::make_shared<native_fn>("Copy", fs_copy_file, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>("from"))
             ->registerParameter(BuildParameter<std::string>("to"))
-        );
+        ); 
         fs_env_ar->environment->define("RemoveAll",
             std::make_shared<native_fn>("RemoveAll", fs_remove_all, fs_env_ar)
             ->registerParameter(BuildParameter<std::string>("path"))

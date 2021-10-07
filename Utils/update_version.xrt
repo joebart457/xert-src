@@ -18,7 +18,7 @@ class XertVersion{
 	
 	function Finalize(){
 		function createOutputString(string versionName, int32_t versionNo){
-			return "#define " + versionName + "\t\t\tstd::string(\"" + String.Pad(versionNo::string, String.Char("0"), 6::int64_t) + "\")";
+			return "#define " + versionName + "\t\t\tstd::string(\"" + String.Create(versionNo) + "\")";
 		}
 		FileSystem.ReplaceLine(szVersionFile, createOutputString("STD_LIB_VERSION", STD_LIB_VERSION), i_STD_LIB_VERSION::uint64_t);
 		FileSystem.ReplaceLine(szVersionFile, createOutputString("INTERPRETER_VERSION", INTERPRETER_VERSION), i_INTERPRETER_VERSION::uint64_t);
@@ -55,7 +55,6 @@ class XertVersion{
 	}
 	
 	function ExtractVersions(){
-		uint32_t padding = 6u::uint32_t;
 		string data = FileSystem.ReadToString(szVersionFile);
 		list fileData = String.Split(data, "\n");
 		uint32_t counter = 0u::uint32_t;
