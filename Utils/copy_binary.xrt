@@ -9,6 +9,10 @@ function main(){
 	FileSystem.Copy(exePath, "C:/Program Files/xert/bin/xert-"+Language.Version+".exe");
 	if (FileSystem.Exists(dest)){
 		Console.WriteLine("Copied "+ exePath +" to " + dest);
+		bool rc = FileSystem.ReplaceLine("C:/Program Files/xert/bin/xert-latest.bat", "xert-"+Language.Version+".exe", 0u::uint64_t);
+		if (rc){
+			Console.WriteLine("Updated xert-latest");
+		}
 	} else {
 		Console.WriteLine("Failed to copy "+ exePath +" to " + dest);
 	}

@@ -795,7 +795,7 @@ public:
 
         e->define("Network",
             std::make_shared<klass_definition>("Network", net_env_ar)
-        );
+        ); 
 
 		return e;
 	}
