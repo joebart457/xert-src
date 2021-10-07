@@ -153,6 +153,25 @@ std::any list_constructor(std::shared_ptr<interpreter> i, _args args)
 	return nullptr;
 }
 
+std::any list_join(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+
+	auto raw = context->get<std::shared_ptr<std::vector<std::any>>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	std::string delim = args.get<std::string>(0);
+	std::string result = "";
+	if (raw->size() >= 1) {
+		result = Utilities().stringify(raw->at(0));
+	}
+	for (unsigned int i{ 1 }; i < raw->size(); i++) {
+		result += delim + Utilities().stringify(raw->at(i));
+	}
+	return result;
+}
 
 // Map methods
 std::any map_add(std::shared_ptr<interpreter> i, _args args)

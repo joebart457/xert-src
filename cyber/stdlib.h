@@ -27,6 +27,7 @@ std::any list_push(std::shared_ptr<interpreter> i, _args args);
 std::any list_remove(std::shared_ptr<interpreter> i, _args args);
 std::any list_size(std::shared_ptr<interpreter> i, _args args);
 std::any list_constructor(std::shared_ptr<interpreter> i, _args args);
+std::any list_join(std::shared_ptr<interpreter> i, _args args);
 
 // Map methods
 std::any map_add(std::shared_ptr<interpreter> i, _args args);

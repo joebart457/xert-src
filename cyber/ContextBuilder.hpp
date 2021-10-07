@@ -397,6 +397,11 @@ public:
             std::make_shared<native_fn>("size", list_size, list_env_ar)
         );
 
+        list_env_ar->environment->define("join",
+            std::make_shared<native_fn>("join", list_join, list_env_ar)
+            ->registerParameter(BuildParameter<std::string>("delim"))
+        );
+
 
         // Map
 
@@ -7683,6 +7688,7 @@ not
 			
 			tokenizer_rule(Keywords().NEW(), "new"),
 			tokenizer_rule(TOKEN_TYPE_EOL_COMMENT, "//"),
+            tokenizer_rule(TOKEN_TYPE_EOL_COMMENT, "#"),
             tokenizer_rule(TOKEN_TYPE_ML_COMMENT_START, "/*"),
             tokenizer_rule(TOKEN_TYPE_ML_COMMENT_ENCLOSING, "*/"),
 			tokenizer_rule(TOKEN_TYPE_STRING_ENCLOSING, "\""),
