@@ -151,7 +151,7 @@ public:
         string_ar->environment->define("Pad",
             std::make_shared<native_fn>("Pad", string_pad)
             ->registerParameter(BuildParameter<std::string>("source"))
-            ->registerParameter(BuildParameter<int8_t>("pad"))
+            ->registerParameter(BuildParameter<uint8_t>("pad"))
             ->registerParameter(BuildParameter<int64_t>("width")),
             true
         );

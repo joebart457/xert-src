@@ -116,7 +116,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>"C:\Program Files\Git\cmd\git" status | findstr "\.h" &gt; $(SolutionDir)\out.txt  &amp;&amp; $(SolutionDir)Utils/cyber.exe $(SolutionDir)Utils/update_version.txt</Command>
+      <Command>"C:\Program Files\Git\cmd\git" status | findstr "\.h" &gt; $(SolutionDir)\out.txt &amp;&amp;  $(SolutionDir)/Utils/xert-stable.exe $(SolutionDir)/Utils/update_version.xrt
+</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>(git) Detecting modifications and (xert) Updating version</Message>
@@ -152,7 +153,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>"C:\Program Files\Git\cmd\git" status | findstr "\.h" &gt; $(SolutionDir)\out.txt  &amp;&amp; $(SolutionDir)Utils/cyber.exe $(SolutionDir)Utils/update_version.txt</Command>
+      <Command>"C:\Program Files\Git\cmd\git" status | findstr "\.h" &gt; $(SolutionDir)\out.txt &amp;&amp;  $(SolutionDir)/Utils/xert-stable.exe $(SolutionDir)/Utils/update_version.xrt
+</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>(git) Detecting modifications and (xert) Updating version</Message>
