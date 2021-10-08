@@ -528,6 +528,11 @@ public:
             ->registerParameter(BuildParameter<uint32_t>("attempts")),
             true
         );
+        fs_env_ar->environment->define("CreateDir",
+            std::make_shared<native_fn>("CreateDir", fs_create_dir, fs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("path")),
+            true
+        );
         fs_env_ar->environment->define("WorkingDirectory",
             std::filesystem::current_path().string(),
             true

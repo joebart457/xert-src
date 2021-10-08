@@ -464,6 +464,10 @@ std::any fs_get_unique_name(std::shared_ptr<interpreter> i, _args args)
 	return FileHandle().getUniqueName(args.get<std::string>(0), args.get<uint32_t>(1));
 }
 
+std::any fs_create_dir(std::shared_ptr<interpreter> i, _args args)
+{
+	return FileHandle().create_directory(args.get<std::string>(0));
+}
 
 // Network
 
