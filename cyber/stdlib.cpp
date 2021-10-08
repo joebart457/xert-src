@@ -482,7 +482,7 @@ std::any net_create_client(std::shared_ptr<interpreter> i, _args args)
 	}
 	std::any client = std::make_shared<NetClient>(args.get<std::string>(0), args.get<uint16_t>(1), native_callback, i, args.get<bool>(3), args.get<bool>(4));
 
-	context->define("raw",
+	context->define("__raw__",
 		client,	true, location()
 	);
 
@@ -493,7 +493,7 @@ std::any net_create_client(std::shared_ptr<interpreter> i, _args args)
 std::any net_client_send(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("raw");
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
 	if (client == nullptr) {
 		return false;
 	}
@@ -507,7 +507,7 @@ std::any net_client_send(std::shared_ptr<interpreter> i, _args args)
 std::any net_client_isconnected(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("raw");
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
 	if (client == nullptr) {
 		return false;
 	}
@@ -517,7 +517,7 @@ std::any net_client_isconnected(std::shared_ptr<interpreter> i, _args args)
 std::any net_client_connect(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("raw");
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
 	if (client == nullptr) {
 		return false;
 	}
@@ -528,7 +528,7 @@ std::any net_client_connect(std::shared_ptr<interpreter> i, _args args)
 std::any net_client_disconnect(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("raw");
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
 	if (client == nullptr) {
 		return nullptr;
 	}
@@ -539,17 +539,28 @@ std::any net_client_disconnect(std::shared_ptr<interpreter> i, _args args)
 std::any net_client_start(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("raw");
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
 	if (client == nullptr) {
 		return false;
 	}
 	return client->Start();
 }
 
+std::any net_client_stop(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
+	if (client == nullptr) {
+		return nullptr;
+	}
+	client->Stop();
+	return nullptr;
+}
+
 std::any net_client_start_async(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("raw");
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
 	if (client == nullptr) {
 		return false;
 	}
@@ -562,7 +573,7 @@ std::any net_client_start_async(std::shared_ptr<interpreter> i, _args args)
 std::any net_client_port(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("raw");
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
 	if (client == nullptr) {
 		return static_cast<uint16_t>(0);
 	}
@@ -572,7 +583,7 @@ std::any net_client_port(std::shared_ptr<interpreter> i, _args args)
 std::any net_client_host(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("raw");
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
 	if (client == nullptr) {
 		return std::string("");
 	}
@@ -583,7 +594,7 @@ std::any net_client_host(std::shared_ptr<interpreter> i, _args args)
 std::any net_client_getlasterror(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("raw");
+	std::shared_ptr<NetClient> client = context->get<std::shared_ptr<NetClient>>("__raw__");
 	if (client == nullptr) {
 		return nullptr;
 	}
@@ -615,7 +626,7 @@ std::any net_create_server(std::shared_ptr<interpreter> i, _args args)
 	}
 	std::any server = std::make_shared<NetServer>(args.get<uint16_t>(0), onClientConnect, onClientValidated, onClientDisconnect, onMessage, i, args.get<bool>(5), args.get<bool>(6));
 
-	context->define("raw",
+	context->define("__raw__",
 		server, true, location()
 	);
 
@@ -625,48 +636,58 @@ std::any net_create_server(std::shared_ptr<interpreter> i, _args args)
 std::any net_server_messageclient(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("raw");
+	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("__raw__");
 
 	if (server == nullptr) {
 		return nullptr;
 	}
 
 	auto data = Serializer().Serialize(args.at(1));
-	server->SendMessageData(args.get<std::shared_ptr<net::connection<MsgType>>>(0), data);
+	server->SendMessageData(args.get<uint32_t>(0), data);
 	return nullptr;
 }
 
 std::any net_server_messageall(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("raw");
+	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("__raw__");
 
 	if (server == nullptr) {
 		return nullptr;
 	}
 
 	auto data = Serializer().Serialize(args.at(0));
-	server->MessageAllFromData(data);
+	server->MessageAllFromData(data, args.get<uint32_t>(1));
 	return nullptr;
 }
 
 std::any net_server_getconnectionbyid(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("raw");
+	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("__raw__");
 
 	if (server == nullptr) {
 		return nullptr;
 	}
 
-	return server->GetConnectionById(args.get<uint32_t>(0));
+	auto hConn = server->GetConnectionById(args.get<uint32_t>(0));
+	if (hConn == nullptr) {
+		return nullptr;
+	}
+
+	auto klassdef = context->get_coalesce<std::shared_ptr<klass_definition>>("Network.NetClient");
+	klass_instance xrtObject = klassdef->create();
+	std::vector<std::any> ctorArgs = { hConn->GetHost(), hConn->GetPort(), nullptr, false, true };
+
+	Utilities().getCallable(xrtObject.Get("constructor", location()))->call(i, _args(ctorArgs));
+	return xrtObject;
 }
 
 
 std::any net_server_start(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("raw");
+	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("__raw__");
 
 	if (server == nullptr) {
 		return false;
@@ -677,7 +698,7 @@ std::any net_server_start(std::shared_ptr<interpreter> i, _args args)
 std::any net_server_stop(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("raw");
+	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("__raw__");
 
 	if (server == nullptr) {
 		return false;
@@ -689,7 +710,7 @@ std::any net_server_stop(std::shared_ptr<interpreter> i, _args args)
 std::any net_server_update(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("raw");
+	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("__raw__");
 
 	if (server == nullptr) {
 		return nullptr;
@@ -702,7 +723,7 @@ std::any net_server_update(std::shared_ptr<interpreter> i, _args args)
 std::any net_server_getlasterror(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("raw");
+	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("__raw__");
 	if (server == nullptr) {
 		return nullptr;
 	}
@@ -712,7 +733,7 @@ std::any net_server_getlasterror(std::shared_ptr<interpreter> i, _args args)
 std::any net_server_port(std::shared_ptr<interpreter> i, _args args)
 {
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
-	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("raw");
+	std::shared_ptr<NetServer> server = context->get<std::shared_ptr<NetServer>>("__raw__");
 	if (server == nullptr) {
 		return 0;
 	}

@@ -397,6 +397,11 @@ std::any cast_string_string(std::shared_ptr<interpreter> i, std::any& lhs)
 
 /* Boolean support */
 
+std::any not_bool(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+    return !Utilities().isTruthy(rhs);
+}
+
 std::any cast_bool_int8_t(std::shared_ptr<interpreter> i, std::any& lhs)
 {
     bool lhsVal = std::any_cast<bool>(lhs);

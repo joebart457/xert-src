@@ -355,6 +355,16 @@ namespace net
 			return id;
 		}
 
+		std::string GetHost() const
+		{
+			return m_socket.remote_endpoint().address().to_string();
+		}
+
+		uint16_t GetPort() const
+		{
+			return m_socket.remote_endpoint().port();
+		}
+
 	public:
 		void ConnectToClient(net::server_interface<T>* server, uint32_t uid = 0)
 		{
@@ -927,6 +937,9 @@ namespace net
 							std::cout << "[SERVER] New Connection: " << socket.remote_endpoint() << "\n";
 						}
 
+						std::string connHost = socket.remote_endpoint().address().to_string();
+						uint16_t connPort = socket.remote_endpoint().port();
+
 						// Create a new connection to handle this client 
 						std::shared_ptr<connection<T>> newconn =
 							std::make_shared<connection<T>>(connection<T>::owner::server,
@@ -935,7 +948,7 @@ namespace net
 
 
 						// Give the user server a chance to deny connection
-						if (OnClientConnect(newconn))
+						if (OnClientConnect(connHost, connPort))
 						{
 							// Connection allowed, so add to container of new connections
 							m_deqConnections.push_back(std::move(newconn));
@@ -1074,7 +1087,7 @@ namespace net
 		// customised functionality
 
 		// Called when a client connects, you can veto the connection by returning false
-		virtual bool OnClientConnect(std::shared_ptr<connection<T>> client)
+		virtual bool OnClientConnect(const std::string& host, uint16_t port)
 		{
 			return false;
 		}

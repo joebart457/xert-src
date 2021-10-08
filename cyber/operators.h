@@ -57,6 +57,7 @@ std::any cast_string_float(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_string_double(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_string_string(std::shared_ptr<interpreter> i, std::any& lhs);
 
+std::any not_bool(std::shared_ptr<interpreter> i, std::any& rhs);
 
 std::any cast_bool_int8_t(std::shared_ptr<interpreter> i, std::any& lhs);
 std::any cast_bool_int16_t(std::shared_ptr<interpreter> i, std::any& lhs);

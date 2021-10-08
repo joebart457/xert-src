@@ -54,6 +54,7 @@ public:
 
 
 	bool Start();
+	void Stop();
 	bool TryConnect();
 	void SendMessageData(std::vector<uint8_t>& msg);
 
@@ -87,8 +88,8 @@ public:
 		bool bContinueOnError = false,
 		bool bSuppressOutput = false);
 
-	void SendMessageData(std::shared_ptr<net::connection<MsgType>> client, std::vector<uint8_t>& msg);
-	void MessageAllFromData(std::vector<uint8_t>& msg);
+	void SendMessageData(uint32_t clientId, std::vector<uint8_t>& msg);
+	void MessageAllFromData(std::vector<uint8_t>& msg, uint32_t except);
 
 private:
 	std::any DoCallback(std::shared_ptr<callable> callback, _args args);
@@ -100,7 +101,7 @@ private:
 
 
 protected:
-	bool OnClientConnect(std::shared_ptr<net::connection<MsgType>> client);
+	bool OnClientConnect(const std::string& host, uint16_t port);
 	void OnClientValidated(std::shared_ptr<net::connection<MsgType>> client);
 	void OnClientDisconnect(std::shared_ptr<net::connection<MsgType>> client);
 	void OnMessage(std::shared_ptr<net::connection<MsgType>> client, net::message<MsgType>& msg);

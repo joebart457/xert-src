@@ -711,6 +711,11 @@ public:
             true
         );
 
+        netclient_env_ar->environment->define("Stop",
+            std::make_shared<native_fn>("Stop", net_client_stop, netclient_env_ar),
+            true
+        );
+
         netclient_env_ar->environment->define("StartAsync",
             std::make_shared<native_fn>("StartAsync", net_client_start_async, netclient_env_ar),
             true
@@ -759,13 +764,14 @@ public:
 
         netserver_env_ar->environment->define("MessageClient",
             std::make_shared<native_fn>("MessageClient", net_server_messageclient, netserver_env_ar)
-            ->registerParameter(BuildParameter<std::shared_ptr<net::connection<MsgType>>>("client"))
+            ->registerParameter(BuildParameter<uint32_t>("client"))
             ->registerParameter(BuildParameter("", "object"))
         );
 
         netserver_env_ar->environment->define("MessageAll",
             std::make_shared<native_fn>("MessageAll", net_server_messageall, netserver_env_ar)
             ->registerParameter(BuildParameter("", "object"))
+            ->registerParameter(BuildParameter<uint32_t>("except"))
         );
 
         netserver_env_ar->environment->define("GetClientById",
@@ -1083,6 +1089,13 @@ public:
             std::make_shared<binary_fn>("!=", notequal_string_string)
             ->registerParameter(BuildParameter<std::string>())
             ->registerParameter(BuildParameter<std::string>())
+        );
+
+        /* Not bool */
+
+        opHandler->registerOperator(
+            std::make_shared<unary_fn>("!", not_bool)
+            ->registerParameter(BuildParameter<bool>())
         );
 
         /* Cast bool */

@@ -97,6 +97,7 @@ std::any net_client_isconnected(std::shared_ptr<interpreter> i, _args args);
 std::any net_client_connect(std::shared_ptr<interpreter> i, _args args);
 std::any net_client_disconnect(std::shared_ptr<interpreter> i, _args args);
 std::any net_client_start(std::shared_ptr<interpreter> i, _args args);
+std::any net_client_stop(std::shared_ptr<interpreter> i, _args args);
 std::any net_client_start_async(std::shared_ptr<interpreter> i, _args args);
 std::any net_client_port(std::shared_ptr<interpreter> i, _args args);
 std::any net_client_host(std::shared_ptr<interpreter> i, _args args);

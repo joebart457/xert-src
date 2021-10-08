@@ -52,6 +52,21 @@ public:
 
 	std::string severity() { return m_szSeverity; }
 
+	std::string type()
+	{
+		return m_szType;
+	}
+
+	std::string message() 
+	{
+		return m_szMsg;
+	}
+
+	location loc()
+	{
+		return m_loc;
+	}
+
 	virtual std::string what()
 	{
 		std::ostringstream oss;

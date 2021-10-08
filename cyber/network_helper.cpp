@@ -62,6 +62,12 @@ bool NetClient::Start()
 	return true;
 }
 
+void NetClient::Stop()
+{
+	bAtomActive = false;
+}
+
+
 
 bool NetClient::TryConnect()
 {
@@ -111,28 +117,25 @@ std::any NetClient::DoCallback(std::shared_ptr<callable> callback, _args args)
 		return callback->call(m_iContext, args);
 	}
 	catch (PanicException pe) {
-		m_lastError = ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse message data", Severity().MEDIUM()).value();
+		m_lastError = pe.value();
 		if (!m_bContinueOnError) {
 			bAtomActive = false;
 		}
 	}
 	catch (ProgramException pe) {
-		m_lastError = ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse message data", Severity().MEDIUM()).value();
+		m_lastError = ExceptionBuilder().Build(pe.type(),pe.message(), pe.severity(), pe.loc()).value();
 		if (!m_bContinueOnError) {
 			bAtomActive = false;
 		}
 	}
 	catch (std::exception e) {
-		m_lastError = ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse message data", Severity().MEDIUM()).value();
+		m_lastError = ExceptionBuilder().Build(ExceptionTypes().SYSTEM(), e.what(), Severity().CRITICAL()).value();
 		if (!m_bContinueOnError) {
 			bAtomActive = false;
 		}
 	}
 	return nullptr;
 }
-
-
-
 
 
 
@@ -149,19 +152,19 @@ NetServer::NetServer(uint16_t port,
 {
 }
 
-void NetServer::SendMessageData(std::shared_ptr<net::connection<MsgType>> client, std::vector<uint8_t>& msg) {
+void NetServer::SendMessageData(uint32_t clientId, std::vector<uint8_t>& msg) {
 	net::message<MsgType> message;
 	message.header.id = MsgType::Message;
 	message.addSerializedData(msg);
-	MessageClient(client, message);
+	MessageClient(GetConnectionById(clientId), message);
 }
 
-void NetServer::MessageAllFromData(std::vector<uint8_t>& msg)
+void NetServer::MessageAllFromData(std::vector<uint8_t>& msg, uint32_t except)
 {
 	net::message<MsgType> message;
 	message.header.id = MsgType::Message;
 	message.addSerializedData(msg);
-	MessageAllClients(message);
+	MessageAllClients(message, GetConnectionById(except));
 }
 
 std::any NetServer::DoCallback(std::shared_ptr<callable> callback, _args args)
@@ -177,13 +180,13 @@ std::any NetServer::DoCallback(std::shared_ptr<callable> callback, _args args)
 		}
 	}
 	catch (ProgramException pe) {
-		m_lastError = pe.fullTrace();
+		m_lastError = ExceptionBuilder().Build(pe.type(), pe.message(), pe.severity(), pe.loc()).value();
 		if (!m_bContinueOnError) {
 			RequestStop();
 		}
 	}
 	catch (std::exception e) {
-		m_lastError = std::string(e.what());
+		m_lastError = ExceptionBuilder().Build(ExceptionTypes().SYSTEM(), e.what(), Severity().CRITICAL()).value();
 		if (!m_bContinueOnError) {
 			RequestStop();
 		}
@@ -192,18 +195,15 @@ std::any NetServer::DoCallback(std::shared_ptr<callable> callback, _args args)
 }
 
 
-bool NetServer::OnClientConnect(std::shared_ptr<net::connection<MsgType>> client)
+bool NetServer::OnClientConnect(const std::string& host, uint16_t port)
 {
 	std::scoped_lock(m_mutex);
 
-	if (client == nullptr) {
-		return false;
-	}
 	if (m_onClientConnect == nullptr) {
 		// There is no filter function, so just allow the connection 
 		return true;
 	}
-	std::vector<std::any> args = { client->GetID() };
+	std::vector<std::any> args = { host, port };
 	std::any temp = DoCallback(m_onClientConnect, args);
 	return Utilities().isTruthyNoThrow(temp);
 }

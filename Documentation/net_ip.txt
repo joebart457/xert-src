@@ -37,8 +37,8 @@ Network.NetServer
 	- ctor(uint16_t port, <callable> onClientConnect, <callable> onClientValidated,<callable> onClientDisconnect, bool continueOnError, bool suppressOutput)
 	-- uint16_t port: port to host on
 	-- <callable> onClientConnect: to be called upon recieving connection attempt
-	-- -- takes 1 argument of uint32_t type
-	-- -- arg is equal to id of client connection 
+	-- -- takes 2 arguments of string and uint16_t type
+	-- -- arg 1 is hostname arg 2 is port 
 	-- -- RETURNS true to approve connection or false to deny connection
 	-- <callable> onClientValidated to be called upon connection validation
 	-- -- takes 1 argument of uint32_t type
@@ -68,13 +68,14 @@ Network.NetServer
 	!= Do NOT call Stop inside of handler callback function, will result in server stop or crash
 
 
-	- MessageClient(~native~ client, _ty msg)
+	- MessageClient(uint32_t clientId, _ty msg)
 	-- serializes msg object and sends to client
-	-- if client is null, does not attempt to send
-	-- ~native~ client: client of native net::connection<MsgType> to be passed in using GetClientById method
+	-- attempts to resolve client id to connection object
+	-- if the connection object is null, does not attempt to send
+	-- uint32_t clientId: id of client 
 	-- _ty msg: any object to send
 
-	-MessageAll(_ty msg)
-	-- serializes msg object and sends to all currently connected clients
+	-MessageAll(_ty msg, uint32_t except)
+	-- serializes msg object and sends to all currently connected clients, except client with id that was passed in arg 2
 	-- _ty msg: any object to send
-	
+	-- uint32_t except: client to be ignored when sending the message
