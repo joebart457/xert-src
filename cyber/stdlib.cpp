@@ -49,12 +49,11 @@ std::any time_timestamp_to_timestring_f(std::shared_ptr<interpreter> i, _args ar
 	std::string szFormat = args.get<std::string>(1);
 	std::tm timeStruct;
 	localtime_s(&timeStruct, &timestamp);
-	char buffer[64];
+	char buffer[4096];
 
-	std::strftime(buffer, 64, szFormat.c_str(), &timeStruct); // see documentation for format specifiers
+	std::strftime(buffer, 4096, szFormat.c_str(), &timeStruct); // see documentation for format specifiers
 	return std::string(buffer);
 }
-
 
 
 // DB Methods

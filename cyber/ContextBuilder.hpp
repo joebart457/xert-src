@@ -31,14 +31,6 @@
 #endif
 
 
-
-
-
-// Operators
-
-
-
-
 class ContextBuilder
 {
 public:
