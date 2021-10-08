@@ -654,6 +654,11 @@ public:
             true
         );
 
+        language_ar->environment->define("Entry",
+            std::string("__main__"),
+            true
+        );
+
         e->define("Language",
             std::make_shared<klass_definition>("Language", language_ar),
             true

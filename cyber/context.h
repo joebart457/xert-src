@@ -128,6 +128,37 @@ public:
 		return std::any_cast<Ty>(obj);
 	}
 
+	template <typename Ty>
+	Ty try_get_coalesce(const std::string& szKey, Ty defaultValue, const std::string& delim = ".")
+	{
+		std::scoped_lock(m_mutex);
+
+		std::vector<std::string> matches = StringUtilities().split(szKey, delim);
+		list_crawler<std::string> crwlMatches(matches);
+		std::shared_ptr<activation_record> ar = nullptr;
+		std::any obj = nullptr;
+		for (unsigned int i{ 0 }; i < matches.size(); i++) {
+			std::string key = matches.at(i);
+			if (i > 0 && ar == nullptr) {
+				return defaultValue;
+			}
+			if (ar == nullptr) {
+				obj = get(key, location());
+			}
+			else {
+				if (!ar->environment->get(key, obj)) {
+					return defaultValue;
+				}
+			}
+			ar = Utilities().extractScope(obj);
+		}
+
+		if (obj.type() != typeid(Ty)) {
+			return defaultValue;
+		}
+		return std::any_cast<Ty>(obj);
+	}
+
 
 	std::any get(const std::string& szKey, const location& loc)
 	{

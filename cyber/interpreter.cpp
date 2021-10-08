@@ -93,7 +93,17 @@ std::shared_ptr<activation_record> interpreter::interpret(const std::string& dat
 {
 	std::scoped_lock(m_mutex);
 
-	return interpret(m_parser->parse(m_tokenizer->tokenize(data)));
+	interpret(m_parser->parse(m_tokenizer->tokenize(data)));
+
+	std::string entry = m_context->try_get_coalesce<std::string>("Language.Entry", "__main__");
+
+	if (m_context->exists(entry)) {
+		std::any __main__ = m_context->get(entry, location());
+		std::shared_ptr<callable> hMain = Utilities().getCallable(__main__);
+		hMain->call(shared_from_this(), _args());
+	}
+
+	return m_context->top();
 }
 
 
