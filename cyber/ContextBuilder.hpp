@@ -636,6 +636,12 @@ public:
             true
         );
 
+        language_debug_ar->environment->define("Exists",
+            std::make_shared<native_fn>("Exists", language_object_exists, language_ar)
+            ->registerParameter(BuildParameter("", "object")),
+            true
+        )
+            ;
         language_ar->environment->define("Debug",
             std::make_shared<klass_definition>("Debug", language_debug_ar),
             true

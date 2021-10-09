@@ -348,6 +348,13 @@ std::any flush_import(std::shared_ptr<interpreter> i, _args args)
 	return nullptr;
 }
 
+std::any language_object_exists(std::shared_ptr<interpreter> i, _args args)
+{
+	auto context = Utilities().fetch_context(i);
+
+	return context->exists(args.get<std::string>(0));
+}
+
 
 // FileSystem
 std::any fs_relative_path(std::shared_ptr<interpreter> i, _args args)

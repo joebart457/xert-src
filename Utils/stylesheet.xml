@@ -13,7 +13,7 @@
             <Keywords name="Numbers, suffix1"></Keywords>
             <Keywords name="Numbers, suffix2"></Keywords>
             <Keywords name="Numbers, range"></Keywords>
-            <Keywords name="Operators1">+ - * / == != &lt;= &gt;= &lt; &gt; . ( ) [ ] { } :: ; !</Keywords>
+            <Keywords name="Operators1">+ - * / == != &lt;= &gt;= &lt; &gt; . ( ) [ ] { } :: ; ! ,</Keywords>
             <Keywords name="Operators2"></Keywords>
             <Keywords name="Folders in code1, open">#region</Keywords>
             <Keywords name="Folders in code1, middle"></Keywords>
@@ -24,7 +24,7 @@
             <Keywords name="Folders in comment, open"></Keywords>
             <Keywords name="Folders in comment, middle"></Keywords>
             <Keywords name="Folders in comment, close"></Keywords>
-            <Keywords name="Keywords1">uint8_t&#x000D;&#x000A;uint16_t&#x000D;&#x000A;uint32_t&#x000D;&#x000A;uint64_t&#x000D;&#x000A;int8_t&#x000D;&#x000A;int16_t&#x000D;&#x000A;int32_t&#x000D;&#x000A;int64_t&#x000D;&#x000A;string&#x000D;&#x000A;bool&#x000D;&#x000A;null&#x000D;&#x000A;</Keywords>
+            <Keywords name="Keywords1">false&#x000D;&#x000A;true&#x000D;&#x000A;uint8_t&#x000D;&#x000A;uint16_t&#x000D;&#x000A;uint32_t&#x000D;&#x000A;uint64_t&#x000D;&#x000A;int8_t&#x000D;&#x000A;int16_t&#x000D;&#x000A;int32_t&#x000D;&#x000A;int64_t&#x000D;&#x000A;string&#x000D;&#x000A;bool&#x000D;&#x000A;null&#x000D;&#x000A;</Keywords>
             <Keywords name="Keywords2">_ty&#x000D;&#x000A;list&#x000D;&#x000A;map&#x000D;&#x000A;lib&#x000D;&#x000A;NetClient&#x000D;&#x000A;NetServer</Keywords>
             <Keywords name="Keywords3">if&#x000D;&#x000A;else&#x000D;&#x000A;while&#x000D;&#x000A;break&#x000D;&#x000A;class&#x000D;&#x000A;return&#x000D;&#x000A;try&#x000D;&#x000A;catch</Keywords>
             <Keywords name="Keywords4">function&#x000D;&#x000A;new&#x000D;&#x000A;this</Keywords>

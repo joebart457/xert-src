@@ -67,6 +67,7 @@ std::any print_environment(std::shared_ptr<interpreter> i, _args args);
 std::any print_operators(std::shared_ptr<interpreter> i, _args args);
 std::any flush_imports(std::shared_ptr<interpreter> i, _args args);
 std::any flush_import(std::shared_ptr<interpreter> i, _args args);
+std::any language_object_exists(std::shared_ptr<interpreter> i, _args args);
 
 
 // FileSystem
