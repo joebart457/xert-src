@@ -158,5 +158,8 @@
     <ClInclude Include="Colors.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clArgs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

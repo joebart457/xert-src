@@ -72,7 +72,6 @@ public:
 			oss << toTypeQualifiedSerial<uint64_t>(obj);
 		}
 		else if (obj.type() == typeid(bool)) {
-			// the typing will be handled by Deserialize()
 			oss << std::boolalpha << std::any_cast<bool>(obj);
 		}
 		else if (obj.type() == typeid(float)) {
@@ -98,7 +97,12 @@ public:
 			oss << SerializeClassDefinition(classdef);
 		}
 		else if (obj.type() == typeid(klass_instance)) {
-			oss << std::any_cast<klass_instance>(obj).toString();
+			auto instance = std::any_cast<klass_instance>(obj);
+			oss << SerializeClassInstance(instance);
+		}
+		else if (obj.type() == typeid(std::vector<std::any>)) {
+			auto vec = std::any_cast<std::vector<std::any>>(obj);
+			oss << SerializeVector(vec);
 		}
 		else if (obj.type() == typeid(nullptr)) {
 			oss << "null";
@@ -168,6 +172,9 @@ public:
 		else if (obj.type() == typeid(klass_instance)) {
 			return true;
 		}
+		else if (obj.type() == typeid(std::vector<std::any>)) {
+			return true;
+		}
 		else if (obj.type() == typeid(nullptr)) {
 			return true;
 		}
@@ -201,4 +208,46 @@ private:
 		return oss.str();
 	}
 
+
+	std::string SerializeClassInstance(klass_instance& instance)
+	{
+		if (instance.m_ar == nullptr
+			|| instance.m_ar->environment == nullptr
+			|| instance.m_ar->environment->lookup() == nullptr)
+		{
+			return "null";
+		}
+
+		auto mpLookup = instance.m_ar->environment->lookup();
+
+		std::ostringstream oss;
+		oss << "{";
+		for (auto it = mpLookup->begin(); it != mpLookup->end(); it++) {
+			if (Serializable(it->second)) {
+				oss << "_ty ~" << it->first << "~ = " << Serialize(it->second) << ";";
+			}
+		}
+		oss << "}";
+		return oss.str();
+	}
+
+	std::string SerializeVector(std::vector<std::any> v)
+	{
+		std::ostringstream oss;
+		oss << "new Containers.list(";
+		if (v.size() > 0) {
+			oss << v.at(0);
+		}
+		for (unsigned int i{ 1 }; i < v.size(); i++) {
+			oss << ",";
+			if (Serializable(v.at(i))) {
+				oss << Serialize(v.at(i));
+			}
+			else {
+				oss << "null";
+			}
+		}
+		oss << ")";
+		return oss.str();
+	}
 };

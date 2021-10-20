@@ -14,7 +14,108 @@
 #include "Serializer.hpp"
 #include "db_helper.h"
 #include "ConsoleHandle.hpp"
+#include "clArgs.hpp"
 
+// clArgs
+
+std::any clArgs_constructor(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	auto clArgs = args.get<std::shared_ptr<_clArgs>>(0);
+	if (clArgs == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+	context->define("__raw__", clArgs, true, location());
+
+	return nullptr;
+}
+
+std::any clArgs_size(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	auto raw = context->get<std::shared_ptr<_clArgs>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	return raw->Size();
+}
+
+std::any clArgs_getbooleanoption(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	auto raw = context->get<std::shared_ptr<_clArgs>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	std::string szVerbose = args.get<std::string>(0);
+	std::string szAbbr = args.get<std::string>(1);
+	int32_t nPos = args.get<int32_t>(2);
+	bool defaultValue = args.get<bool>(3);
+
+	return raw->TryGetBooleanOption(clOption(szVerbose, szAbbr, nPos, clOptionType::BOOLEAN, defaultValue), defaultValue);
+}
+std::any clArgs_getstringoption(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	auto raw = context->get<std::shared_ptr<_clArgs>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	std::string szVerbose = args.get<std::string>(0);
+	std::string szAbbr = args.get<std::string>(1);
+	int32_t nPos = args.get<int32_t>(2);
+	std::string defaultValue = args.get<std::string>(3);
+
+	return raw->TryGetStringOption(clOption(szVerbose, szAbbr, nPos, clOptionType::STRING, defaultValue), defaultValue);
+}
+std::any clArgs_getint32option(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	auto raw = context->get<std::shared_ptr<_clArgs>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	std::string szVerbose = args.get<std::string>(0);
+	std::string szAbbr = args.get<std::string>(1);
+	int32_t nPos = args.get<int32_t>(2);
+	int32_t defaultValue = args.get<int32_t>(3);
+
+	return raw->TryGetIntegerOption(clOption(szVerbose, szAbbr, nPos, clOptionType::INT32, defaultValue), defaultValue);
+}
+std::any clArgs_getuint32option(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	auto raw = context->get<std::shared_ptr<_clArgs>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	std::string szVerbose = args.get<std::string>(0);
+	std::string szAbbr = args.get<std::string>(1);
+	int32_t nPos = args.get<int32_t>(2);
+	uint32_t defaultValue = args.get<uint32_t>(3);
+
+	return raw->TryGetUnsignedIntegerOption(clOption(szVerbose, szAbbr, nPos, clOptionType::UINT32, defaultValue), defaultValue);
+}
+std::any clArgs_getdoubleoption(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	auto raw = context->get<std::shared_ptr<_clArgs>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	std::string szVerbose = args.get<std::string>(0);
+	std::string szAbbr = args.get<std::string>(1);
+	int32_t nPos = args.get<int32_t>(2);
+	double defaultValue = args.get<double>(3);
+
+	return raw->TryGetDoubleOption(clOption(szVerbose, szAbbr, nPos, clOptionType::DOUBLE, defaultValue), defaultValue);
+}
 
 // Thread
 

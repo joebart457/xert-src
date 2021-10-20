@@ -123,7 +123,7 @@
       <Message>(git) Detecting modifications and (xert) Updating version</Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>$(OutputPath)cyber.exe $(SolutionDir)/Utils/copy_binary.xrt $(OutputPath)</Command>
+      <Command>$(OutputPath)cyber.exe $(SolutionDir)/Utils/copy_binary.xrt --outdir $(OutputPath)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Coping Binary to Program Files</Message>
@@ -166,7 +166,7 @@
       <Message>(git) Detecting modifications and (xert) Updating version</Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>$(OutputPath)cyber.exe $(SolutionDir)/Utils/copy_binary.xrt $(OutputPath)</Command>
+      <Command>$(OutputPath)cyber.exe $(SolutionDir)/Utils/copy_binary.xrt --outdir $(OutputPath)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Coping Binary to Program Files</Message>
@@ -175,6 +175,7 @@
   <ItemGroup>
     <ClInclude Include="BuildDefinitions.hpp" />
     <ClInclude Include="callable.h" />
+    <ClInclude Include="clArgs.hpp" />
     <ClInclude Include="Colors.hpp" />
     <ClInclude Include="ConsoleHandle.hpp" />
     <ClInclude Include="context.h" />

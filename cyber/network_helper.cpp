@@ -11,7 +11,7 @@ iNetHelper::iNetHelper(
 {
 	m_tokenizer = ContextBuilder().BuildTokenizer();
 	m_parser = ContextBuilder().BuildParser();
-	m_interpreter = ContextBuilder().BuildInterpreter();
+	m_interpreter = ContextBuilder().BuildInterpreter(false);
 }
 
 std::any iNetHelper::InterpretMsgObject(std::vector<uint8_t> body)
@@ -47,7 +47,7 @@ NetClient::NetClient(const std::string& host,
 {
 	m_tokenizer = ContextBuilder().BuildTokenizer();
 	m_parser = ContextBuilder().BuildParser();
-	m_interpreter = ContextBuilder().BuildInterpreter();
+	m_interpreter = ContextBuilder().BuildInterpreter(false);
 }
 
 bool NetClient::Start()

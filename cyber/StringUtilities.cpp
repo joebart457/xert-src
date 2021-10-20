@@ -6,6 +6,12 @@
 #include <sstream>
 #include <iomanip>
 
+bool StringUtilities::startsWith(const std::string& s, const std::string& match)
+{
+	return s.find(match) == 0;
+}
+
+
 bool StringUtilities::contains(const std::string& s, const std::string& match)
 {
 	return s.find(match) != std::string::npos;

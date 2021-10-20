@@ -8,6 +8,7 @@
 
 class StringUtilities {
 public:
+	static bool startsWith(const std::string& s, const std::string& match);
 	static bool contains(const std::string& s, const std::string& match);
 	static std::vector<std::string> split(const std::string& s, char delimiter);
 	static std::string lower(const std::string& s);

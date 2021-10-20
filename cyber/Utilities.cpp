@@ -357,3 +357,59 @@ std::any Utilities::strToAppropriateUInt(const std::string& src)
 		throw ExceptionBuilder().Build(ExceptionTypes().PARSING(), "unable to parse value to unsigned integer " + src, Severity().HIGH());
 	}
 }
+
+bool Utilities::StringToBoolean(const std::string& src, bool& out)
+{
+	try {
+		out = std::stoi(src);
+		return true;
+	}
+	catch (std::invalid_argument) {
+		return false;
+	}
+	catch (std::out_of_range) {
+		return false;
+	}
+}
+
+bool Utilities::StringToInt32(const std::string& src, int32_t& out)
+{
+	try {
+		out = std::stoi(src);
+		return true;
+	}
+	catch (std::invalid_argument) {
+		return false;
+	}
+	catch (std::out_of_range) {
+		return false;
+	}
+}
+
+bool Utilities::StringToUInt32(const std::string& src, uint32_t& out)
+{
+	try {
+		out = static_cast<uint32_t>(std::stoul(src));
+		return true;
+	}
+	catch (std::invalid_argument) {
+		return false;
+	}
+	catch (std::out_of_range) {
+		return false;
+	}
+}
+
+bool Utilities::StringToDouble(const std::string& src, double& out)
+{
+	try {
+		out = std::stod(src);
+		return true;
+	}
+	catch (std::invalid_argument) {
+		return false;
+	}
+	catch (std::out_of_range) {
+		return false;
+	}
+}

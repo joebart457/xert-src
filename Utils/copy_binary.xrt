@@ -1,10 +1,12 @@
 function main(){
-	if (System.Args.size() != 3){
-		Console.WriteLine("Copy failed. Please provide outdir");
+
+	string outDir = System.clArgs.TryGetStringOption("--outdir","-o",-1,"");
+	if (outDir == ""){
+	Console.WriteLine("Copy failed. Please provide outdir");
 		return null;
 	}
 	
-	string exePath = System.Args[2] +"cyber.exe";
+	string exePath = outDir +"cyber.exe";
 	string dest = "C:/Program Files/xert/bin/xert-"+Language.Version+".exe";
 	FileSystem.Copy(exePath, "C:/Program Files/xert/bin/xert-"+Language.Version+".exe");
 	if (FileSystem.Exists(dest)){

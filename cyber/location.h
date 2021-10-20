@@ -16,4 +16,4 @@ public:
 private:
 	unsigned int _x{ 0 };
 	unsigned int _y{ 0 };
-};
+}; 

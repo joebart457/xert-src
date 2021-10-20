@@ -30,7 +30,10 @@ public:
 	static std::shared_ptr<klass_definition> BuildErrorObject(const std::string szType, const std::string szMsg, const std::string& szSeverity);
 	static std::any strToAppropriateInt(const std::string& src);
 	static std::any strToAppropriateUInt(const std::string& src);
-
+	static bool StringToBoolean(const std::string& src, bool& out);
+	static bool StringToInt32(const std::string& src, int32_t& out);
+	static bool StringToUInt32(const std::string& src, uint32_t& out);
+	static bool StringToDouble(const std::string& src, double& out);
 };
 
 #endif

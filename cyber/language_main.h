@@ -13,10 +13,10 @@ public:
 	language_main() {}
 	~language_main() {}
 
-	int run_file(const std::string& szFilePath, std::vector<std::string> cl_arguments = {})
+	int run_file(const std::string& szFilePath, std::shared_ptr<_clArgs> args)
 	{
 		try {
-			auto interp = ContextBuilder().BuildInterpreter(FileHandle().parent_path(szFilePath), cl_arguments);
+			auto interp = ContextBuilder().BuildInterpreter(FileHandle().parent_path(szFilePath), args, m_bLightweight);
 			interp->interpret(FileHandle().readFileAsString(szFilePath));
 			return 0;
 		}
@@ -39,7 +39,7 @@ public:
 		bool bFinished = false;
 		bool bShowTokens = false;
 		std::string szText;
-		auto i = ContextBuilder().BuildInterpreter();
+		auto i = ContextBuilder().BuildInterpreter(m_bLightweight);
 		auto p = ContextBuilder().BuildParser();
 		auto t = ContextBuilder().BuildTokenizer();
 		while (!bFinished) {
@@ -82,4 +82,12 @@ public:
 		}
 
 	}
+
+	void UseLightweight()
+	{
+		m_bLightweight = true;
+	}
+
+private:
+	bool m_bLightweight{ false };
 };

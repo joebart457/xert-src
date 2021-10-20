@@ -23,6 +23,7 @@
 #include "parser.hpp"
 #include "network_helper.h"
 #include "Colors.hpp"
+#include "clArgs.hpp"
 
 #include "BuildDefinitions.hpp"
 
@@ -253,9 +254,19 @@ public:
         sys_env_ar->szAlias = "System";
         sys_env_ar->environment = std::make_shared<scope<std::any>>();
 
+        std::shared_ptr<activation_record> sys_flags_ar = std::make_shared<activation_record>();
+        sys_flags_ar->szAlias = "Flags";
+        sys_flags_ar->environment = std::make_shared<scope<std::any>>();
+
+#ifndef BUILD_WINDOWS
+        sys_flags_ar->environment->define("Windows", false);
+#endif
 
 #ifdef BUILD_WINDOWS
         /* Windows */
+
+        sys_flags_ar->environment->define("Windows", true);
+
 
         std::shared_ptr<activation_record> winlib_env_ar = std::make_shared<activation_record>();
         winlib_env_ar->szAlias = "lib";
@@ -345,6 +356,67 @@ public:
         /* End Windows */
 #endif
 
+        sys_env_ar->environment->define("Flags",
+            std::make_shared<klass_definition>("Flags", sys_flags_ar),
+            true
+        );
+
+        std::shared_ptr<activation_record> clargs_env_ar = std::make_shared<activation_record>();
+        clargs_env_ar->szAlias = "clArgs";
+        clargs_env_ar->environment = std::make_shared<scope<std::any>>();
+
+        clargs_env_ar->environment->define("constructor",
+            std::make_shared<native_fn>("constructor", clArgs_constructor, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::shared_ptr<_clArgs>>("raw"))
+        );
+
+        clargs_env_ar->environment->define("TryGetBooleanOption",
+            std::make_shared<native_fn>("TryGetBooleanOption", clArgs_getbooleanoption, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<bool>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("TryGetStringOption",
+            std::make_shared<native_fn>("TryGetStringOption", clArgs_getstringoption, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<std::string>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("TryGetInt32Option",
+            std::make_shared<native_fn>("TryGetInt32Option", clArgs_getint32option, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<int32_t>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("TryGetUInt32Option",
+            std::make_shared<native_fn>("TryGetUInt32Option", clArgs_getuint32option, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<uint32_t>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("TryGetDoubleOption",
+            std::make_shared<native_fn>("TryGetDoubleOption", clArgs_getdoubleoption, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<double>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("Size",
+            std::make_shared<native_fn>("Size", clArgs_size, clargs_env_ar)
+        );
+
+        sys_env_ar->environment->define("clArgs",
+            std::make_shared<klass_definition>("clArgs", clargs_env_ar)
+        );
 
         e->define("System",
             std::make_shared<klass_definition>("System", sys_env_ar),
@@ -611,6 +683,25 @@ public:
         language_ar->szAlias = "Language";
         language_ar->environment = std::make_shared<scope<std::any>>();
 
+        std::shared_ptr<activation_record> language_flags_ar = std::make_shared<activation_record>();
+        language_flags_ar->szAlias = "Flags";
+        language_flags_ar->environment = std::make_shared<scope<std::any>>();
+
+        language_flags_ar->environment->define("Lightweight", false, true);
+
+        language_flags_ar->environment->define("Windows", 
+#ifdef BUILD_WINDOWS
+            true,
+#else
+            false, 
+#endif            
+            true);
+
+        language_ar->environment->define("Flags",
+            std::make_shared<klass_definition>("Flags", language_flags_ar),
+            true
+        );
+
         std::shared_ptr<activation_record> language_debug_ar = std::make_shared<activation_record>();
         language_debug_ar->szAlias = "Debug";
         language_debug_ar->environment = std::make_shared<scope<std::any>>();
@@ -814,63 +905,187 @@ public:
 		return e;
 	}
 
-	static std::shared_ptr<interpreter> BuildInterpreter()
+    static std::shared_ptr<scope<std::any>> BuildLightweightScope()
+    {
+        std::shared_ptr<scope<std::any>> e = std::make_shared<scope<std::any>>("default");
+
+        // Std
+
+        e->define("to_string",
+            std::make_shared<unary_fn>("to_string", to_string)
+            ->registerParameter(BuildParameter("")),
+            true
+        );
+
+        e->define("print",
+            std::make_shared<native_fn>("print", print)
+            ->setVariadic(),
+            true
+        );
+
+        e->define("typeof",
+            std::make_shared<unary_fn>("typeof", type_of_any)
+            ->registerParameter(BuildParameter("")),
+            true
+        );
+
+        // Language
+
+        std::shared_ptr<activation_record> language_ar = std::make_shared<activation_record>();
+        language_ar->szAlias = "Language";
+        language_ar->environment = std::make_shared<scope<std::any>>();
+
+        std::shared_ptr<activation_record> language_flags_ar = std::make_shared<activation_record>();
+        language_flags_ar->szAlias = "Flags";
+        language_flags_ar->environment = std::make_shared<scope<std::any>>();
+
+        language_flags_ar->environment->define("Lightweight", false, true);
+
+        language_flags_ar->environment->define("Windows",
+#ifdef BUILD_WINDOWS
+            true,
+#else
+            false,
+#endif            
+            true);
+
+        language_ar->environment->define("Flags",
+            std::make_shared<klass_definition>("Flags", language_flags_ar),
+            true
+        );
+
+        language_ar->environment->define("Version",
+            INTERPRETER_VERSION + "." + PARSER_VERSION + "." + TOKENIZER_VERSION + "." + STD_LIB_VERSION,
+            true
+        );
+
+        language_ar->environment->define("Entry",
+            std::string("__main__"),
+            true
+        );
+
+        e->define("Language",
+            std::make_shared<klass_definition>("Language", language_ar),
+            true
+        );
+
+        // System
+
+        std::shared_ptr<activation_record> sys_env_ar = std::make_shared<activation_record>();
+        sys_env_ar->szAlias = "System";
+        sys_env_ar->environment = std::make_shared<scope<std::any>>();
+
+        std::shared_ptr<activation_record> clargs_env_ar = std::make_shared<activation_record>();
+        clargs_env_ar->szAlias = "clArgs";
+        clargs_env_ar->environment = std::make_shared<scope<std::any>>();
+
+        clargs_env_ar->environment->define("constructor",
+            std::make_shared<native_fn>("constructor", clArgs_constructor, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::shared_ptr<_clArgs>>("raw"))
+        );
+
+        clargs_env_ar->environment->define("TryGetBooleanOption",
+            std::make_shared<native_fn>("TryGetBooleanOption", clArgs_getbooleanoption, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<bool>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("TryGetStringOption",
+            std::make_shared<native_fn>("TryGetStringOption", clArgs_getstringoption, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<std::string>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("TryGetInt32Option",
+            std::make_shared<native_fn>("TryGetInt32Option", clArgs_getint32option, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<int32_t>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("TryGetUInt32Option",
+            std::make_shared<native_fn>("TryGetUInt32Option", clArgs_getuint32option, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<uint32_t>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("TryGetDoubleOption",
+            std::make_shared<native_fn>("TryGetDoubleOption", clArgs_getdoubleoption, clargs_env_ar)
+            ->registerParameter(BuildParameter<std::string>("szVerbose"))
+            ->registerParameter(BuildParameter<std::string>("szAbbr"))
+            ->registerParameter(BuildParameter<int32_t>("nPos"))
+            ->registerParameter(BuildParameter<double>("defaultValue"))
+        );
+
+        clargs_env_ar->environment->define("Size",
+            std::make_shared<native_fn>("Size", clArgs_size, clargs_env_ar)
+        );
+
+        sys_env_ar->environment->define("clArgs",
+            std::make_shared<klass_definition>("clArgs", clargs_env_ar)
+        );
+
+        e->define("System",
+            std::make_shared<klass_definition>("System", sys_env_ar),
+            true);
+
+        return e;
+    }
+
+	static std::shared_ptr<interpreter> BuildInterpreter(bool bLightweight)
 	{
-        auto context = BuildExecutionContext();
+        auto context = BuildExecutionContext(bLightweight);
         auto i = std::make_shared<interpreter>(context, BuildTokenizer(), BuildParser());
 
         auto systemNamespace = context->get<std::shared_ptr<klass_definition>>("System");
 
-        auto listDefintion = context->get_coalesce<std::shared_ptr<klass_definition>>("Containers.list");
-        auto lsInstance = listDefintion->create();
-        std::vector<std::any> arguments;
-        Utilities().getCallable(lsInstance.Get("constructor", location()))->call(i, _args(arguments));
+        auto clArgsDefinition = context->get_coalesce<std::shared_ptr<klass_definition>>("System.clArgs");
+        auto clArgsInstance = clArgsDefinition->create();
 
-        systemNamespace->Define("Args", lsInstance, location(), true);
+        std::vector<std::any> args = { std::make_shared<_clArgs>() };
+        Utilities().getCallable(clArgsInstance.Get("constructor", location()))->call(i, _args(args));
+
+        systemNamespace->Define("clArgs", clArgsInstance, location(), true);
 
         return i;
 	}
 
-    static std::shared_ptr<interpreter> BuildInterpreter(const std::string& szExecutionDir, std::vector<std::string> clArgs)
+    static std::shared_ptr<interpreter> BuildInterpreter(const std::string& szExecutionDir, std::shared_ptr<_clArgs> clArgs, bool bLightweight)
     {
-        auto context = BuildExecutionContext();
+        auto context = BuildExecutionContext(bLightweight);
         auto i = std::make_shared<interpreter>(context, BuildTokenizer(), BuildParser());
   
         auto systemNamespace = context->get<std::shared_ptr<klass_definition>>("System");
         auto fsNamespace = context->get<std::shared_ptr<klass_definition>>("FileSystem");
 
         fsNamespace->Define("WorkingDirectory", szExecutionDir, location(), true);
-        auto listDefintion = context->get_coalesce<std::shared_ptr<klass_definition>>("Containers.list");
-        auto lsInstance = listDefintion->create();
+        auto clArgsDefinition = context->get_coalesce<std::shared_ptr<klass_definition>>("System.clArgs");
+        auto clArgsInstance = clArgsDefinition->create();
         
-        std::vector<std::any> arguments;
-        for (auto arg : clArgs) {
-            arguments.push_back(arg);
-        }
+       
+        std::vector<std::any> args = { clArgs };
+        Utilities().getCallable(clArgsInstance.Get("constructor", location()))->call(i, _args(args));
 
-        Utilities().getCallable(lsInstance.Get("constructor", location()))->call(i, _args(arguments));
-
-        systemNamespace->Define("Args", lsInstance, location(), true);
+        systemNamespace->Define("clArgs", clArgsInstance, location(), true);
         
         return i;
     }
 
-	static std::shared_ptr<execution_context> BuildExecutionContext() 
+	static std::shared_ptr<execution_context> BuildExecutionContext(bool bLightweight) 
 	{
 		std::shared_ptr<activation_record> default_ar = std::make_shared<activation_record>();
 		default_ar->id = 0;
-		default_ar->environment = BuildDefaultScope();
+		default_ar->environment = bLightweight ? BuildLightweightScope() : BuildDefaultScope();
 		return std::make_shared<execution_context>(default_ar, BuildOperatorHandler());
 	}
 
-    static std::shared_ptr<execution_context> BuildExecutionContext(const std::string& szExecutionDir)
-    {
-        std::shared_ptr<activation_record> default_ar = std::make_shared<activation_record>();
-        default_ar->id = 0;
-        default_ar->environment = BuildDefaultScope();
-        auto context = std::make_shared<execution_context>(default_ar, BuildOperatorHandler());
-        
-    }
 
     static std::shared_ptr<parser> BuildParser()
     {

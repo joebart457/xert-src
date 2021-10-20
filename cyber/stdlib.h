@@ -7,8 +7,16 @@
 #include "interpreter.h"
 
 
-// Thread
+// clArgs
+std::any clArgs_constructor(std::shared_ptr<interpreter> i, _args args);
+std::any clArgs_size(std::shared_ptr<interpreter> i, _args args);
+std::any clArgs_getbooleanoption(std::shared_ptr<interpreter> i, _args args);
+std::any clArgs_getstringoption(std::shared_ptr<interpreter> i, _args args);
+std::any clArgs_getint32option(std::shared_ptr<interpreter> i, _args args);
+std::any clArgs_getuint32option(std::shared_ptr<interpreter> i, _args args);
+std::any clArgs_getdoubleoption(std::shared_ptr<interpreter> i, _args args);
 
+// Thread
 std::any thread_sleep(std::shared_ptr<interpreter> i, _args args);
 
 // Time
