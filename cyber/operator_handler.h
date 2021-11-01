@@ -14,8 +14,8 @@ public:
 	~operator_handler(){}
 
 	void registerOperator(std::shared_ptr<callable> op, const std::string& signatureOverride = "");
-	std::shared_ptr<callable> getOperator(std::string szName);
-
+	std::shared_ptr<callable> getOperator(const std::string& szName);
+	bool exists(const std::string& szName);
 	void output();
 
 private:

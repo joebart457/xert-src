@@ -71,23 +71,41 @@ class callable :
 {
 public:
 	callable(std::string szName)
-		:m_szName{ szName }{}
+		:m_szName{ szName }
+	{
+		// TODO: assert this for type safety
+		//m_retType.szNativeType = typeid(nullptr).name();
+	}
 	callable(std::string szName, std::vector<param> params)
-		:m_szName{ szName }, m_params{ params } {}
+		:m_szName{ szName }, m_params{ params } {
+		// TODO: assert this for type safety
+		//m_retType.szNativeType = typeid(nullptr).name();
+
+	}
 
 	virtual std::any call(std::shared_ptr<interpreter> c, _args arguments) = 0;
 
 	virtual std::string getSignature();
+
+	template <class _Ty>
+	std::shared_ptr<callable> returns(const std::string& szName = "", const std::string& szCustomType = "")
+	{
+		m_retType.szCustomType = szCustomType;
+		m_retType.szNativeType = typeid(_Ty).name();
+		m_retType.szName = szName;
+		return shared_from_this();
+	}
 
 protected:
 	bool m_bMayThrow{ false };
 	std::string m_szName{ "" };
 	std::vector<param> m_params;
 	std::mutex m_mtx;
+	param m_retType;
 };
 
 
-typedef std::any( *func)(std::shared_ptr<interpreter>, _args);
+typedef std::any(*func)(std::shared_ptr<interpreter>, _args);
 
 class native_fn :
 	public callable {

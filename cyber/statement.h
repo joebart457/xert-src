@@ -31,9 +31,11 @@ protected:
 
 struct param
 {
-	std::string name;
-	std::string type;
-	std::string class_specifier;
+	std::string szName = "";
+
+	std::string szNativeType = "";
+	std::string szCustomType = "";
+
 	std::shared_ptr<expression> default_value{ nullptr };
 };
 

@@ -14,12 +14,17 @@ void operator_handler::registerOperator(std::shared_ptr<callable> op, const std:
 	}
 }
 
-std::shared_ptr<callable> operator_handler::getOperator(std::string szName)
+std::shared_ptr<callable> operator_handler::getOperator(const std::string& szName)
 {
 	if (m_operators.count(szName)) {
 		return m_operators[szName];
 	}
 	throw ExceptionBuilder().Build(ExceptionTypes().UNRESOLVED_SYMBOL(), "Undefined operator '" + szName + "'", Severity().CRITICAL());
+}
+
+bool operator_handler::exists(const std::string& szName)
+{
+	return m_operators.count(szName);
 }
 
 

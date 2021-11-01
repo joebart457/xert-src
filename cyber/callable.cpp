@@ -16,11 +16,11 @@ std::string callable::getSignature()
 	oss << m_szName << "(";
 
 	if (m_params.size() >= 1) {
-		oss << (m_params.at(0).class_specifier.size() > 0? m_params.at(0).class_specifier : m_params.at(0).type);
+		oss << (m_params.at(0).szCustomType.empty()? m_params.at(0).szNativeType : m_params.at(0).szCustomType);
 	}
 
 	for (unsigned int i{ 1 }; i < m_params.size(); i++) {
-		oss << "," << (m_params.at(i).class_specifier.size() > 0? m_params.at(i).class_specifier : m_params.at(i).type);
+		oss << "," << (m_params.at(0).szCustomType.empty() ? m_params.at(0).szNativeType : m_params.at(0).szCustomType);
 	}
 	oss << ")";
 	return oss.str();
@@ -91,7 +91,7 @@ std::any native_fn::call(std::shared_ptr<interpreter> c, _args args)
 	}
 
 	context->pop_ar();
-	return ret;
+	return c->assert_or_convert_type(m_retType, ret, location());
 
 }
 
@@ -126,9 +126,13 @@ std::any custom_fn::call(std::shared_ptr<interpreter> c, _args arguments)
 
 	std::shared_ptr<execution_context> context = Utilities().fetch_context(c); // Also checks that c is not nullptr
 
+
 	// Create closure
 	context->push_ar(m_enclosing);
 	context->push_ar(m_szName);
+
+	std::any retVal = nullptr;
+	bool bReturnCaught = false;
 
 	try {
 
@@ -140,7 +144,7 @@ std::any custom_fn::call(std::shared_ptr<interpreter> c, _args arguments)
 		// Clean arguments and define parameters in this scope
 		for (unsigned int i{ 0 }; i < m_params.size(); i++) {
 			std::any cleanedObject = c->assert_or_convert_type(m_params.at(i), arguments.at(i), m_loc);
-			context->define(m_params.at(i).name, cleanedObject, false, m_loc);
+			context->define(m_params.at(i).szName, cleanedObject, false, m_loc);
 		}
 
 		// Execute function body
@@ -153,7 +157,8 @@ std::any custom_fn::call(std::shared_ptr<interpreter> c, _args arguments)
 		context->pop_ar();
 
 		// Return value
-		return ret.value();
+		retVal = ret.value();
+		bReturnCaught = true;
 	}
 	catch (PanicException pe) {
 
@@ -172,13 +177,18 @@ std::any custom_fn::call(std::shared_ptr<interpreter> c, _args arguments)
 		// throw error
 		throw pe;
 	}
-	//Reset Environment
-	context->pop_ar();
-	context->pop_ar();
+
+	if (!bReturnCaught) {
+		//Reset Environment
+		context->pop_ar();
+		context->pop_ar();
+		// We would normally do this in the try{} block
+		// but pop_ar itself may throw
+	}
 
 	// If there are no errors and no return has been caught
 	// just return null value
-	return nullptr;
+	return c->assert_or_convert_type(m_retType, retVal, m_loc);
 }
 
 
@@ -200,7 +210,7 @@ std::any unary_fn::call(std::shared_ptr<interpreter> c, _args args)
 
 	std::any cleanedArg = c->assert_or_convert_type(m_param, args.at(0), location());
 
-	return m_hFn(c, cleanedArg);
+	return c->assert_or_convert_type(m_retType, m_hFn(c, cleanedArg), location());
 }
 
 
@@ -213,7 +223,8 @@ std::shared_ptr<callable> unary_fn::registerParameter(const param& p)
 std::string unary_fn::getSignature()
 {
 	std::ostringstream oss;
-	oss << m_szName << "(" << m_param.type << ")";
+	// TODO: custom typing support
+	oss << m_szName << "(" << m_param.szNativeType << ")";
 	return oss.str();
 }
 
@@ -233,7 +244,7 @@ std::any binary_fn::call(std::shared_ptr<interpreter> c,  _args args)
 		cleanedArgs.push_back(arg);
 	}
 
-	return m_hFn(c, cleanedArgs.at(0), cleanedArgs.at(1));
+	return c->assert_or_convert_type(m_retType, m_hFn(c, cleanedArgs.at(0), cleanedArgs.at(1)), location());
 }
 
 
@@ -314,7 +325,7 @@ std::any loaded_native_fn::call(std::shared_ptr<interpreter> c, _args args)
 	}
 
 	context->pop_ar();
-	return ret;
+	return c->assert_or_convert_type(m_retType, ret, location());
 
 }
 

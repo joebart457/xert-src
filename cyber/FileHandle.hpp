@@ -220,7 +220,12 @@ public:
 		throw BuildException("unable to create unique file '" + p.string() + "'");
 	}
 
-	static bool create_directory(const std::string& path)
+	static bool create_directory (const std::string& path)
+	{
+		return std::filesystem::create_directory(path);
+	}
+
+	static bool list_directory(const std::string& path)
 	{
 		return std::filesystem::create_directory(path);
 	}

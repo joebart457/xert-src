@@ -97,6 +97,7 @@ std::any fs_exists(std::shared_ptr<interpreter> i, _args args);
 std::any fs_replace_line(std::shared_ptr<interpreter> i, _args args);
 std::any fs_get_unique_name(std::shared_ptr<interpreter> i, _args args);
 std::any fs_create_dir(std::shared_ptr<interpreter> i, _args args);
+std::any fs_ls(std::shared_ptr<interpreter> i, _args args);
 
 // Network
 

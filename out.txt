@@ -1,9 +1,8 @@
-	modified:   BuildDefinitions.hpp
 	modified:   ContextBuilder.hpp
-	modified:   Serializer.hpp
-	modified:   StringUtilities.h
-	modified:   Utilities.h
-	modified:   language_main.h
-	modified:   location.h
+	modified:   FileHandle.hpp
+	modified:   callable.h
+	modified:   context.h
+	modified:   operator_handler.h
+	modified:   parser.hpp
+	modified:   statement.h
 	modified:   stdlib.h
-	clArgs.hpp

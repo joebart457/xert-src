@@ -173,13 +173,13 @@ void interpreter::acceptVariableDeclaration(std::shared_ptr<variable_declaration
 		std::any val = acceptExpression(var_decl->m_var.default_value);
 
 		val = assert_or_convert_type(var_decl->m_var, val, var_decl->m_loc);
-		m_context->define(var_decl->m_var.name, val, false, var_decl->m_loc);
+		m_context->define(var_decl->m_var.szName, val, false, var_decl->m_loc);
 	} 
 	else {
 		// Here we avoid using param.class_specifier 
 		// this is because custom class prototypes are not currently allowed/supported
-		std::any val = m_context->getObjectPrototype(var_decl->m_var.type, var_decl->m_loc);
-		m_context->define(var_decl->m_var.name, val, false, var_decl->m_loc);
+		std::any val = m_context->getObjectPrototype(var_decl->m_var.szNativeType, var_decl->m_loc);
+		m_context->define(var_decl->m_var.szName, val, false, var_decl->m_loc);
 	}
 }
 
@@ -381,11 +381,12 @@ void interpreter::acceptTryCatchStatement(std::shared_ptr<try_catch_statement> t
 		bool caught{ false };
 		for (auto c : tc_stmt->m_catches) {
 			std::string errType = Utilities().getTypeString(err.value());
-			if ((c.first->m_var.class_specifier != "" && c.first->m_var.class_specifier == errType)
-				|| c.first->m_var.type == errType) {
+			// TODO refactor
+			if ((c.first->m_var.szCustomType != "" && c.first->m_var.szCustomType == errType)
+				|| c.first->m_var.szNativeType == errType) {
 				caught = true;
 				m_context->push_ar();
-				m_context->define(c.first->m_var.name, err.value(), false, c.first->getLocation());
+				m_context->define(c.first->m_var.szName, err.value(), false, c.first->getLocation());
 				try {
 					// this is so we don't nest blocks unneccessarily
 					interpret(c.second->m_statements);
@@ -684,30 +685,37 @@ std::any interpreter::assert_or_convert_type(const param& p, std::any obj, const
 
 	std::string szType = Utilities().getTypeString(obj);
 
-	if (p.class_specifier != "") {
-		// Need this test for klass_instance type for now because of how we use class_specifier
-		if (obj.type() == typeid(klass_instance)) {
-			if (szType != p.class_specifier) {
-				throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), 
-					"Type mismatch klass_instance::" + Utilities().getTypeString(obj) + " != " + p.type + "::" + p.class_specifier, 
-					Severity().MEDIUM(), loc
-				);
-			}
+	if (p.szCustomType.empty()) {
+		if (obj.type().name() == p.szNativeType || p.szNativeType.empty()) {
 			return obj;
 		}
-		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(),
-			"Type mismatch klass_instance::" + Utilities().getTypeString(obj) + " != " + p.type + "::" + p.class_specifier,
-			Severity().MEDIUM(), loc
-		);
+		else {
+			// If there is a conversion function, call it
+			std::string szPossibleOpSignature = Utilities().createOperatorSignature("::", obj, p.szNativeType);
+			if (m_context->operatorExists(szPossibleOpSignature)) {
+				std::cout<<"attempting conversion using" << szPossibleOpSignature<<std::endl;
+				std::vector<std::any> arguments = { obj };
+				std::any convertedVal = m_context->getOperator(szPossibleOpSignature)->call(std::static_pointer_cast<interpreter>(shared_from_this()), _args(arguments));
+				if (convertedVal.type().name() == p.szNativeType) {
+					return convertedVal;
+				}
+				// Even the conversion did not resolve the type correctly
+				throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "Unable to convert type " + Utilities().getTypeString(obj) + " to " + p.szNativeType + "; conversion failed", Severity().MEDIUM(), loc);
+			}
+
+			// Otherwise throw a type_mismatch error
+			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "Type mismatch " + Utilities().getTypeString(obj) + " != " + p.szNativeType, Severity().MEDIUM(), loc);
+		}
 	}
 	else {
-		if (p.type != "" && szType != p.type) {
-			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(),
-				"Type mismatch klass_instance::" + Utilities().getTypeString(obj) + " != " + p.type + "::" + p.class_specifier,
-				Severity().MEDIUM(), loc
-			);
+		// We are looking for a custom type
+		if (p.szNativeType == typeid(klass_instance).name()) {
+			klass_instance instance = std::any_cast<klass_instance>(obj);
+			if (instance.getType() == p.szCustomType) {
+				return obj;
+			}
+			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "Type mismatch " + Utilities().getTypeString(obj) + " != " + p.szCustomType, Severity().MEDIUM(), loc);
 		}
-		return obj;
+		throw ExceptionBuilder().Build(ExceptionTypes().NOT_SUPPORTED(), "Custom typing with native type: " + p.szNativeType + " is not supported.", Severity().CRITICAL(), loc);
 	}
-	
 }

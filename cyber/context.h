@@ -288,6 +288,20 @@ public:
 		return m_opHandler->getOperator(Utilities().createOperatorSignature(szName, args));
 	}
 
+	bool operatorExists(const std::string& szName)
+	{
+		std::scoped_lock(m_mutex);
+
+		return m_opHandler->exists(szName);
+	}
+
+	bool operatorExists(const std::string& szName, std::vector<std::any> args) 
+	{
+		std::scoped_lock(m_mutex);
+
+		return m_opHandler->exists(Utilities().createOperatorSignature(szName, args));
+	}
+
 	std::any getObjectPrototype(const std::string& szTypename, const location& loc)
 	{
 		std::scoped_lock(m_mutex);

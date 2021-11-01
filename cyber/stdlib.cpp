@@ -576,6 +576,11 @@ std::any fs_create_dir(std::shared_ptr<interpreter> i, _args args)
 	return FileHandle().create_directory(args.get<std::string>(0));
 }
 
+std::any fs_ls(std::shared_ptr<interpreter> i, _args args)
+{
+	return nullptr;
+}
+
 // Network
 
 std::any net_create_client(std::shared_ptr<interpreter> i, _args args) 

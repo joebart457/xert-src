@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
 void displayUsage() {
 	std::cout << "usage:  xert *(options)" << std::endl;
-	std::cout << "\toption                      |  description" << std::endl;
+	std::cout << "\toption                      | description" << std::endl;
 	std::cout << "\t-xh (--xhelp)               | display this message" << std::endl;
 	std::cout << "\t-xr (--xrunfile) <filename> | execute file <filename> with remaining arguments passed to program entry point" << std::endl;
 	std::cout << "\t-xl (--xlightweight)        | load only essential library functions" << std::endl;

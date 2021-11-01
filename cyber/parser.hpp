@@ -7,7 +7,7 @@
 #include "expression.h"
 #include "exceptions.hpp"
 #include "Keywords.hpp"
-
+#include "klass_instance.h"
 
 
 class parser
@@ -184,13 +184,13 @@ public:
 				if (match_variable_declaration()) {
 					param p;
 					if (match_builtin()) {
-						p.type = m_pi.previous().lexeme();
+						p.szNativeType = m_pi.previous().lexeme();
 					}
 					else {
-						p.type = m_pi.consume(TOKEN_TYPE_WORD, "expect type specifier in parameter").lexeme();
-						p.class_specifier = p.type;
+						p.szNativeType = typeid(klass_instance).name();
+						p.szCustomType = m_pi.consume(TOKEN_TYPE_WORD, "expect type specifier in parameter").lexeme();
 					}
-					p.name = m_pi.consume(TOKEN_TYPE_WORD, "expect variable name in parameter").lexeme();
+					p.szName = m_pi.consume(TOKEN_TYPE_WORD, "expect variable name in parameter").lexeme();
 					if (m_pi.match(Keywords().EQUAL())) {
 						p.default_value = parse_expression();
 					}
@@ -242,15 +242,14 @@ public:
 	{
 		param p;
 		if (match_builtin()) {
-			p.type = m_pi.previous().lexeme();
-			p.class_specifier = "";
+			p.szNativeType = m_pi.previous().lexeme();
 		}
 		else {
-			p.class_specifier = m_pi.consume(TOKEN_TYPE_WORD, "expect type specifier in declaration").lexeme();
-			p.type = "";
+			p.szCustomType = m_pi.consume(TOKEN_TYPE_WORD, "expect type specifier in declaration").lexeme();
+			p.szNativeType = typeid(klass_instance).name();
 		}
 		token tok = m_pi.previous();
-		p.name = m_pi.consume(TOKEN_TYPE_WORD, "expect variable name in declaration").lexeme();
+		p.szName = m_pi.consume(TOKEN_TYPE_WORD, "expect variable name in declaration").lexeme();
 		p.default_value = nullptr;
 		if (m_pi.match(Keywords().EQUAL())) {
 			p.default_value = parse_expression();
