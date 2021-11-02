@@ -81,24 +81,24 @@ std::string Utilities::stringify(const std::any& obj)
 	}
 	// TODO: do this better
 	else if (obj.type() == typeid(std::shared_ptr<native_fn>)) {
-		oss << (std::any_cast<std::shared_ptr<native_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<native_fn>>(obj)->getSignature());
+		oss << (std::any_cast<std::shared_ptr<native_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<native_fn>>(obj)->toDisplayString());
 	}
 #ifdef BUILD_WINDOWS
 	else if (obj.type() == typeid(std::shared_ptr<loaded_native_fn>)) {
-		oss << (std::any_cast<std::shared_ptr<loaded_native_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<loaded_native_fn>>(obj)->getSignature());
+		oss << (std::any_cast<std::shared_ptr<loaded_native_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<loaded_native_fn>>(obj)->toDisplayString());
 	}
 #endif
 	else if (obj.type() == typeid(std::shared_ptr<binary_fn>)) {
-		oss << (std::any_cast<std::shared_ptr<binary_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<binary_fn>>(obj)->getSignature());
+		oss << (std::any_cast<std::shared_ptr<binary_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<binary_fn>>(obj)->toDisplayString());
 	}
 	else if (obj.type() == typeid(std::shared_ptr<custom_fn>)) {
-		oss << (std::any_cast<std::shared_ptr<custom_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<custom_fn>>(obj)->getSignature());
+		oss << (std::any_cast<std::shared_ptr<custom_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<custom_fn>>(obj)->toDisplayString());
 	}
 	else if (obj.type() == typeid(std::shared_ptr<unary_fn>)) {
-		oss << (std::any_cast<std::shared_ptr<unary_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<unary_fn>>(obj)->getSignature());
+		oss << (std::any_cast<std::shared_ptr<unary_fn>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<unary_fn>>(obj)->toDisplayString());
 	}
 	else if (obj.type() == typeid(std::shared_ptr<callable>)) {
-		oss << (std::any_cast<std::shared_ptr<callable>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<callable>>(obj)->getSignature());
+		oss << (std::any_cast<std::shared_ptr<callable>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<callable>>(obj)->toDisplayString());
 	}
 	else if (obj.type() == typeid(std::shared_ptr<klass_definition>)) {
 		oss << (std::any_cast<std::shared_ptr<klass_definition>>(obj) == nullptr ? "<null>" : std::any_cast<std::shared_ptr<klass_definition>>(obj)->toString());

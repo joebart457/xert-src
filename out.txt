@@ -1,8 +1,5 @@
 	modified:   ContextBuilder.hpp
-	modified:   FileHandle.hpp
+	modified:   Keywords.hpp
 	modified:   callable.h
-	modified:   context.h
-	modified:   operator_handler.h
 	modified:   parser.hpp
 	modified:   statement.h
-	modified:   stdlib.h

@@ -64,11 +64,12 @@ class function_declaration :
 	friend class interpreter;
 public:
 	function_declaration(
-		std::string szName,							// name of function
+		const std::string& szName,					// name of function
+		param& returnType,							// return type 
 		std::vector<param> params,					// list of parameters
 		std::shared_ptr<block> body,				// block of code to execute
 		const location& loc							// location of statement
-	) : statement("function_declaration", loc), m_szName{ szName }, m_params{ params }, m_body{ body } {}
+	) : statement("function_declaration", loc), m_szName{ szName }, m_returnType{ returnType }, m_params{ params }, m_body{ body } {}
 
 	~function_declaration()
 	{
@@ -78,7 +79,8 @@ public:
 	virtual void accept(std::shared_ptr<interpreter> i);
 
 protected:
-	std::string m_szName;
+	std::string m_szName{ "" };
+	param m_returnType;
 	std::vector<param> m_params;
 	std::shared_ptr<block> m_body;
 };

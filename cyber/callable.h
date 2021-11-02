@@ -70,13 +70,13 @@ class callable :
 	public std::enable_shared_from_this<callable>
 {
 public:
-	callable(std::string szName)
+	callable(const std::string& szName)
 		:m_szName{ szName }
 	{
 		// TODO: assert this for type safety
 		//m_retType.szNativeType = typeid(nullptr).name();
 	}
-	callable(std::string szName, std::vector<param> params)
+	callable(const std::string& szName, std::vector<param> params)
 		:m_szName{ szName }, m_params{ params } {
 		// TODO: assert this for type safety
 		//m_retType.szNativeType = typeid(nullptr).name();
@@ -86,7 +86,8 @@ public:
 	virtual std::any call(std::shared_ptr<interpreter> c, _args arguments) = 0;
 
 	virtual std::string getSignature();
-
+	virtual std::string toDisplayString();
+		
 	template <class _Ty>
 	std::shared_ptr<callable> returns(const std::string& szName = "", const std::string& szCustomType = "")
 	{
@@ -113,7 +114,10 @@ public:
 	native_fn(std::string szName, func fn, std::shared_ptr<activation_record> enclosing = nullptr)
 		:callable(szName), m_hFn{ fn }, m_enclosing{ enclosing } {}
 	native_fn(native_fn& fn)
-		:callable(fn.m_szName, fn.m_params), m_hFn{ fn.m_hFn }, m_enclosing{ fn.m_enclosing }, m_variadic{ fn.m_variadic }, m_variadic_after{ fn.m_variadic_after } {}
+		:callable(fn.m_szName, fn.m_params), m_hFn{ fn.m_hFn }, m_enclosing{ fn.m_enclosing }, m_variadic{ fn.m_variadic }, m_variadic_after{ fn.m_variadic_after } 
+	{
+		m_retType = fn.m_retType;
+	}
 	~native_fn() {}
 
 	std::any call(std::shared_ptr<interpreter> c, _args args);
@@ -139,10 +143,16 @@ private:
 class custom_fn :
 	public callable {
 public:
-	custom_fn(std::string szName, std::shared_ptr<activation_record> ar, std::vector<std::shared_ptr<statement>> body, std::vector<param> parameters, const location& loc)
-		:callable{ szName, parameters }, m_enclosing{ ar }, m_body{ body }, m_loc{ loc } {}
+	custom_fn(const std::string& szName, param& retType, std::shared_ptr<activation_record> ar, std::vector<std::shared_ptr<statement>> body, std::vector<param> parameters, const location& loc)
+		:callable{ szName, parameters }, m_enclosing{ ar }, m_body{ body }, m_loc{ loc } 
+	{
+		m_retType = retType;
+	}
 	custom_fn(custom_fn& fn)
-		:callable{ fn.m_szName, fn.m_params }, m_enclosing{ fn.m_enclosing }, m_body{ fn.m_body }, m_loc{ fn.m_loc }{}
+		:callable{ fn.m_szName, fn.m_params }, m_enclosing{ fn.m_enclosing }, m_body{ fn.m_body }, m_loc{ fn.m_loc }
+	{
+		m_retType = fn.m_retType;
+	}
 
 	~custom_fn() {}
 
@@ -167,7 +177,7 @@ typedef std::any(*unary_func)(std::shared_ptr<interpreter>, std::any&);
 class unary_fn :
 	public callable {
 public:
-	unary_fn(std::string szName, unary_func fn)
+	unary_fn(const std::string& szName, unary_func fn)
 		:callable(szName), m_hFn{ fn } {}
 	~unary_fn() {}
 
@@ -195,7 +205,7 @@ typedef std::any(*binary_func)(std::shared_ptr<interpreter>, std::any&, std::any
 class binary_fn :
 	public callable {
 public:
-	binary_fn(std::string szName, binary_func fn)
+	binary_fn(const std::string& szName, binary_func fn)
 		:callable(szName), m_hFn{ fn } {}
 	~binary_fn() {}
 
@@ -218,10 +228,13 @@ typedef std::any(__stdcall *hFunc)(std::shared_ptr<interpreter>, _args);
 class loaded_native_fn :
 	public callable {
 public:
-	loaded_native_fn(std::string szName, hFunc fn, std::shared_ptr<activation_record> enclosing = nullptr)
+	loaded_native_fn(const std::string& szName, hFunc fn, std::shared_ptr<activation_record> enclosing = nullptr)
 		:callable(szName), m_hFn{ fn }, m_enclosing{ enclosing } {}
 	loaded_native_fn(loaded_native_fn& fn)
-		:callable(fn.m_szName, fn.m_params), m_hFn{ fn.m_hFn }, m_enclosing{ fn.m_enclosing }, m_variadic{ fn.m_variadic }, m_variadic_after{ fn.m_variadic_after } {}
+		:callable(fn.m_szName, fn.m_params), m_hFn{ fn.m_hFn }, m_enclosing{ fn.m_enclosing }, m_variadic{ fn.m_variadic }, m_variadic_after{ fn.m_variadic_after } 
+	{
+		m_retType = fn.m_retType;
+	}
 	~loaded_native_fn() {}
 
 	std::any call(std::shared_ptr<interpreter> c, _args args);

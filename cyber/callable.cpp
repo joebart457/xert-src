@@ -20,9 +20,16 @@ std::string callable::getSignature()
 	}
 
 	for (unsigned int i{ 1 }; i < m_params.size(); i++) {
-		oss << "," << (m_params.at(0).szCustomType.empty() ? m_params.at(0).szNativeType : m_params.at(0).szCustomType);
+		oss << "," << (m_params.at(i).szCustomType.empty() ? m_params.at(i).szNativeType : m_params.at(i).szCustomType);
 	}
 	oss << ")";
+	return oss.str();
+}
+
+std::string callable::toDisplayString()
+{
+	std::ostringstream oss;
+	oss << getSignature() << "->" << m_retType.szNativeType << (m_retType.szCustomType.empty()? "" : ":") << m_retType.szCustomType;
 	return oss.str();
 }
 

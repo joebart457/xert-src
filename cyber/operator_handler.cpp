@@ -31,6 +31,6 @@ bool operator_handler::exists(const std::string& szName)
 void operator_handler::output()
 {
 	for (auto it = m_operators.begin(); it != m_operators.end(); it++) {
-		std::cout << it->first << ":=" << (it->second == nullptr ? "<null>" : it->second->getSignature()) << std::endl;
+		std::cout << it->first << ":=" << (it->second == nullptr ? "<null>" : it->second->toDisplayString()) << std::endl;
 	}
 }

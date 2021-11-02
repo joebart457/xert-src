@@ -36,6 +36,9 @@ public:
 	static std::string INT64_T() { return "int64_t"; }
 	static std::string FLOAT_T() { return "float_t"; }
 	static std::string DBLFLOAT_T() { return "dblfloat_t"; }
+	static std::string ANY_T() { return "any_t"; }
+	static std::string NULLPTR_T() { return "nullptr_t"; }
+
 
 
 	static std::string DIRECTIVE() { return "directive"; }
@@ -49,12 +52,14 @@ public:
 	static std::string BREAK() { return "break"; }
 	static std::string CONTINUE() { return "continue"; }
 
-	static std::string LCURLY() { return "{"; }
-	static std::string RCURLY() { return "}"; }
-	static std::string LPAREN() { return "("; }
-	static std::string RPAREN() { return ")"; }
-	static std::string LBRACKET() { return "["; }
-	static std::string RBRACKET() { return "]"; }
+	static std::string LCURLY() { return "lcurly"; }
+	static std::string RCURLY() { return "rcurly"; }
+	static std::string LPAREN() { return "lparen"; }
+	static std::string RPAREN() { return "rparen"; }
+	static std::string LBRACKET() { return "lbracket"; }
+	static std::string RBRACKET() { return "rbrakcet"; }
+	static std::string LCARAT() { return "lcarat"; }
+	static std::string RCARAT() { return "rcarat"; }
 
 	static std::string COMMA() { return "comma"; }
 	static std::string DOT() { return "dot"; }

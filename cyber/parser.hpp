@@ -176,6 +176,18 @@ public:
 	std::shared_ptr<function_declaration> parse_function_declaration()
 	{
 		token name = m_pi.consume(TOKEN_TYPE_WORD, "expect function name");
+		
+		param retType;
+		if (m_pi.match(Keywords().LESSTHAN())) {
+			if (match_builtin()) {
+				retType.szNativeType = m_pi.previous().lexeme();
+			}
+			else {
+				retType.szCustomType = m_pi.consume(TOKEN_TYPE_WORD, "expect return type after '<' in function declaration").lexeme();
+				retType.szNativeType = typeid(klass_instance).name();
+			}
+			m_pi.consume(Keywords().GREATERTHAN(), "expect enclosing '>' after return type declaration");
+		}
 		m_pi.consume(Keywords().LPAREN(), "expect '(' in function declaration");
 
 		std::vector<param> parameters;
@@ -204,7 +216,7 @@ public:
 		}
 		m_pi.consume(Keywords().LCURLY(), "expect function body");
 		std::shared_ptr<block> body = parse_block();
-		return std::make_shared<function_declaration>(name.lexeme(), parameters, body, name.loc());
+		return std::make_shared<function_declaration>(name.lexeme(), retType, parameters, body, name.loc());
 	}
 
 	std::shared_ptr<class_extension> parse_class_extension()
@@ -707,6 +719,8 @@ private:
 		Keywords().INT64_T(),
 		Keywords().FLOAT_T(),
 		Keywords().DBLFLOAT_T(),
+		Keywords().ANY_T(),
+		Keywords().NULLPTR_T(),
 	};
 
 	bool match_variable_declaration() {

@@ -159,7 +159,7 @@ void interpreter::acceptFunctionDeclaration(std::shared_ptr<function_declaration
 	std::scoped_lock(m_mutex);
 
 	m_context->define(func_decl->m_szName, 
-		std::make_shared<custom_fn>(func_decl->m_szName, m_context->current_ar(), func_decl->m_body->m_statements, func_decl->m_params, func_decl->m_loc), 
+		std::make_shared<custom_fn>(func_decl->m_szName, func_decl->m_returnType, m_context->current_ar(), func_decl->m_body->m_statements, func_decl->m_params, func_decl->m_loc), 
 		false,
 		func_decl->m_loc);
 }
@@ -463,7 +463,7 @@ void interpreter::acceptClassExtensionStatement(std::shared_ptr<class_extension>
 	if (parent_klass.type() == typeid(klass_instance)) {
 		klass_instance instance = std::any_cast<klass_instance>(parent_klass);
 		instance.Define(fn->m_szName,
-			std::make_shared<custom_fn>(fn->m_szName, instance.ar(), fn->m_body->m_statements, fn->m_params, fn->m_loc),
+			std::make_shared<custom_fn>(fn->m_szName, fn->m_returnType, instance.ar(), fn->m_body->m_statements, fn->m_params, fn->m_loc),
 			ce_stmt->m_loc,
 			true
 		);
@@ -471,7 +471,7 @@ void interpreter::acceptClassExtensionStatement(std::shared_ptr<class_extension>
 	else if (parent_klass.type() == typeid(std::shared_ptr<klass_definition>)) {
 		std::shared_ptr<klass_definition> klass_def = std::any_cast<std::shared_ptr<klass_definition>>(parent_klass);
 		klass_def->Define(fn->m_szName,
-			std::make_shared<custom_fn>(fn->m_szName, klass_def->ar(), fn->m_body->m_statements, fn->m_params, fn->m_loc),
+			std::make_shared<custom_fn>(fn->m_szName, fn->m_returnType, klass_def->ar(), fn->m_body->m_statements, fn->m_params, fn->m_loc),
 			ce_stmt->m_loc,
 			true
 		);
@@ -682,9 +682,6 @@ std::any interpreter::acceptObjectLiteral(std::shared_ptr<object_literal> obj_li
 std::any interpreter::assert_or_convert_type(const param& p, std::any obj, const location& loc)
 {
 	std::scoped_lock(m_mutex);
-
-	std::string szType = Utilities().getTypeString(obj);
-
 	if (p.szCustomType.empty()) {
 		if (obj.type().name() == p.szNativeType || p.szNativeType.empty()) {
 			return obj;
@@ -693,7 +690,6 @@ std::any interpreter::assert_or_convert_type(const param& p, std::any obj, const
 			// If there is a conversion function, call it
 			std::string szPossibleOpSignature = Utilities().createOperatorSignature("::", obj, p.szNativeType);
 			if (m_context->operatorExists(szPossibleOpSignature)) {
-				std::cout<<"attempting conversion using" << szPossibleOpSignature<<std::endl;
 				std::vector<std::any> arguments = { obj };
 				std::any convertedVal = m_context->getOperator(szPossibleOpSignature)->call(std::static_pointer_cast<interpreter>(shared_from_this()), _args(arguments));
 				if (convertedVal.type().name() == p.szNativeType) {

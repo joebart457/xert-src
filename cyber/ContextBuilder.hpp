@@ -8017,8 +8017,8 @@ not
             tokenizer_rule(Keywords().FLOAT_T(), "float_t", std::make_shared<std::string>(typeid(float).name())),
             tokenizer_rule(Keywords().DBLFLOAT_T(), "double_t", std::make_shared<std::string>(typeid(double).name())),
 
-			tokenizer_rule(TOKEN_TYPE_WORD, "_ty", std::make_shared<std::string>("")),
-			
+			tokenizer_rule(Keywords().ANY_T(), "_ty", std::make_shared<std::string>("")),
+            tokenizer_rule(Keywords().NULLPTR_T(), "nullptr_t", std::make_shared<std::string>(typeid(nullptr).name())),
 			
 			tokenizer_rule(Keywords().NEW(), "new"),
 			tokenizer_rule(TOKEN_TYPE_EOL_COMMENT, "//"),
@@ -8028,7 +8028,9 @@ not
 			tokenizer_rule(TOKEN_TYPE_STRING_ENCLOSING, "\""),
 			tokenizer_rule(Keywords().INJECT(), "inject"),
 			tokenizer_rule(Keywords().DIRECTIVE(), "@"),
-			tokenizer_rule(Keywords().UPCARAT(), "^")
+			tokenizer_rule(Keywords().UPCARAT(), "^"),
+            tokenizer_rule(Keywords().LCARAT(), "<"),
+            tokenizer_rule(Keywords().RCARAT(), ">")
 		};
 		return std::make_shared<tokenizer>(rules);
 	}
