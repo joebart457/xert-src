@@ -8,6 +8,24 @@
 #include "interpreter.h"
 #include "exceptions.hpp"
 #include "Utilities.h"
+#include "klass_instance.h"
+
+void callable::safeCall(std::shared_ptr<interpreter> c, _args arguments, std::shared_ptr<klass_instance> result)
+{
+	try {
+		result->Define("result", call(c, arguments), location(), true);
+		result->Define("bHadError", false, location(), true);
+		result->Define("error", std::string(""), location(), true);
+	}
+	catch (PanicException pe) {
+		result->Define("bHadError", true, location(), true);
+		result->Define("error", pe.fullTrace(), location(), true);
+	}
+	catch (ProgramException pe) {
+		result->Define("bHadError", true, location(), true);
+		result->Define("error", pe.fullTrace(), location(), true);
+	}
+}
 
 
 std::string callable::getSignature()
@@ -86,12 +104,16 @@ std::any native_fn::call(std::shared_ptr<interpreter> c, _args args)
 	catch (PanicException pe) {
 		// Reset environment
 		context->pop_ar();
+		// Add to stack trace for error tracking
+		pe.addStackTrace(toDisplayString(), location(-1,-1));
 
 		throw pe;
 	}
 	catch (ProgramException pe) {
 		// Reset environment
 		context->pop_ar();
+		// Add to stack trace for error tracking
+		pe.addStackTrace(toDisplayString(), location(-1, -1));
 
 		// throw error
 		throw pe;
@@ -172,6 +194,8 @@ std::any custom_fn::call(std::shared_ptr<interpreter> c, _args arguments)
 		// Reset environment
 		context->pop_ar();
 		context->pop_ar();
+		// Add to stack trace for error tracking
+		pe.addStackTrace(toDisplayString(), m_loc);
 
 		// Return value
 		throw pe;
@@ -180,6 +204,8 @@ std::any custom_fn::call(std::shared_ptr<interpreter> c, _args arguments)
 		// Reset environment
 		context->pop_ar();
 		context->pop_ar();
+		// Add to stack trace for error tracking
+		pe.addStackTrace(toDisplayString(), m_loc);
 
 		// throw error
 		throw pe;
@@ -320,12 +346,16 @@ std::any loaded_native_fn::call(std::shared_ptr<interpreter> c, _args args)
 	catch (PanicException pe) {
 		// Reset environment
 		context->pop_ar();
+		// Add to stack trace for error tracking
+		pe.addStackTrace(toDisplayString(), location(-1, -1));
 
 		throw pe;
 	}
 	catch (ProgramException pe) {
 		// Reset environment
 		context->pop_ar();
+		// Add to stack trace for error tracking
+		pe.addStackTrace(toDisplayString(), location(-1, -1));
 
 		// throw error
 		throw pe;

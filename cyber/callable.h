@@ -19,6 +19,8 @@
 class interpreter;
 struct activation_record;
 
+class klass_instance;
+
 class _args
 {
 public:
@@ -84,6 +86,7 @@ public:
 	}
 
 	virtual std::any call(std::shared_ptr<interpreter> c, _args arguments) = 0;
+	virtual void safeCall(std::shared_ptr<interpreter> c, _args arguments, std::shared_ptr<klass_instance> result);
 
 	virtual std::string getSignature();
 	virtual std::string toDisplayString();

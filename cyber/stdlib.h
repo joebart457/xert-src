@@ -18,6 +18,12 @@ std::any clArgs_getdoubleoption(std::shared_ptr<interpreter> i, _args args);
 
 // Thread
 std::any thread_sleep(std::shared_ptr<interpreter> i, _args args);
+std::any thread_constructor(std::shared_ptr<interpreter> i, _args args);
+std::any thread_join(std::shared_ptr<interpreter> i, _args args);
+std::any thread_detach(std::shared_ptr<interpreter> i, _args args);
+std::any thread_get_id(std::shared_ptr<interpreter> i, _args args);
+std::any thread_joinable(std::shared_ptr<interpreter> i, _args args);
+
 
 // Time
 std::any time_timestamp(std::shared_ptr<interpreter> i, _args args);

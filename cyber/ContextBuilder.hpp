@@ -66,10 +66,62 @@ public:
         thread_ar->szAlias = "Thread";
         thread_ar->environment = std::make_shared<scope<std::any>>();
 
+        std::shared_ptr<activation_record> thread_safe_result_ar = std::make_shared<activation_record>();
+        thread_safe_result_ar->szAlias = "SafeResult";
+        thread_safe_result_ar->environment = std::make_shared<scope<std::any>>();
+
+        thread_safe_result_ar->environment->define("result", nullptr, true);
+        thread_safe_result_ar->environment->define("bHadError", false, true);
+        thread_safe_result_ar->environment->define("error", std::string(""), true);
+
+        thread_ar->environment->define("SafeResult",
+            std::make_shared<klass_definition>("SafeResult", thread_safe_result_ar),
+            true
+        );
 
         thread_ar->environment->define("Sleep",
             std::make_shared<native_fn>("Sleep", thread_sleep, thread_ar)
             ->registerParameter(BuildParameter<uint64_t>("milliseconds")),
+            true
+        );
+
+        thread_ar->environment->define("constructor",
+            std::make_shared<native_fn>("constructor", thread_constructor, thread_ar)
+            ->registerParameter(BuildParameter("", "callee"))
+            ->setVariadic()
+            ->setVariadicAfter(0),
+            true
+        );
+
+        thread_ar->environment->define("Join",
+            std::make_shared<native_fn>("Join", thread_join, thread_ar),
+            true
+        );
+
+        thread_ar->environment->define("Joinable",
+            std::make_shared<native_fn>("Joinable", thread_joinable, thread_ar)
+            ->returns<bool>(),
+            true
+        );
+
+        thread_ar->environment->define("Detach",
+            std::make_shared<native_fn>("Detach", thread_detach, thread_ar),
+            true
+        );
+
+        thread_ar->environment->define("GetId",
+            std::make_shared<native_fn>("GetId", thread_get_id, thread_ar)
+            ->returns<std::string>(),
+            true
+        );
+
+        thread_ar->environment->define("_err",
+            std::string(""),
+            true
+        );
+
+        thread_ar->environment->define("_bHadErr",
+            false,
             true
         );
 

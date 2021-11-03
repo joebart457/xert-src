@@ -125,6 +125,77 @@ std::any thread_sleep(std::shared_ptr<interpreter> i, _args args)
 	return nullptr;
 }
 
+std::any thread_constructor(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+
+	auto callee = Utilities().getCallable(args.at(0));
+	std::vector<std::any> remaining = args.size() > 1 ? args.subset(1) : std::vector<std::any>();
+
+	klass_instance sr = context->get<std::shared_ptr<klass_definition>>("SafeResult")->create();
+	context->define("SafeResult", sr, true, location());
+	std::shared_ptr<std::thread> th = std::make_shared<std::thread>(&callable::safeCall, callee, i, _args(remaining), std::make_shared<klass_instance>(sr));
+
+	context->define("__raw__",
+		th, false, location()
+	);
+	return nullptr;
+}
+
+
+std::any thread_join(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	std::shared_ptr<std::thread> th = context->get<std::shared_ptr<std::thread>>("__raw__");
+
+	if (th == nullptr) {
+		return false;
+	}
+
+	th->join();
+	return true;
+}
+
+std::any thread_joinable(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	std::shared_ptr<std::thread> th = context->get<std::shared_ptr<std::thread>>("__raw__");
+
+	if (th == nullptr) {
+		return false;
+	}
+
+	return th->joinable();
+}
+
+std::any thread_get_id(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	std::shared_ptr<std::thread> th = context->get<std::shared_ptr<std::thread>>("__raw__");
+
+	if (th == nullptr) {
+		return std::string("-1");
+	}
+	std::ostringstream oss;
+	oss << th->get_id();
+
+	return oss.str();
+}
+
+std::any thread_detach(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	std::shared_ptr<std::thread> th = context->get<std::shared_ptr<std::thread>>("__raw__");
+
+	if (th == nullptr) {
+		return false;
+	}
+
+	th->detach();
+	return true;
+}
+
+
 // Time
 
 std::any time_timestamp(std::shared_ptr<interpreter> i, _args args)
