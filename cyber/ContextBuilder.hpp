@@ -115,16 +115,6 @@ public:
             true
         );
 
-        thread_ar->environment->define("_err",
-            std::string(""),
-            true
-        );
-
-        thread_ar->environment->define("_bHadErr",
-            false,
-            true
-        );
-
         e->define("Thread",
             std::make_shared<klass_definition>("Thread", thread_ar),
             true

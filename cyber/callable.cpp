@@ -247,10 +247,10 @@ std::any unary_fn::call(std::shared_ptr<interpreter> c, _args args)
 }
 
 
-std::shared_ptr<callable> unary_fn::registerParameter(const param& p)
+std::shared_ptr<unary_fn> unary_fn::registerParameter(const param& p)
 {
 	m_param = p;
-	return std::static_pointer_cast<callable>(shared_from_this());
+	return std::static_pointer_cast<unary_fn>(shared_from_this());
 }
 
 std::string unary_fn::getSignature()

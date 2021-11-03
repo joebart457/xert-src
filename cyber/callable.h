@@ -90,15 +90,6 @@ public:
 
 	virtual std::string getSignature();
 	virtual std::string toDisplayString();
-		
-	template <class _Ty>
-	std::shared_ptr<callable> returns(const std::string& szName = "", const std::string& szCustomType = "")
-	{
-		m_retType.szCustomType = szCustomType;
-		m_retType.szNativeType = typeid(_Ty).name();
-		m_retType.szName = szName;
-		return shared_from_this();
-	}
 
 protected:
 	bool m_bMayThrow{ false };
@@ -135,6 +126,15 @@ public:
 		m_bMayThrow = true;
 		return std::static_pointer_cast<native_fn>(shared_from_this());
 	}
+
+	template <class _Ty>
+	std::shared_ptr<native_fn> returns(const std::string& szName = "", const std::string& szCustomType = "")
+	{
+		m_retType.szCustomType = szCustomType;
+		m_retType.szNativeType = typeid(_Ty).name();
+		m_retType.szName = szName;
+		return std::static_pointer_cast<native_fn>(shared_from_this());
+	}
 private:
 	func m_hFn;
 	std::shared_ptr<activation_record> m_enclosing{ nullptr };
@@ -167,6 +167,15 @@ public:
 		m_bMayThrow = true;
 		return std::static_pointer_cast<custom_fn>(shared_from_this());
 	}
+
+	template <class _Ty>
+	std::shared_ptr<custom_fn> returns(const std::string& szName = "", const std::string& szCustomType = "")
+	{
+		m_retType.szCustomType = szCustomType;
+		m_retType.szNativeType = typeid(_Ty).name();
+		m_retType.szName = szName;
+		return std::static_pointer_cast<custom_fn>(shared_from_this());
+	}
 private:
 	std::shared_ptr<activation_record> m_enclosing;
 	std::vector<std::shared_ptr<statement>> m_body;
@@ -187,12 +196,21 @@ public:
 	std::any call(std::shared_ptr<interpreter> c, _args args);
 
 
-	std::shared_ptr<callable> registerParameter(const param& p);
+	std::shared_ptr<unary_fn> registerParameter(const param& p);
 
 	virtual std::string getSignature();
 
 	std::shared_ptr<unary_fn> mayThrow() {
 		m_bMayThrow = true;
+		return std::static_pointer_cast<unary_fn>(shared_from_this());
+	}
+
+	template <class _Ty>
+	std::shared_ptr<unary_fn> returns(const std::string& szName = "", const std::string& szCustomType = "")
+	{
+		m_retType.szCustomType = szCustomType;
+		m_retType.szNativeType = typeid(_Ty).name();
+		m_retType.szName = szName;
 		return std::static_pointer_cast<unary_fn>(shared_from_this());
 	}
 
@@ -218,6 +236,15 @@ public:
 
 	std::shared_ptr<binary_fn> mayThrow() {
 		m_bMayThrow = true;
+		return std::static_pointer_cast<binary_fn>(shared_from_this());
+	}
+
+	template <class _Ty>
+	std::shared_ptr<binary_fn> returns(const std::string& szName = "", const std::string& szCustomType = "")
+	{
+		m_retType.szCustomType = szCustomType;
+		m_retType.szNativeType = typeid(_Ty).name();
+		m_retType.szName = szName;
 		return std::static_pointer_cast<binary_fn>(shared_from_this());
 	}
 private:
@@ -250,6 +277,15 @@ public:
 
 	std::shared_ptr<loaded_native_fn> mayThrow() {
 		m_bMayThrow = true;
+		return std::static_pointer_cast<loaded_native_fn>(shared_from_this());
+	}
+
+	template <class _Ty>
+	std::shared_ptr<loaded_native_fn> returns(const std::string& szName = "", const std::string& szCustomType = "")
+	{
+		m_retType.szCustomType = szCustomType;
+		m_retType.szNativeType = typeid(_Ty).name();
+		m_retType.szName = szName;
 		return std::static_pointer_cast<loaded_native_fn>(shared_from_this());
 	}
 private:
