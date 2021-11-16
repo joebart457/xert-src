@@ -282,6 +282,9 @@ std::string Utilities::getTypeString(std::any obj)
 	if (obj.type() == typeid(klass_instance)) {
 		return std::any_cast<klass_instance>(obj).getType();
 	}
+	if (obj.type() == typeid(std::shared_ptr<klass_definition>)) {
+		return std::any_cast<std::shared_ptr<klass_definition>>(obj)->getName();
+	}
 	return obj.type().name();
 }
 

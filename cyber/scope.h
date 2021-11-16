@@ -10,6 +10,7 @@
 #include <sstream>
 #include <any>
 #include <iostream>
+#include <mutex>
 #include "StringUtilities.h"
 
 template<typename T>
@@ -33,15 +34,22 @@ public:
 		m_lookup = lookup;
 	}
 
-	~scope() {}
+	~scope() 
+	{
+		m_lookup.clear();
+	}
 
 	bool exists_local(const std::string& szKey)
 	{
+		std::scoped_lock(m_mtx);
+
 		return m_lookup.count(szKey);
 	}
 
 	bool define(const std::string& szKey, _Ty val, bool overwrite = false)
 	{
+		std::scoped_lock(m_mtx);
+
 		if (overwrite) {
 			m_lookup[szKey] = val;
 			return true;
@@ -57,6 +65,8 @@ public:
 
 	bool remove(const std::string& szKey)
 	{
+		std::scoped_lock(m_mtx);
+
 		if (!exists_local(szKey)) {
 			return false;
 		}
@@ -68,6 +78,8 @@ public:
 
 	bool assign(const std::string& szKey, _Ty val)
 	{
+		std::scoped_lock(m_mtx);
+
 		if (exists_local(szKey)) {
 			m_lookup[szKey] = val;
 			return true;
@@ -77,6 +89,8 @@ public:
 
 	bool get(const std::string& szKey, _Ty& out)
 	{
+		std::scoped_lock(m_mtx);
+
 		if (exists_local(szKey)) {
 			out = m_lookup[szKey];
 			return true;
@@ -87,16 +101,22 @@ public:
 
 	unsigned int id() const
 	{
+		std::scoped_lock(m_mtx);
+
 		return m_id;
 	}
 
 	void set_id(unsigned int id)
 	{
+		std::scoped_lock(m_mtx);
+
 		m_id = id;
 	}
 
 	std::string toString(const std::string& exclude = "") const
 	{
+		std::scoped_lock(m_mtx);
+
 		std::ostringstream oss;
 		oss << "<" << (m_szAlias.empty() ? "scopeId" : m_szAlias) << ": " << m_id << "> {";
 		for (auto it = m_lookup.begin(); it != m_lookup.end(); ++it) {
@@ -115,6 +135,8 @@ public:
 
 	std::string toStringIndented(const std::string& exclude) const
 	{
+		std::scoped_lock(m_mtx);
+
 		std::ostringstream oss;
 		oss << "<" << (m_szAlias.empty() ? "scopeId" : m_szAlias) << ": " << m_id << "> {";
 		for (auto it = m_lookup.begin(); it != m_lookup.end(); ++it) {
@@ -133,6 +155,8 @@ public:
 
 	std::shared_ptr<scope<_Ty>> copy()
 	{
+		std::scoped_lock(m_mtx);
+
 		std::shared_ptr<scope<_Ty>> s = std::make_shared<scope<_Ty>>();
 		for (auto it = m_lookup.begin(); it != m_lookup.end(); it++) {
 			s->define(it->first, it->second, true);
@@ -141,12 +165,18 @@ public:
 	}
 
 
-	std::map<std::string, _Ty>* lookup() { return &m_lookup; }
+	std::map<std::string, _Ty>* lookup() 
+	{ 
+		std::scoped_lock(m_mtx);
+
+		return &m_lookup; 
+	}
 
 private:
 	std::string m_szAlias{ "" };
 	unsigned int m_id{ 0 };
 	std::map<std::string, _Ty> m_lookup;
+	std::mutex m_mtx;
 };
 
 #endif

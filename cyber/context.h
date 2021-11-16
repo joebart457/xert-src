@@ -39,7 +39,11 @@ public:
 			m_opHandler = std::make_shared<operator_handler>();
 		}
 	}
-	~execution_context() {}
+	execution_context(){}
+	~execution_context() 
+	{
+		m_records.clear();
+	}
 
 	void push_ar(std::string szAlias = "")
 	{
@@ -328,6 +332,15 @@ public:
 			return defaultValue;
 		}
 		return std::any_cast<Ty>(out);
+	}
+
+	std::shared_ptr<execution_context> spawn_for_thread()
+	{
+		std::shared_ptr<execution_context> context = std::make_shared<execution_context>();
+		context->m_index = m_index;
+		context->m_opHandler = m_opHandler;
+		context->m_records = m_records;
+		return context;
 	}
 
 private:

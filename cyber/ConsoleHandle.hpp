@@ -9,7 +9,10 @@
 #include "BuildDefinitions.hpp"
 
 #ifdef BUILD_WINDOWS
-#include <Windows.h>
+#if !defined(NOMINMAX)
+#define NOMINMAX
+#endif
+#include <windows.h>
 #endif
 
 class ConsoleHandle {
@@ -54,7 +57,7 @@ public:
 	}
 
 	static void ResetOutputColor() {
-		SetOutputColor(LIGHTGRAY | BLACK_B);
+		SetOutputColor(C_LIGHTGRAY | C_BLACK_B);
 	}
 
 	static void SetCursorPosition(int16_t x, int16_t y) {

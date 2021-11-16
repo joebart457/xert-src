@@ -33,6 +33,14 @@ void interpreter::Validate()
 	}
 }
 
+
+std::shared_ptr<interpreter> interpreter::spawn_for_thread()
+{
+	// TODO: sharing parser and tokenizer WILL be problematic with imports
+	std::shared_ptr<interpreter> interp = std::make_shared<interpreter>(m_context->spawn_for_thread(), m_tokenizer, m_parser); 
+	return interp;
+}
+
 void interpreter::CompleteImport(const std::string& szFile, const location& loc)
 {
 	std::scoped_lock(m_mutex);
@@ -161,7 +169,8 @@ void interpreter::acceptFunctionDeclaration(std::shared_ptr<function_declaration
 	m_context->define(func_decl->m_szName, 
 		std::make_shared<custom_fn>(func_decl->m_szName, func_decl->m_returnType, m_context->current_ar(), func_decl->m_body->m_statements, func_decl->m_params, func_decl->m_loc), 
 		false,
-		func_decl->m_loc);
+		func_decl->m_loc
+	);
 }
 
 
@@ -672,7 +681,7 @@ std::any interpreter::acceptListInitializer(std::shared_ptr<list_initializer> ex
 std::any interpreter::acceptObjectLiteral(std::shared_ptr<object_literal> obj_lit)
 {
 	std::scoped_lock(m_mutex);
-
+	
 	std::shared_ptr<activation_record> env = acceptBlock_KeepEnvironment(std::make_shared<block>(obj_lit->statements, obj_lit->getLocation()));
 
 	return klass_instance("klass_instance", "", env);
@@ -706,11 +715,17 @@ std::any interpreter::assert_or_convert_type(const param& p, std::any obj, const
 	else {
 		// We are looking for a custom type
 		if (p.szNativeType == typeid(klass_instance).name()) {
-			klass_instance instance = std::any_cast<klass_instance>(obj);
-			if (instance.getType() == p.szCustomType) {
-				return obj;
+			try {
+				klass_instance instance = std::any_cast<klass_instance>(obj);
+				if (instance.getType() == p.szCustomType) {
+					return obj;
+				}
+				throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "Type mismatch " + Utilities().getTypeString(obj) + " != " + p.szCustomType, Severity().MEDIUM(), loc);
 			}
-			throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "Type mismatch " + Utilities().getTypeString(obj) + " != " + p.szCustomType, Severity().MEDIUM(), loc);
+			catch (std::bad_any_cast) {
+				throw ExceptionBuilder().Build(ExceptionTypes().SYSTEM(), "Type mismatch " + Utilities().getTypeString(obj) + " != " + p.szCustomType, Severity().MEDIUM(), loc);
+
+			}
 		}
 		throw ExceptionBuilder().Build(ExceptionTypes().NOT_SUPPORTED(), "Custom typing with native type: " + p.szNativeType + " is not supported.", Severity().CRITICAL(), loc);
 	}

@@ -31,4 +31,16 @@ std::any win_GetWindowSize(std::shared_ptr<interpreter> i, _args args);
 std::any win_SetTitle(std::shared_ptr<interpreter> i, _args args);
 std::any win_SetWindowSize(std::shared_ptr<interpreter> i, _args args);
 
+// View
+
+std::any win_view_contructor(std::shared_ptr<interpreter> i, _args args);
+std::any win_view_contruct(std::shared_ptr<interpreter> i, _args args);
+std::any win_view_start(std::shared_ptr<interpreter> i, _args args);
+std::any win_view_DrawStringDecal(std::shared_ptr<interpreter> i, _args args);
+std::any win_view_FillRect(std::shared_ptr<interpreter> i, _args args);
+
+std::any win_view_vf2d(std::shared_ptr<interpreter> i, _args args);
+std::any win_view_vi2d(std::shared_ptr<interpreter> i, _args args);
+std::any win_view_pixel(std::shared_ptr<interpreter> i, _args args);
+
 #endif

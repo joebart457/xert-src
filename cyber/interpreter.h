@@ -67,6 +67,8 @@ public:
 
 	void FlushImports();
 	void FlushImport(const std::string& szFile);
+
+	std::shared_ptr<interpreter> spawn_for_thread();
 private:
 
 	void CompleteImport(const std::string& szFile, const location& loc);

@@ -205,6 +205,9 @@
     <ClInclude Include="tokenizer.hpp" />
     <ClInclude Include="FileHandle.hpp" />
     <ClInclude Include="Utilities.h" />
+    <ClInclude Include="video_output.hpp" />
+    <ClInclude Include="vo_interface.hpp" />
+    <ClInclude Include="vo_transformed_view.hpp" />
     <ClInclude Include="win_std_lib.h" />
   </ItemGroup>
   <ItemGroup>

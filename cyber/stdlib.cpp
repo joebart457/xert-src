@@ -134,12 +134,16 @@ std::any thread_constructor(std::shared_ptr<interpreter> i, _args args)
 
 	klass_instance sr = context->get<std::shared_ptr<klass_definition>>("SafeResult")->create();
 	context->define("SafeResult", sr, true, location());
-	std::shared_ptr<std::thread> th = std::make_shared<std::thread>(&callable::safeCall, callee, i, _args(remaining), std::make_shared<klass_instance>(sr));
-
-	context->define("__raw__",
-		th, false, location()
-	);
-	return nullptr;
+	try {
+		std::shared_ptr<std::thread> th = std::make_shared<std::thread>(&callable::safeCall, callee, i->spawn_for_thread(), _args(remaining), std::make_shared<klass_instance>(sr));
+		context->define("__raw__",
+			th, false, location()
+		);
+		return nullptr;
+	}
+	catch (std::system_error se) {
+		throw ExceptionBuilder().Build(ExceptionTypes().SYSTEM(), "unable to create new thread", Severity().MEDIUM());
+	}
 }
 
 
@@ -192,6 +196,19 @@ std::any thread_detach(std::shared_ptr<interpreter> i, _args args)
 	}
 
 	th->detach();
+	return true;
+}
+
+std::any thread_reset(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+	std::shared_ptr<std::thread> th = context->get<std::shared_ptr<std::thread>>("__raw__");
+
+	if (th == nullptr) {
+		return false;
+	}
+
+	th.reset();
 	return true;
 }
 
@@ -287,6 +304,31 @@ std::any list_push(std::shared_ptr<interpreter> i, _args args)
 
 	raw->push_back(args.at(0));
 	return nullptr;
+}
+
+std::any list_clear(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+
+	auto raw = context->get<std::shared_ptr<std::vector<std::any>>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	raw->clear();
+	return nullptr;
+}
+
+std::any list_empty(std::shared_ptr<interpreter> i, _args args)
+{
+	std::shared_ptr<execution_context> context = Utilities().fetch_context(i);
+
+	auto raw = context->get<std::shared_ptr<std::vector<std::any>>>("__raw__");
+	if (raw == nullptr) {
+		throw ExceptionBuilder().Build(ExceptionTypes().TYPE_MISMATCH(), "__raw__ was nullptr", Severity().HIGH());
+	}
+
+	return raw->empty();
 }
 
 std::any list_remove(std::shared_ptr<interpreter> i, _args args)
@@ -391,6 +433,13 @@ std::any print(std::shared_ptr<interpreter> i, _args args)
 std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs)
 {
 	return Utilities().stringify(rhs);
+}
+
+std::any help(std::shared_ptr<interpreter> i, std::any& rhs)
+{
+	auto callee = Utilities().getCallable(rhs);
+	std::cout << callee->toHelpString() << std::endl;
+	return nullptr;
 }
 
 // Null

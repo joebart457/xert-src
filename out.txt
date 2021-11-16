@@ -1,1 +1,5 @@
 	modified:   ContextBuilder.hpp
+	modified:   win_std_lib.h
+	video_output.hpp
+	vo_interface.hpp
+	vo_transformed_view.hpp

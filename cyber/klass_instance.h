@@ -194,6 +194,11 @@ public:
 		return "class " + m_szName + " :r" + std::to_string(m_refIndex);
 	}
 
+	std::string getName()
+	{
+		return m_szName;
+	}
+
 	std::shared_ptr<activation_record> ar()
 	{
 		return m_ar;

@@ -161,5 +161,14 @@
     <ClInclude Include="clArgs.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="video_output.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vo_transformed_view.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vo_interface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

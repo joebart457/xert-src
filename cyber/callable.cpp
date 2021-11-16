@@ -10,20 +10,39 @@
 #include "Utilities.h"
 #include "klass_instance.h"
 
-void callable::safeCall(std::shared_ptr<interpreter> c, _args arguments, std::shared_ptr<klass_instance> result)
+bool callable::safeCall(std::shared_ptr<interpreter> c, _args arguments, std::shared_ptr<klass_instance> result)
 {
+	std::scoped_lock(m_mtx);
+
 	try {
-		result->Define("result", call(c, arguments), location(), true);
-		result->Define("bHadError", false, location(), true);
-		result->Define("error", std::string(""), location(), true);
+		std::any ret = call(c, arguments);
+		if (result != nullptr) {
+			result->Define("result", ret, location(), true);
+			result->Define("bHadError", false, location(), true);
+			result->Define("error", std::string(""), location(), true);
+		}
+		return true;
 	}
 	catch (PanicException pe) {
-		result->Define("bHadError", true, location(), true);
-		result->Define("error", pe.fullTrace(), location(), true);
+		if (result != nullptr) {
+			result->Define("bHadError", true, location(), true);
+			result->Define("error", pe.fullTrace(), location(), true);
+		}
+		return false;
 	}
 	catch (ProgramException pe) {
-		result->Define("bHadError", true, location(), true);
-		result->Define("error", pe.fullTrace(), location(), true);
+		if (result != nullptr) {
+			result->Define("bHadError", true, location(), true);
+			result->Define("error", pe.fullTrace(), location(), true);
+		}
+		return false;
+	}
+	catch (std::exception e) {
+		if (result != nullptr) {
+			result->Define("bHadError", true, location(), true);
+			result->Define("error", std::string(e.what()), location(), true);
+		}
+		return false;
 	}
 }
 
@@ -51,7 +70,21 @@ std::string callable::toDisplayString()
 	return oss.str();
 }
 
+std::string callable::toHelpString()
+{
+	std::ostringstream oss;
+	oss << m_szName << "(";
 
+	if (m_params.size() >= 1) {
+		oss << (m_params.at(0).szCustomType.empty() ? m_params.at(0).szNativeType : m_params.at(0).szCustomType) << " " << m_params.at(0).szName;
+	}
+
+	for (unsigned int i{ 1 }; i < m_params.size(); i++) {
+		oss << "," << (m_params.at(i).szCustomType.empty() ? m_params.at(i).szNativeType : m_params.at(i).szCustomType) << " " << m_params.at(i).szName;
+	}
+	oss << ")" << "->" << m_retType.szNativeType << (m_retType.szCustomType.empty() ? "" : ":") << m_retType.szCustomType;
+	return oss.str();
+}
 
 std::any native_fn::call(std::shared_ptr<interpreter> c, _args args)
 {
@@ -250,6 +283,7 @@ std::any unary_fn::call(std::shared_ptr<interpreter> c, _args args)
 std::shared_ptr<unary_fn> unary_fn::registerParameter(const param& p)
 {
 	m_param = p;
+	m_params = { p }; // strictly for display purposes when printing to console
 	return std::static_pointer_cast<unary_fn>(shared_from_this());
 }
 

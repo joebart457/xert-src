@@ -29,6 +29,7 @@
 
 #ifdef BUILD_WINDOWS
 #include "win_std_lib.h"
+#include "video_output.hpp"
 #endif
 
 
@@ -58,6 +59,13 @@ public:
 			std::make_shared<unary_fn>("typeof", type_of_any)
 			->registerParameter(BuildParameter("")),
 			true
+        );
+
+        e->define("help",
+            std::make_shared<unary_fn>("help", help)
+            ->registerParameter(BuildParameter("", "function_to_display"))
+            ->returns<std::nullptr_t>(),
+            true
         );
 
         // Thread
@@ -112,6 +120,11 @@ public:
         thread_ar->environment->define("GetId",
             std::make_shared<native_fn>("GetId", thread_get_id, thread_ar)
             ->returns<std::string>(),
+            true
+        );
+
+        thread_ar->environment->define("Reset",
+            std::make_shared<native_fn>("Reset", thread_reset, thread_ar),
             true
         );
 
@@ -251,37 +264,37 @@ public:
         colors_env_ar->szAlias = "Colors";
         colors_env_ar->environment = std::make_shared<scope<std::any>>();
 
-        colors_env_ar->environment->define("BLACK", BLACK, true);
-        colors_env_ar->environment->define("BLUE", BLUE, true);
-        colors_env_ar->environment->define("GREEN", GREEN, true);
-        colors_env_ar->environment->define("CYAN", CYAN, true);
-        colors_env_ar->environment->define("RED", RED, true);
-        colors_env_ar->environment->define("MAGENTA", MAGENTA, true);
-        colors_env_ar->environment->define("BROWN", BROWN, true);
-        colors_env_ar->environment->define("LIGHTGRAY", LIGHTGRAY, true);
-        colors_env_ar->environment->define("DARKGRAY", DARKGRAY, true);
-        colors_env_ar->environment->define("LIGHTBLUE", LIGHTBLUE, true);
-        colors_env_ar->environment->define("LIGHTCYAN", LIGHTCYAN, true);
-        colors_env_ar->environment->define("LIGHTRED", LIGHTRED, true);
-        colors_env_ar->environment->define("LIGHTMAGENTA", LIGHTMAGENTA, true);
-        colors_env_ar->environment->define("YELLOW", YELLOW, true);
-        colors_env_ar->environment->define("WHITE", WHITE, true);
+        colors_env_ar->environment->define("BLACK", C_BLACK, true);
+        colors_env_ar->environment->define("BLUE", C_BLUE, true);
+        colors_env_ar->environment->define("GREEN", C_GREEN, true);
+        colors_env_ar->environment->define("CYAN", C_CYAN, true);
+        colors_env_ar->environment->define("RED", C_RED, true);
+        colors_env_ar->environment->define("MAGENTA", C_MAGENTA, true);
+        colors_env_ar->environment->define("BROWN", C_BROWN, true);
+        colors_env_ar->environment->define("LIGHTGRAY", C_LIGHTGRAY, true);
+        colors_env_ar->environment->define("DARKGRAY", C_DARKGRAY, true);
+        colors_env_ar->environment->define("LIGHTBLUE", C_LIGHTBLUE, true);
+        colors_env_ar->environment->define("LIGHTCYAN", C_LIGHTCYAN, true);
+        colors_env_ar->environment->define("LIGHTRED", C_LIGHTRED, true);
+        colors_env_ar->environment->define("LIGHTMAGENTA", C_LIGHTMAGENTA, true);
+        colors_env_ar->environment->define("YELLOW", C_YELLOW, true);
+        colors_env_ar->environment->define("WHITE", C_WHITE, true);
         
-        colors_env_ar->environment->define("BLACK_B", BLACK_B, true);
-        colors_env_ar->environment->define("BLUE_B", BLUE_B, true);
-        colors_env_ar->environment->define("GREEN_B", GREEN_B, true);
-        colors_env_ar->environment->define("CYAN_B", CYAN_B, true);
-        colors_env_ar->environment->define("RED_B", RED_B, true);
-        colors_env_ar->environment->define("MAGENTA_B", MAGENTA_B, true);
-        colors_env_ar->environment->define("BROWN_B", BROWN_B, true);
-        colors_env_ar->environment->define("LIGHTGRAY_B", LIGHTGRAY_B, true);
-        colors_env_ar->environment->define("DARKGRAY_B", DARKGRAY_B, true);
-        colors_env_ar->environment->define("LIGHTBLUE_B", LIGHTBLUE_B, true);
-        colors_env_ar->environment->define("LIGHTCYAN_B", LIGHTCYAN_B, true);
-        colors_env_ar->environment->define("LIGHTRED_B", LIGHTRED_B, true);
-        colors_env_ar->environment->define("LIGHTMAGENTA_B", LIGHTMAGENTA_B, true);
-        colors_env_ar->environment->define("YELLOW_B", YELLOW_B, true);
-        colors_env_ar->environment->define("WHITE_B", WHITE_B, true);
+        colors_env_ar->environment->define("BLACK_B", C_BLACK_B, true);
+        colors_env_ar->environment->define("BLUE_B", C_BLUE_B, true);
+        colors_env_ar->environment->define("GREEN_B", C_GREEN_B, true);
+        colors_env_ar->environment->define("CYAN_B", C_CYAN_B, true);
+        colors_env_ar->environment->define("RED_B", C_RED_B, true);
+        colors_env_ar->environment->define("MAGENTA_B", C_MAGENTA_B, true);
+        colors_env_ar->environment->define("BROWN_B", C_BROWN_B, true);
+        colors_env_ar->environment->define("LIGHTGRAY_B", C_LIGHTGRAY_B, true);
+        colors_env_ar->environment->define("DARKGRAY_B", C_DARKGRAY_B, true);
+        colors_env_ar->environment->define("LIGHTBLUE_B", C_LIGHTBLUE_B, true);
+        colors_env_ar->environment->define("LIGHTCYAN_B", C_LIGHTCYAN_B, true);
+        colors_env_ar->environment->define("LIGHTRED_B", C_LIGHTRED_B, true);
+        colors_env_ar->environment->define("LIGHTMAGENTA_B", C_LIGHTMAGENTA_B, true);
+        colors_env_ar->environment->define("YELLOW_B", C_YELLOW_B, true);
+        colors_env_ar->environment->define("WHITE_B", C_WHITE_B, true);
 
         e->define("Colors",
             std::make_shared<klass_definition>("Colors", colors_env_ar),
@@ -396,6 +409,82 @@ public:
             true
         );
 
+
+        std::shared_ptr<activation_record> view_ar = std::make_shared<activation_record>();
+        view_ar->szAlias = "View";
+        view_ar->environment = std::make_shared<scope<std::any>>();
+
+        view_ar->environment->define("constructor",
+            std::make_shared<native_fn>("constructor", win_view_contructor)
+            ->registerParameter(BuildParameter("", "onUserUpdate"))
+        );
+
+        view_ar->environment->define("Construct",
+            std::make_shared<native_fn>("Construct", win_view_contruct)
+            ->registerParameter(BuildParameter<int32_t>("w"))
+            ->registerParameter(BuildParameter<int32_t>("h"))
+            ->registerParameter(BuildParameter<int32_t>("pixel_w"))
+            ->registerParameter(BuildParameter<int32_t>("pixel_h"))
+            ->registerParameter(BuildParameter<bool>("fullscreen"))
+            ->registerParameter(BuildParameter<bool>("vsync"))
+            ->registerParameter(BuildParameter<bool>("cohesion"))
+            ->returns<bool>()
+        );
+
+        view_ar->environment->define("Start",
+            std::make_shared<native_fn>("Start", win_view_start)
+            ->returns<bool>()
+        );
+
+        view_ar->environment->define("DrawStringDecal",
+            std::make_shared<native_fn>("DrawStringDecal", win_view_DrawStringDecal)
+            ->registerParameter(BuildParameter<float>("x"))
+            ->registerParameter(BuildParameter<float>("y"))
+            ->registerParameter(BuildParameter<std::string>("str"))
+            ->registerParameter(BuildParameter<olc::Pixel>("color"))
+            ->registerParameter(BuildParameter<float>("scale_x"))
+            ->registerParameter(BuildParameter<float>("scale_y"))
+            ->returns<std::nullptr_t>()
+        );
+
+
+        view_ar->environment->define("vf2d",
+            std::make_shared<native_fn>("vf2d", win_view_vf2d)
+            ->registerParameter(BuildParameter<float>("x"))
+            ->registerParameter(BuildParameter<float>("y"))
+            ->returns<olc::vf2d>()
+        );
+
+        view_ar->environment->define("vi2d",
+            std::make_shared<native_fn>("vi2d", win_view_vi2d)
+            ->registerParameter(BuildParameter<int32_t>("x"))
+            ->registerParameter(BuildParameter<int32_t>("y"))
+            ->returns<olc::vi2d>()
+        );
+
+        view_ar->environment->define("Pixel",
+            std::make_shared<native_fn>("Pixel", win_view_pixel)
+            ->registerParameter(BuildParameter<uint8_t>("r"))
+            ->registerParameter(BuildParameter<uint8_t>("g"))
+            ->registerParameter(BuildParameter<uint8_t>("b"))
+            ->registerParameter(BuildParameter<uint8_t>("a"))
+            ->returns<olc::Pixel>()
+        );
+
+        view_ar->environment->define("FillRect",
+            std::make_shared<native_fn>("FillRect", win_view_FillRect)
+            ->registerParameter(BuildParameter<olc::vf2d>("pos"))
+            ->registerParameter(BuildParameter<olc::vf2d>("size"))
+            ->registerParameter(BuildParameter<olc::Pixel>("color"))
+            ->returns<std::nullptr_t>()
+
+        );
+
+        e->define("View",
+            std::make_shared<klass_definition>("View", view_ar), true);
+
+        
+
         /* End Windows */
 #endif
 
@@ -482,6 +571,15 @@ public:
 		list_env_ar->environment->define("push",
 			std::make_shared<native_fn>("push", list_push, list_env_ar)
             ->registerParameter(BuildParameter("", "object"))
+        );
+
+        list_env_ar->environment->define("clear",
+            std::make_shared<native_fn>("clear", list_clear, list_env_ar)
+        );
+
+        list_env_ar->environment->define("empty",
+            std::make_shared<native_fn>("empty", list_empty, list_env_ar)
+            ->returns<bool>()
         );
 
         list_env_ar->environment->define("remove",
@@ -1151,7 +1249,7 @@ public:
 
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_map_string)
-            ->registerParameter(BuildParameter<klass_definition>("", "map"))
+            ->registerParameter(BuildParameter<klass_instance>("", "map"))
             ->registerParameter(BuildParameter<std::string>())
         );
 
@@ -1159,49 +1257,49 @@ public:
 
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_list_int8_t)
-            ->registerParameter(BuildParameter<klass_definition>("", "list"))
+            ->registerParameter(BuildParameter<klass_instance>("", "list"))
             ->registerParameter(BuildParameter<int8_t>())
         );
 
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_list_int16_t)
-            ->registerParameter(BuildParameter<klass_definition>("", "list"))
+            ->registerParameter(BuildParameter<klass_instance>("", "list"))
             ->registerParameter(BuildParameter<int16_t>())
         );
 
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_list_int32_t)
-            ->registerParameter(BuildParameter<klass_definition>("", "list"))
+            ->registerParameter(BuildParameter<klass_instance>("", "list"))
             ->registerParameter(BuildParameter<int32_t>())
         );
 
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_list_int64_t)
-            ->registerParameter(BuildParameter<klass_definition>("", "list"))
+            ->registerParameter(BuildParameter<klass_instance>("", "list"))
             ->registerParameter(BuildParameter<int64_t>())
         );
 
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_list_uint8_t)
-            ->registerParameter(BuildParameter<klass_definition>("", "list"))
+            ->registerParameter(BuildParameter<klass_instance>("", "list"))
             ->registerParameter(BuildParameter<uint8_t>())
         );
 
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_list_uint16_t)
-            ->registerParameter(BuildParameter<klass_definition>("", "list"))
+            ->registerParameter(BuildParameter<klass_instance>("", "list"))
             ->registerParameter(BuildParameter<uint16_t>())
         );
 
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_list_uint32_t)
-            ->registerParameter(BuildParameter<klass_definition>("", "list"))
+            ->registerParameter(BuildParameter<klass_instance>("", "list"))
             ->registerParameter(BuildParameter<uint32_t>())
         );
 
         opHandler->registerOperator(
             std::make_shared<binary_fn>("[", index_list_uint64_t)
-            ->registerParameter(BuildParameter<klass_definition>("", "list"))
+            ->registerParameter(BuildParameter<klass_instance>("", "list"))
             ->registerParameter(BuildParameter<uint64_t>())
         );
 

@@ -86,10 +86,11 @@ public:
 	}
 
 	virtual std::any call(std::shared_ptr<interpreter> c, _args arguments) = 0;
-	virtual void safeCall(std::shared_ptr<interpreter> c, _args arguments, std::shared_ptr<klass_instance> result);
+	virtual bool safeCall(std::shared_ptr<interpreter> c, _args arguments, std::shared_ptr<klass_instance> result);
 
 	virtual std::string getSignature();
 	virtual std::string toDisplayString();
+	virtual std::string toHelpString();
 
 protected:
 	bool m_bMayThrow{ false };
@@ -105,7 +106,7 @@ typedef std::any(*func)(std::shared_ptr<interpreter>, _args);
 class native_fn :
 	public callable {
 public:
-	native_fn(std::string szName, func fn, std::shared_ptr<activation_record> enclosing = nullptr)
+	native_fn(const std::string& szName, func fn, std::shared_ptr<activation_record> enclosing = nullptr)
 		:callable(szName), m_hFn{ fn }, m_enclosing{ enclosing } {}
 	native_fn(native_fn& fn)
 		:callable(fn.m_szName, fn.m_params), m_hFn{ fn.m_hFn }, m_enclosing{ fn.m_enclosing }, m_variadic{ fn.m_variadic }, m_variadic_after{ fn.m_variadic_after } 

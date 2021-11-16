@@ -23,7 +23,7 @@ std::any thread_join(std::shared_ptr<interpreter> i, _args args);
 std::any thread_detach(std::shared_ptr<interpreter> i, _args args);
 std::any thread_get_id(std::shared_ptr<interpreter> i, _args args);
 std::any thread_joinable(std::shared_ptr<interpreter> i, _args args);
-
+std::any thread_reset(std::shared_ptr<interpreter> i, _args args);
 
 // Time
 std::any time_timestamp(std::shared_ptr<interpreter> i, _args args);
@@ -38,6 +38,8 @@ std::any db_run_prepared_query(std::shared_ptr<interpreter> i, _args args);
 
 // List methods
 std::any list_push(std::shared_ptr<interpreter> i, _args args);
+std::any list_clear(std::shared_ptr<interpreter> i, _args args);
+std::any list_empty(std::shared_ptr<interpreter> i, _args args);
 std::any list_remove(std::shared_ptr<interpreter> i, _args args);
 std::any list_size(std::shared_ptr<interpreter> i, _args args);
 std::any list_constructor(std::shared_ptr<interpreter> i, _args args);
@@ -53,6 +55,7 @@ std::any map_exists(std::shared_ptr<interpreter> i, _args args);
 // stdlib
 std::any print(std::shared_ptr<interpreter> i, _args args);
 std::any to_string(std::shared_ptr<interpreter> i, std::any& rhs);
+std::any help(std::shared_ptr<interpreter> i, std::any& rhs);
 
 // Null
 std::any null_isNullType(std::shared_ptr<interpreter> i, _args args);
